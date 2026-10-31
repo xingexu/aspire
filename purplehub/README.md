@@ -25,7 +25,7 @@ computer, and fills it with demo accounts. It leaves any other PostgreSQL alone.
 | Home | `#week` | Everyone | Upcoming and past events, with search, sort by club and category |
 | Messages | `#messages` | Signed in | Conversations with the USC and clubs, with unread counts and live delivery |
 | For clubs | `#clubs` | Club presidents | Add a post, apply for funding, and see the USC's answers |
-| USC dashboard | `#usc` | USC staff | Funding applications and posts to approve or decline, and totals |
+| Management | `#usc` | USC staff | Funding applications and posts to approve or decline, and totals |
 
 ## How it fits together
 

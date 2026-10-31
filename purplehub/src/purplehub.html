@@ -283,6 +283,7 @@ dialog.tour::backdrop{background:transparent}
 .dd-menu [aria-selected="true"]{font-weight:750}
 .new-chat .dd-btn{height:2.75rem;font-size:0.9375rem}
 /* happening today */
+.funded-tag{justify-self:start;display:inline-flex;align-items:center;width:max-content;padding:0.3125rem 0.75rem;border-radius:999px;background:linear-gradient(135deg,#4F2683,#7A45BE);color:#FFF;font-size:0.8125rem;font-weight:750;letter-spacing:.01em;box-shadow:0 4px 12px rgb(79 38 131 / .3)}
 .today-sec{display:grid;gap:1rem}
 .sec-title{font-size:clamp(1.75rem,3.4vw,2.75rem);margin:0}
 .up-sec{display:grid;gap:1rem}
@@ -421,14 +422,14 @@ dialog.sheet[open]::backdrop{opacity:1}
       <a href="#week" aria-label="Home"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span class="lab-long">Home</span><span class="lab-short">Home</span></a>
       <a href="#messages" aria-label="Messages"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span class="lab-long">Messages</span><span class="lab-short">Messages</span><span class="unread tab-badge" id="msg-badge" data-testid="msg-badge" hidden></span></a>
       <a href="#clubs" aria-label="For clubs"><span class="lab-long">For clubs</span><span class="lab-short">Clubs</span></a>
-      <a href="#usc" aria-label="USC dashboard"><span class="lab-long">USC dashboard</span><span class="lab-short">USC</span></a>
+      <a href="#usc" aria-label="Management"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h7M15 17h5"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="13" cy="17" r="2"/></g></svg><span class="lab-long">Management</span><span class="lab-short">Management</span></a>
     </nav>
 </div>
 
 <main class="wrap">
   <section class="view" id="view-week" data-view="week" aria-label="Upcoming events"></section>
   <section class="view" id="view-clubs" data-view="clubs" aria-label="For clubs" hidden></section>
-  <section class="view" id="view-usc" data-view="usc" aria-label="USC dashboard" hidden></section>
+  <section class="view" id="view-usc" data-view="usc" aria-label="Management" hidden></section>
   <section class="view" id="view-messages" data-view="messages" aria-label="Messages" hidden></section>
 
 </main>
@@ -552,7 +553,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (!r.ok) throw new Error(j.error || 'Something went wrong. Please try again.');
     return j;
   }
-  let D = { user: null, posts: [], mine: [], requests: [], funding: [], threads: [] };
+  let D = { funded: [], user: null, posts: [], mine: [], requests: [], funding: [], threads: [] };
   const UI = { q: '', club: 'All', cat: 'All', thread: null, draftInbox: null };
   const unreadTotal = () => D.threads.reduce((t, x) => t + x.unread, 0);
   // Reloads everything this person may see. New messages arrive here too, pushed by the stream below.
@@ -635,6 +636,8 @@ dialog.sheet[open]::backdrop{opacity:1}
   });
 
   /* ---------- home: happening today, upcoming and past events ---------- */
+  const isFunded = (e) => (D.funded || []).some((f) => f.club === e.club && f.event === e.title);
+  const fundedTag = (e) => (isFunded(e) ? '<span class="funded-tag" data-testid="funded-' + e.id + '">USC funded</span>' : '');
   function mediaHTML(e, c) {
     const alt = 'Picture of ' + esc(c.short) + '’s post for ' + esc(e.title) + '.';
     if (shot(e)) {
@@ -646,7 +649,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function posterHTML(e) {
     const c = CLUBS[e.club];
     return '<article class="poster" data-testid="event-' + e.id + '">' + mediaHTML(e, c) +
-      '<div class="poster-body"><p class="club-line">' + esc(c.name) + '</p><h3 class="poster-title">' + esc(e.title) + '</h3>' +
+      '<div class="poster-body"><p class="club-line">' + esc(c.name) + '</p><h3 class="poster-title">' + esc(e.title) + '</h3>' + fundedTag(e) +
       '<p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
   }
   function matches(e) {
@@ -660,7 +663,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function todayHTML(e) {
     const c = CLUBS[e.club];
     return '<article class="poster today-card" data-testid="event-' + e.id + '">' + mediaHTML(e, c) +
-      '<div class="today-body"><p class="today-badge"><span class="live-dot" aria-hidden="true"></span>On today</p><p class="club-line">' + esc(c.name) + '</p><h3 class="today-title">' + esc(e.title) + '</h3><p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
+      '<div class="today-body"><p class="today-badge"><span class="live-dot" aria-hidden="true"></span>On today</p><p class="club-line">' + esc(c.name) + '</p><h3 class="today-title">' + esc(e.title) + '</h3>' + fundedTag(e) + '<p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
   }
   function renderLists() {
     const today = EVENTS.filter(isToday).filter(matches);
@@ -671,7 +674,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     $('#feed').innerHTML = up.map(posterHTML).join('') || '<p class="empty">No upcoming events match that.</p>';
     $('#past-grid').innerHTML = past.map((e) => {
       const inner = (shot(e) ? '<img class="past-shot" src="' + shot(e) + '" alt="">' : '<span class="past-shot"></span>') +
-        '<span class="past-date">' + esc(e.date) + '</span><span class="past-title">' + esc(e.title) + '</span><span class="past-meta">' + esc(e.hosts || CLUBS[e.club].short) + '</span>';
+        '<span class="past-date">' + esc(e.date) + '</span><span class="past-title">' + esc(e.title) + '</span>' + fundedTag(e) + '<span class="past-meta">' + esc(e.hosts || CLUBS[e.club].short) + '</span>';
       return e.post ? '<a class="past-card" data-testid="past-' + e.id + '" href="' + e.post + '" target="_blank" rel="noopener" aria-label="' + esc(e.title) + ', ' + esc(e.date) + '. Open on Instagram">' + inner + '</a>' : '<div class="past-card" data-testid="past-' + e.id + '">' + inner + '</div>';
     }).join('') || '<p class="empty">No past events match that.</p>';
   }
@@ -738,7 +741,7 @@ dialog.sheet[open]::backdrop{opacity:1}
       budgetHTML({ items: f.items, amount: x.total || f.amount }) + (others ? '<p class="small muted">Other funding: ' + money(others) + ' (club ' + money(o.club || 0) + ', tickets ' + money(o.tickets || 0) + ', sponsors ' + money(o.sponsors || 0) + ')</p>' : '') + decision + '</div></article>';
   }
   function renderUSC() {
-    if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'USC dashboard'); return; }
+    if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'Management'); return; }
     const openPosts = D.requests.filter((p) => p.status === 'pending'), openFund = D.funding.filter((f) => f.status === 'pending');
     const donePosts = D.requests.filter((p) => p.status !== 'pending'), doneFund = D.funding.filter((f) => f.status !== 'pending');
     const sum = (st) => D.funding.reduce((t, f) => t + (f.status === st ? (st === 'approved' ? f.approvedAmount : f.amount) : 0), 0);
@@ -747,7 +750,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     document.querySelectorAll('#view-usc .note-field input').forEach((i) => { notes[i.id] = i.value; });
     document.querySelectorAll('#view-usc .review-checks input').forEach((i) => { ticks[i.id] = i.checked; });
     $('#view-usc').innerHTML =
-      '<header class="view-head"><h1 class="h1">USC dashboard</h1></header>' +
+      '<header class="view-head"><h1 class="h1">Management</h1></header>' +
       '<div class="kpis">' + tile('Waiting for a decision', openPosts.length + openFund.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
       '<section class="review-sec"><h2 class="h2">Funding requests</h2>' + (openFund.map(fundCard).join('') || '<p class="review-empty">No funding requests waiting.</p>') + '</section>' +
       '<section class="review-sec"><h2 class="h2">Posts to review</h2>' + (openPosts.map(postCard).join('') || '<p class="review-empty">No posts waiting.</p>') + '</section>' +
@@ -825,7 +828,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function current() { const h = location.hash.slice(1); return Object.prototype.hasOwnProperty.call(VIEWS, h) ? h : 'week'; }
   function renderAccount() {
     const b = $('#account-btn');
-    b.textContent = me() ? firstName(me()) : 'Sign in';
+    b.textContent = me() ? (isAdmin() ? 'Management' : firstName(me())) : 'Sign in';
     b.setAttribute('aria-label', me() ? 'Account: ' + me().name : 'Sign in');
     $('.tabs a[href="#clubs"]').hidden = !(me() && me().role === 'club');
     $('.tabs a[href="#usc"]').hidden = !isAdmin();

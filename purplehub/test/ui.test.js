@@ -152,7 +152,7 @@ const PHONE_BAR_MAX = 1199;
         document.querySelectorAll('body, body *').forEach((el) => {
           if (el.closest('svg, script, style, [hidden]') || el.tagName === 'BR') return;
           const cs = getComputedStyle(el);
-          if (el.closest('.unread, .today-badge')) return; // the new-message and On today badges are purple accents
+          if (el.closest('.unread, .today-badge, .funded-tag')) return; // the new-message and On today badges are purple accents
           [cs.backgroundColor, cs.color].forEach((c) => { const h = hue(c); if (h !== null && h >= 235 && h <= 345) off.push(view + ' ' + el.tagName + '.' + el.className + ' ' + c); });
         });
         document.querySelectorAll('#view-' + view + ' :is(.panel,.poster,.kpi)').forEach((el) => {
@@ -418,6 +418,31 @@ const PHONE_BAR_MAX = 1199;
     check('post ' + name + ': no errors', errors.length === 0, errors);
     await ctx.close();
     await b.close();
+  }
+
+  /* ---------- USC funded tag and Management ---------- */
+  {
+    const v = await newPage(browser);
+    await v.page.goto(base);
+    await v.page.waitForSelector('[data-testid="event-design"]');
+    check('funded: no tag before the USC approves', (await v.page.locator('[data-testid="funded-design"]').count()) === 0);
+    const m = await newPage(browser, { as: ADMIN });
+    await m.page.goto(base + '#usc');
+    await m.page.waitForSelector('[data-testid="kpi-open"]');
+    check('management: the tab, page and button all say Management', /Management/.test(await m.page.locator('.tabs a[href="#usc"]').innerText()) && (await m.page.locator('#view-usc h1').innerText()) === 'Management' && (await m.page.locator('[data-testid="account"]').innerText()) === 'Management');
+    check('management: the tab has an icon', (await m.page.locator('.tabs a[href="#usc"] svg').count()) === 1);
+    const card = m.page.locator('[data-testid^="funding-"]', { hasText: 'Design & Defend' });
+    for (const box of await card.locator('.review-checks input').all()) await box.check();
+    await card.locator('[data-testid^="note-funding-"]').fill('Approved');
+    await card.locator('[data-testid^="approve-funding-"]').click();
+    await m.page.waitForFunction(() => /Funding approved/.test(document.querySelector('#toast').innerText));
+    await v.page.reload();
+    await v.page.waitForSelector('[data-testid="funded-design"]');
+    check('funded: the tag shows for a signed-out viewer once approved', (await v.page.locator('[data-testid="funded-design"]').innerText()) === 'USC funded');
+    const pub = await (await v.ctx.request.get(base + 'api/data')).text();
+    check('funded: amounts and applications stay private', !/approvedAmount|"amount"/.test(pub));
+    check('funded: other events have no tag', (await v.page.locator('[data-testid="funded-sprint"]').count()) === 0);
+    await Promise.all([v.ctx.close(), m.ctx.close()]);
   }
 
   /* ---------- messaging: sample chats, delivery and unread counts ---------- */

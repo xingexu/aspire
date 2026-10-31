@@ -101,6 +101,8 @@ async function threadsFor(u) {
 async function bootstrap(u) {
   const out = { demoPassword: DEMO_PASSWORD, user: publicUser(u), posts: [], mine: [], requests: [], funding: [], threads: [] };
   out.posts = (await pool.query("SELECT * FROM posts WHERE status = 'approved'")).rows.map(postJson);
+  // Only which events got funded is public, never the amounts or the application.
+  out.funded = (await pool.query("SELECT DISTINCT club, event FROM funding_requests WHERE status = 'approved'")).rows;
   if (!u) return out;
   out.threads = await threadsFor(u);
   if (u.role === 'club' && u.approved) {
@@ -288,7 +290,7 @@ async function handle(req, res) {
   try {
     await connect().catch((e) => { if (!HOSTED) throw e; console.error('Database unavailable:', e.message); });
     if (!pool) {
-      if (req.method === 'GET' && url === '/api/data') return json(res, 200, { demoPassword: DEMO_PASSWORD, user: null, posts: [], mine: [], requests: [], funding: [], threads: [] });
+      if (req.method === 'GET' && url === '/api/data') return json(res, 200, { demoPassword: DEMO_PASSWORD, funded: [], user: null, posts: [], mine: [], requests: [], funding: [], threads: [] });
       if (req.method === 'POST' && url === '/api/chat') {
         need(req.headers['x-purplehub'] === '1', 403, 'Bad request.');
         const b = await readBody(req);
