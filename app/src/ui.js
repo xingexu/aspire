@@ -524,7 +524,7 @@
     var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Items taken per day over the last 14 days, by Point">';
     [0, niceMax / 2, niceMax].forEach(function (g) {
       out += '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y(g) + '" y2="' + y(g) + '" stroke="var(--line)" stroke-width="1"/>' +
-        '<text x="' + (padL - 6) + '" y="' + (y(g) + 4) + '" text-anchor="end" font-size="12" fill="var(--ink-3)" font-family="Source Sans 3, sans-serif">' + g + '</text>';
+        '<text x="' + (padL - 6) + '" y="' + (y(g) + 4) + '" text-anchor="end" font-size="12" fill="var(--ink-3)" font-family="Schibsted Grotesk, sans-serif">' + g + '</text>';
     });
     m.byDay.forEach(function (r, i) {
       var x = padL + i * bw + bw * 0.18, w = bw * 0.64;
@@ -533,9 +533,9 @@
       out += '<g><title>' + esc(dayFmt.format(new Date(r.day))) + ': UCC ' + r.ucc + ', Weldon ' + r.weldon + '</title>' +
         '<rect x="' + x + '" y="' + y1 + '" width="' + w + '" height="' + Math.max(0, y(0) - y1) + '" rx="2" fill="var(--ucc)"/>' +
         '<rect x="' + x + '" y="' + y2 + '" width="' + w + '" height="' + Math.max(0, y1 - y2) + '" rx="2" fill="var(--weldon)"/></g>' +
-        '<text x="' + (x + w / 2) + '" y="' + (H - padB + 16) + '" text-anchor="middle" font-size="12" fill="' + (today ? 'var(--ink)' : 'var(--ink-3)') + '" font-family="Source Sans 3, sans-serif"' + (today ? ' font-weight="700"' : '') + '>' + new Date(r.day).getDate() + '</text>';
+        '<text x="' + (x + w / 2) + '" y="' + (H - padB + 16) + '" text-anchor="middle" font-size="12" fill="' + (today ? 'var(--ink)' : 'var(--ink-3)') + '" font-family="Schibsted Grotesk, sans-serif"' + (today ? ' font-weight="700"' : '') + '>' + new Date(r.day).getDate() + '</text>';
     });
-    out += '<text x="' + (W - padR) + '" y="' + (H - 4) + '" text-anchor="end" font-size="12" fill="var(--ink-3)" font-family="Source Sans 3, sans-serif">Day of month; today is the last bar</text></svg>';
+    out += '<text x="' + (W - padR) + '" y="' + (H - 4) + '" text-anchor="end" font-size="12" fill="var(--ink-3)" font-family="Schibsted Grotesk, sans-serif">Day of month; today is the last bar</text></svg>';
     return out;
   }
 

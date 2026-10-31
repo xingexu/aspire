@@ -75,9 +75,9 @@ async function newPage(browser, base, opts) {
     check('find: no live drops at start', await page.locator('[data-testid="no-drops"]').isVisible());
     check('find: help list has 6 entries, USC walk-in first', (await page.locator('.help-item').count()) === 6 && /USC Food Support walk-in/.test(await page.locator('.help-item').first().innerText()));
     const fontsOk = await page.evaluate(async () => {
-      await Promise.all(['700 16px "Source Sans 3"', '16px "Source Sans 3"', '600 24px "Source Serif 4"'].map((f) => document.fonts.load(f)));
-      const loaded = (fam) => [...document.fonts].some((f) => f.family.replace(/["']/g, '') === fam && f.status === 'loaded');
-      return loaded('Source Sans 3') && loaded('Source Serif 4');
+      await Promise.all(['700 16px "Schibsted Grotesk"', '16px "Schibsted Grotesk"'].map((f) => document.fonts.load(f)));
+      const faces = [...document.fonts].filter((f) => f.family.replace(/["']/g, '') === 'Schibsted Grotesk' && f.status === 'loaded');
+      return faces.some((f) => f.weight === '700') && faces.some((f) => f.weight === '400');
     });
     check('fonts load', fontsOk);
     if (SHOTS) await page.screenshot({ path: path.join(SHOT_DIR, 'find-desktop.png'), fullPage: true });

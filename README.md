@@ -10,6 +10,12 @@ accountability the USC said walk-ins lacked.
 | [`app/`](app/) | The working app: browser UI, shared business rules, and a Node.js server that stores an append-only event log in PostgreSQL (or a JSON file). Full documentation in [`app/README.md`](app/README.md). |
 | [`deck/`](deck/) | The 7-minute pitch deck, `PBSN_ASPIRE_FoodLink.pptx`, and the script that builds it. |
 
+## Open in VS Code
+
+Open this folder in VS Code, then press **F5** (Run and Debug, "Run FoodLink"). It installs the packages,
+builds the page, starts the server and opens http://localhost:3000. The tasks "FoodLink: test" and
+"FoodLink: npm install" are under Terminal > Run Task.
+
 ## Run the app
 
 You need Node.js 20 or newer.
@@ -46,5 +52,5 @@ npm run build         # writes PBSN_ASPIRE_FoodLink.pptx
 npm run screenshots   # optional: retakes img/*.png from the app (Playwright + Chromium, Python with Pillow)
 ```
 
-The deck uses Source Serif 4 and Source Sans 3 from Google Fonts. Google Slides has both built in; install
-them locally before opening the file in PowerPoint or Keynote, or line breaks will move.
+The deck uses Schibsted Grotesk (and Source Serif 4 for one quote) from Google Fonts. Install both before
+opening the file in PowerPoint or Keynote, or line breaks will move.

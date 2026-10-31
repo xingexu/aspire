@@ -1,7 +1,7 @@
-// Appendix slides for the premium FoodLink deck: sources, budget basis, options ruled out, Q&A.
+// Appendix slides (v4 type system): sources, budget basis, options ruled out, Q&A.
 'use strict';
 module.exports = function appendix(pres, k) {
-  const { T, S, title, table, hline, C, M, CW } = k;
+  const { T, B, title, table, hline, C, M, CW, span, colX } = k;
 
   {
     const s = pres.addSlide({ masterName: 'APPENDIX' });
@@ -10,9 +10,9 @@ module.exports = function appendix(pres, k) {
     const per = Math.ceil(items.length / 2);
     items.forEach((r, i) => {
       const col = i < per ? 0 : 1, row = col === 0 ? i : i - per;
-      const x = M + col * (CW / 2 + 0.25), w = CW / 2 - 0.25, y = 1.62 + row * 0.7;
-      T(s, r[0], { x, y, w, h: 0.26, fontSize: 12, bold: true, color: C.ink });
-      T(s, r[1], { x, y: y + 0.26, w, h: 0.38, fontSize: 10.5, color: C.text });
+      const x = colX(col * 6), w = span(6), y = 1.6 + row * 0.72;
+      B(s, r[0], { x, y, w, h: 0.28, fontSize: 13 });
+      T(s, r[1], { x, y: y + 0.28, w, h: 0.42, fontSize: 11.5 });
     });
     s.addNotes('Appendix. Use only if a judge asks where a number came from.');
   }
@@ -21,17 +21,17 @@ module.exports = function appendix(pres, k) {
     title(s, 'A2. Budget assumptions');
     table(s, [
       ['Line', 'Amount', 'Basis'],
-      ['Food seed stock', '$1,050', 'About 420 shelf-stable items at $2.50, bought only after the grant is approved.'],
+      ['Food seed stock', '$1,050', 'About 420 shelf-stable items at $2.50, bought only after approval.'],
       ['Hygiene products', '$400', 'Period products, first on the USC most-needed list, plus soap and toothpaste.'],
-      ['Signs, labels and bins', '$300', 'Shelf signs, QR labels and stock bins for two sites.'],
+      ['Signs, labels, bins', '$300', 'Shelf signs, QR labels and stock bins for two sites.'],
       ['Contingency', '$250', '10% of the request.'],
       ['Promotion', '$250', 'Posters, QR stickers and social posts.'],
-      ['Food-handler training', '$200', 'Online certification for six volunteers.'],
-      ['Hosting and domain', '$50', 'Free hosting tiers and one year of a domain.'],
-      ['Shelving, not requested', 'In kind', 'Borrowed from Food Support or the host building (no equipment purchases).'],
-      ['Team match, not requested', '$250', 'A 10% contribution from our team, which the Grants Committee prefers.'],
-    ], { x: M, y: 1.72, w: CW, colW: [2.9, 1.25, CW - 4.15], rowH: 0.41, fontSize: 13 });
-    T(s, 'To reach 1,000 items: about 420 bought, about 100 hygiene items, and the rest from partners, food drives and Food Support.', { x: M, y: 6.3, w: CW, h: 0.32, fontSize: 13, color: C.ink });
+      ['Volunteer training', '$200', 'Online food-handler certification for six volunteers.'],
+      ['Hosting', '$50', 'Free hosting tiers and one year of a domain.'],
+      ['Shelving (not requested)', 'In kind', 'Borrowed from Food Support or the host building.'],
+      ['Team match (not requested)', '$250', '10% from our team, which the committee prefers.'],
+    ], { x: M, y: 1.6, w: CW, colW: [3.05, 1.15, CW - 4.2], rowH: 0.42 }, { head: 14, body: 14 });
+    T(s, 'To reach 1,000 items: about 420 bought, about 100 hygiene items, and the rest from partners, food drives and Food Support.', { x: M, y: 6.3, w: CW, h: 0.35, fontSize: 14, color: C.ink });
     s.addNotes('Appendix. Bases for each budget line.');
   }
   {
@@ -39,24 +39,23 @@ module.exports = function appendix(pres, k) {
     title(s, 'A3. Options we ruled out');
     table(s, [
       ['Option', 'What it offers', 'Why not on its own'],
-      ['Longer walk-in hours at UCC 40F', 'Familiar, staffed', 'Still one basement room, and every extra hour needs paid staff. No live stock or counts.'],
+      ['Longer walk-in hours at UCC 40F', 'Familiar, staffed', 'Still one basement room; every extra hour needs paid staff. No live stock or counts.'],
       ['More hampers', 'Proven, private', 'Still a form and at least 48 hours. FoodLink lists hampers next to the shelves.'],
       ['Community fridge', 'Fresh food', 'Needs temperature logs, cleaning and public-health rules. A phase-two option.'],
-      ['FoodRescue.ca alone', 'Free surplus for non-profits', 'Built for agencies collecting in bulk, not students. Food Support can join it to stock the shelves.'],
+      ['FoodRescue.ca alone', 'Free surplus', 'Built for agencies collecting in bulk, not students. Food Support can join it.'],
       ['Too Good To Go', 'Cheap surplus bags', 'Costs money and is mostly off campus.'],
-    ], { x: M, y: 1.75, w: CW, colW: [3.0, 2.8, CW - 5.8], rowH: 0.6 });
+    ], { x: M, y: 1.6, w: CW, colW: [3.5, 2.4, CW - 5.9], rowH: 0.72 }, { head: 14, body: 16 });
     s.addNotes('Appendix. Why not something simpler.');
   }
   {
     const s = pres.addSlide({ masterName: 'APPENDIX' });
     title(s, 'A4. Questions we expect');
     const qa = module.exports.questions;
-    const gap = 0.45, cw = (CW - gap) / 2;
     qa.forEach((r, i) => {
-      const x = M + (i % 2) * (cw + gap), y = 1.72 + Math.floor(i / 2) * 1.2;
-      hline(s, x, y - 0.1, cw);
-      T(s, r[0], { x, y, w: cw, h: 0.34, fontSize: 15, bold: true, color: C.ink });
-      T(s, r[1], { x, y: y + 0.37, w: cw, h: 0.72, fontSize: 13, color: C.text });
+      const x = colX((i % 2) * 6), w = span(6), y = 1.58 + Math.floor(i / 2) * 1.27;
+      hline(s, x, y - 0.1, w);
+      B(s, r[0], { x, y, w, h: 0.36, fontSize: 16 });
+      T(s, r[1], { x, y: y + 0.4, w, h: 0.78, fontSize: 14 });
     });
     s.addNotes('Appendix. Short answers for Q&A.');
   }
@@ -85,7 +84,7 @@ module.exports.questions = [
   ['What stops one person emptying a shelf?', 'A posted guide, two restocks a day, and live counts that show rushes so stock can move.'],
   ['Who restocks?', 'Six certified volunteers on 15-minute check-ins, with Food Support staff covering gaps.'],
   ['Is handing out donated food safe and legal?', 'Sealed, labelled, in-date food only, enforced in the app. Ontario’s Donation of Food Act protects good-faith donors.'],
-  ['Food Support is a USC service. Can a USC Grant fund this?', 'Yes. Our team applies as enrolled undergraduates, and USC Grants allow a collaborative to include ineligible partners.'],
+  ['Can a USC Grant include Food Support?', 'Yes. Our team applies as enrolled undergraduates, and USC Grants allow a collaborative to include ineligible partners.'],
   ['How do you know students will use it?', 'Comparable walk-up pantries are used heavily (VCU, Alberta). We have no Western data yet; the pilot measures it.'],
   ['What happens after week 11?', 'If four of five targets are met, add two shelves and hand daily running to Food Support. If not, stop and publish what we learned.'],
 ];

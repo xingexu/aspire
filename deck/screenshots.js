@@ -26,11 +26,11 @@ async function ready(page, sel) {
   await page.waitForSelector(sel);
   await page.evaluate(() => document.fonts.ready);
   const ok = await page.evaluate(async () => {
-    await Promise.all(['700 16px "Source Sans 3"', '600 24px "Source Serif 4"'].map((f) => document.fonts.load(f)));
-    const loaded = (fam) => [...document.fonts].some((f) => f.family.replace(/["']/g, '') === fam && f.status === 'loaded');
-    return loaded('Source Sans 3') && loaded('Source Serif 4');
+    await Promise.all(['700 16px "Schibsted Grotesk"', '16px "Schibsted Grotesk"'].map((f) => document.fonts.load(f)));
+    const faces = [...document.fonts].filter((f) => f.family.replace(/["']/g, '') === 'Schibsted Grotesk' && f.status === 'loaded');
+    return faces.some((f) => f.weight === '700') && faces.some((f) => f.weight === '400');
   });
-  if (!ok) throw new Error('Source Sans 3 / Source Serif 4 did not load');
+  if (!ok) throw new Error('Schibsted Grotesk did not load');
 }
 (async () => {
   const browser = await chromium.launch();
