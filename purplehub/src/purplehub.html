@@ -549,14 +549,16 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (current() === 'week' && $('#feed')) { renderLists(); renderAccount(); } else render();
     markOpenThreadRead();
   }
-  let stream = null;
+  let stream = null, poll = 0;
   function openStream() {
     closeStream();
     if (!window.EventSource) return;
     stream = new EventSource('/api/stream');
     stream.addEventListener('change', () => { refresh(true).catch(() => {}); });
+    // Hosted on Vercel the connection is refused, so check for updates every few seconds instead.
+    stream.onerror = () => { if (stream && stream.readyState === 2) { closeStream(); poll = setInterval(() => { if (!document.hidden) refresh(true).catch(() => {}); }, 8000); } };
   }
-  function closeStream() { if (stream) { stream.close(); stream = null; } }
+  function closeStream() { if (stream) { stream.close(); stream = null; } clearInterval(poll); poll = 0; }
   const act = (p) => p.catch((e) => { toast(e.message); });
   const me = () => D.user;
   const isAdmin = () => !!me() && me().role === 'admin' && me().approved;

@@ -48,7 +48,9 @@ async function migrate(pool) {
 }
 
 // Sample accounts and conversations so the app isn't empty in a demo. Never added in production.
-const DEMO_PASSWORD = 'purplehub-demo';
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'purplehub-demo';
+// A public site only gets demo accounts if it's given its own private password.
+const demoAllowed = () => (process.env.NODE_ENV !== 'production' || !!process.env.DEMO_PASSWORD) && process.env.SEED_DEMO !== '0';
 async function seed(pool, clubs) {
   const { rows } = await pool.query('SELECT count(*)::int AS n FROM users');
   if (rows[0].n) return false;
@@ -86,23 +88,23 @@ async function seedFunding(pool) {
   await pool.query("INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ('wfn', $1, 'Design & Defend', $2, 420, 60, 'Dinner and prizes for a hands-on design competition, open to students with no experience.', '2026-11-03')", [rows[0].id, JSON.stringify(items)]);
 }
 
-async function open(url, clubs) {
-  let pool = new Pool({ connectionString: url, max: 10 });
+async function open(url, clubs, max = 10) {
+  let pool = new Pool({ connectionString: url, max });
   try {
     await pool.query('SELECT 1');
   } catch (e) {
     await pool.end().catch(() => {});
     if (e.code !== '3D000') throw e;
     await createDatabaseIfMissing(url);
-    pool = new Pool({ connectionString: url, max: 10 });
+    pool = new Pool({ connectionString: url, max });
   }
   // An idle connection dropping (say, PostgreSQL restarting) must not take the whole server down.
   pool.on('error', (e) => console.warn('Database connection lost:', e.message));
   await migrate(pool);
-  if (process.env.NODE_ENV !== 'production' && process.env.SEED_DEMO !== '0' && await seed(pool, clubs)) {
-    console.log('Added demo accounts (password: ' + DEMO_PASSWORD + '). See README.md.');
+  if (demoAllowed() && await seed(pool, clubs)) {
+    console.log('Added demo accounts. See README.md.');
   }
-  if (process.env.NODE_ENV !== 'production' && process.env.SEED_DEMO !== '0') await seedFunding(pool);
+  if (demoAllowed()) await seedFunding(pool);
   return pool;
 }
 

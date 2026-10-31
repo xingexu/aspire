@@ -28,7 +28,18 @@ const SECURE = process.env.NODE_ENV === 'production';
 // Without this code nobody can register as USC staff. Set it in .env, or use the one printed at startup.
 const INVITE = process.env.ADMIN_INVITE_CODE || crypto.randomBytes(9).toString('base64url');
 
-let pool;
+let pool, opening = null;
+// Vercel has no local database: it needs DATABASE_URL. Until that's set, events and the assistant still work.
+const HOSTED = !!process.env.VERCEL;
+function connect() {
+  if (pool) return Promise.resolve(pool);
+  if (HOSTED && !process.env.DATABASE_URL) return Promise.resolve(null);
+  if (!opening) {
+    const url = process.env.DATABASE_URL || require('./scripts/db').start();
+    opening = db.open(url, DATA.clubs, HOSTED ? 2 : 10).then((p) => { pool = p; return p; }, (e) => { opening = null; throw e; });
+  }
+  return opening;
+}
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 class Fail extends Error { constructor(status, msg) { super(msg); this.status = status; } }
 const need = (ok, status, msg) => { if (!ok) throw new Fail(status, msg); };
@@ -265,10 +276,22 @@ async function handle(req, res) {
   }
   if (!url.startsWith('/api/')) { res.writeHead(404, { 'content-type': 'text/plain' }); return res.end('Not found'); }
   try {
+    await connect().catch((e) => { if (!HOSTED) throw e; console.error('Database unavailable:', e.message); });
+    if (!pool) {
+      if (req.method === 'GET' && url === '/api/data') return json(res, 200, { user: null, posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] });
+      if (req.method === 'POST' && url === '/api/chat') {
+        need(req.headers['x-purplehub'] === '1', 403, 'Bad request.');
+        const b = await readBody(req);
+        need(Array.isArray(b.messages) && b.messages.length, 400, 'Please ask a question.');
+        return json(res, 200, await chat.reply(b.messages.slice(-10).map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '').slice(0, 1000) })), DATA));
+      }
+      return json(res, 503, { error: 'Accounts aren’t connected on this site yet. You can still browse events.' });
+    }
     const u = await currentUser(req);
     if (req.method === 'GET' && url === '/api/data') return json(res, 200, await bootstrap(u));
     if (req.method === 'GET' && url === '/api/stream') {
       need(u, 401, 'Please sign in.');
+      need(!HOSTED, 503, 'Live connections aren’t available here.'); // functions can't stay open, so the page checks for updates instead
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-store', connection: 'keep-alive' });
       res.write(': connected\n\n');
       const id = String(u.id);
@@ -292,15 +315,17 @@ async function handle(req, res) {
   }
 }
 
-(async () => {
-  const url = process.env.DATABASE_URL || require('./scripts/db').start();
-  pool = await db.open(url, DATA.clubs);
-  http.createServer((req, res) => { handle(req, res); }).listen(PORT, () => {
-    console.log('Purple Hub listening on http://localhost:' + PORT);
-    if (!process.env.ADMIN_INVITE_CODE) console.log('USC staff invite code for this run: ' + INVITE);
-    console.log(process.env.OPENAI_API_KEY ? 'Assistant: GPT (' + (process.env.OPENAI_MODEL || 'gpt-4o-mini') + ')' : 'Assistant: built-in answers. Add OPENAI_API_KEY to purplehub/.env to use GPT.');
+if (require.main === module) {
+  connect().then(() => {
+    http.createServer((req, res) => { handle(req, res); }).listen(PORT, () => {
+      console.log('Purple Hub listening on http://localhost:' + PORT);
+      if (!process.env.ADMIN_INVITE_CODE) console.log('USC staff invite code for this run: ' + INVITE);
+      console.log(process.env.OPENAI_API_KEY ? 'Assistant: GPT (' + (process.env.OPENAI_MODEL || 'gpt-4o-mini') + ')' : 'Assistant: built-in answers. Add OPENAI_API_KEY to purplehub/.env to use GPT.');
+    });
+  }).catch((e) => {
+    console.error('Could not start: ' + e.message + '\nCheck that PostgreSQL is installed, or set DATABASE_URL to a database of your own.');
+    process.exit(1);
   });
-})().catch((e) => {
-  console.error('Could not start: ' + e.message + '\nCheck that PostgreSQL is installed, or set DATABASE_URL to a database of your own.');
-  process.exit(1);
-});
+}
+
+module.exports = { handle };

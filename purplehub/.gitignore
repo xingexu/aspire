@@ -1,5 +1,7 @@
-dist/
-test/shots/
-node_modules/
 .env
 .pgdata/
+.vercel
+dist/
+node_modules/
+test/shots/
+.env*.local

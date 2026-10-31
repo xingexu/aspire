@@ -673,6 +673,33 @@ const PHONE_BAR_MAX = 1199;
     await b.close();
   }
 
+  /* ---------- on Vercel with no database yet ---------- */
+  {
+    const hosted = await startServer(3980, { VERCEL: '1', DATABASE_URL: '' });
+    const c = await browser.newContext();
+    const h = 'http://127.0.0.1:3980/';
+    check('no database: the page loads with empty data', (await (await c.request.get(h + 'api/data')).json()).user === null);
+    const r = await (await c.request.post(h + 'api/chat', { headers: H, data: { messages: [{ role: 'user', content: 'when is the csa agm?' }] } })).json();
+    check('no database: the assistant still answers', /Nov 2/.test(r.reply), r);
+    const s = await c.request.post(h + 'api/login', { headers: H, data: { email: ADMIN, password: DEMO } });
+    check('no database: sign-in explains itself', s.status() === 503 && /aren’t connected/.test((await s.json()).error));
+    await c.close();
+    await stopServer(hosted);
+    const pollSrv = await startServer(3981, { VERCEL: '1' });
+    const cc = await browser.newContext();
+    await cc.addInitScript(() => { localStorage.setItem('purplehub-tour-seen-v1', '1'); });
+    const o = 'http://127.0.0.1:3981/';
+    await cc.request.post(o + 'api/login', { headers: H, data: { email: 'csa.demo@uwo.ca', password: DEMO } });
+    const pg = await cc.newPage();
+    const calls = [];
+    pg.on('request', (q) => { if (q.url().endsWith('/api/data')) calls.push(1); });
+    await pg.goto(o);
+    await pg.waitForTimeout(9500);
+    check('hosted: with no live connection, the page checks for updates', calls.length >= 2, calls.length);
+    await cc.close();
+    await stopServer(pollSrv);
+  }
+
   /* ---------- blocked storage, cross-tab sync ---------- */
   {
     const { ctx, page, errors } = await newPage(browser);

@@ -38,6 +38,17 @@ Real events come from the public Instagram pages of PBSN, WFN, W5, CSA, CAISA an
 haven't joined. Add new ones to `src/data.json`, with a screenshot in `assets/events/`. The screenshots belong to the clubs,
 and the seal in `assets/usc-logo.png` belongs to the USC.
 
+## Deploying to Vercel
+
+Set the project's Root Directory to `purplehub`. `vercel.json` does the rest. Add these environment variables:
+
+- `DATABASE_URL`: a hosted PostgreSQL. Tables are created on the first request. Without it, events and the assistant still work, and sign-in says it isn't connected.
+- `ADMIN_INVITE_CODE`: the code USC staff sign up with.
+- `OPENAI_API_KEY`: optional, for GPT answers.
+- `DEMO_PASSWORD`: optional. Adds the demo accounts below with this password, instead of the public one.
+
+Vercel functions can't hold a connection open, so there the page checks for new messages every 8 seconds.
+
 ## Accounts
 
 Everyone signs up with their own `@uwo.ca` email and a new password, stored as a salted hash. Browsing needs no account.
