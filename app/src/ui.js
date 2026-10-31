@@ -248,6 +248,13 @@
   }
 
   /* ================= views: Find food ================= */
+  // Other USC initiatives FoodLink points to, so students find more than one service (from the Aspire 2026 case).
+  var MORE = [
+    { name: 'Peer Support Centre', chip: 'Weekdays 10–4',
+      body: 'Confidential, non-judgemental support from trained student volunteers, in the lower level of the UCC.' },
+    { name: 'Free the Dot', chip: 'Across campus',
+      body: 'Free menstrual products in washrooms across campus.' },
+  ];
   var HELP = [
     { name: 'USC Food Support walk-in', chip: 'Mon–Thu, 10–4', tone: '',
       body: 'Take what you need at the food bank in UCC 40F, in the basement near the Peer Support Centre. Monday to Thursday, 10 a.m. to 4 p.m.; closed Friday to Sunday.' },
@@ -327,9 +334,14 @@
         : '<div class="empty" data-testid="no-drops">Nothing right now. When a partner has sealed food to give away, it appears here.</div>') +
       '</section>' +
       '<section class="section" aria-labelledby="help-' + pane.id + '"><div class="section-head"><h2 class="h2" id="help-' + pane.id + '">Other places to get food</h2>' +
-      '<span class="hint">From the USC Food Support page, checked Oct 31, 2026</span></div><div class="help">' +
+      '<span class="hint">From the USC Food Support page, checked Oct 31, 2026</span></div><div class="help" data-testid="help-food">' +
       HELP.map(function (h) {
         return '<div class="card help-item"><h3 class="h3">' + esc(h.name) + '</h3><span class="chip ' + h.tone + '">' + esc(h.chip) + '</span><p>' + esc(h.body) + '</p></div>';
+      }).join('') + '</div></section>' +
+      '<section class="section" aria-labelledby="more-' + pane.id + '" data-testid="usc-more"><div class="section-head"><h2 class="h2" id="more-' + pane.id + '">More from the USC</h2>' +
+      '<span class="hint">Free and confidential</span></div><div class="help">' +
+      MORE.map(function (h) {
+        return '<div class="card help-item"><h3 class="h3">' + esc(h.name) + '</h3><span class="chip">' + esc(h.chip) + '</span><p>' + esc(h.body) + '</p></div>';
       }).join('') + '</div></section>' +
       '<p class="note" style="margin-top:24px">FoodLink never asks for your name or student number. In this demo, shelf counts come from a simulated six-week pilot, and anything you do updates live.</p>' +
       '</div>';

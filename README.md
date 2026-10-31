@@ -1,5 +1,8 @@
 # PBSN ASPIRE: FoodLink
 
+Our answer to the PBSN Aspire 2026 case, *Driving Engagement for Western's University Students' Council*. We chose
+USC Food Support Services and built FoodLink to bring it to where students already are.
+
 FoodLink gives Western students walk-up access to free food without a form or a name: two campus shelves
 with live stock counts, sealed surplus from campus partners that students reserve with an anonymous code,
 and a dashboard that shows the USC whether the pilot is working. Every restock is counted, which is the

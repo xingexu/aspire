@@ -73,7 +73,8 @@ async function newPage(browser, base, opts) {
     const proteinTxt = await page.locator('[data-testid="cat-ucc-protein"]').innerText();
     check('find: UCC protein starts low', /Running low/.test(proteinTxt), proteinTxt);
     check('find: no live drops at start', await page.locator('[data-testid="no-drops"]').isVisible());
-    check('find: help list has 6 entries, USC walk-in first', (await page.locator('.help-item').count()) === 6 && /USC Food Support walk-in/.test(await page.locator('.help-item').first().innerText()));
+    check('find: help list has 6 entries, USC walk-in first', (await page.locator('[data-testid="help-food"] .help-item').count()) === 6 && /USC Food Support walk-in/.test(await page.locator('[data-testid="help-food"] .help-item').first().innerText()));
+    check('find: points to other USC services', (await page.locator('[data-testid="usc-more"] .help-item').count()) === 2 && /Peer Support Centre/.test(await page.locator('[data-testid="usc-more"]').innerText()));
     const fontsOk = await page.evaluate(async () => {
       await Promise.all(['700 16px "Schibsted Grotesk"', '16px "Schibsted Grotesk"'].map((f) => document.fonts.load(f)));
       const faces = [...document.fonts].filter((f) => f.family.replace(/["']/g, '') === 'Schibsted Grotesk' && f.status === 'loaded');
