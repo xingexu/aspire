@@ -5,7 +5,8 @@ PD USC (Professional Development USC) and built **Counts**: club events that cou
 record, with a ladder that ends in USC advocacy and Council. See [`counts/README.md`](counts/README.md).
 
 Open this folder in VS Code and press **F5** ("Run Counts"), or run `cd counts && npm start` and open
-http://localhost:3001. No packages to install.
+http://localhost:3001. No packages to install. To share it, send [`counts/Counts.html`](counts/Counts.html): it's one
+complete file.
 
 ## Earlier idea: FoodLink
 

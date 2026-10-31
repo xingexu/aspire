@@ -1,4 +1,3 @@
 dist/
 test/shots/
-test/fonts/*.bin
 node_modules/
