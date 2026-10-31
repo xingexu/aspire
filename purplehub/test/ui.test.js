@@ -241,6 +241,8 @@ const PHONE_BAR_MAX = 1199;
     await page.waitForFunction(() => document.querySelector('[data-testid="account"]').textContent === 'Sign in');
     check('account: Sign out works', true);
     await page.click('[data-testid="account"]');
+    const quick = await page.locator('[data-testid="demo-usc"]').boundingBox(), box = await page.locator('#lg-email').boundingBox();
+    check('shared accounts: the buttons come before the email box', quick.y < box.y);
     await page.click('[data-testid="demo-usc"]');
     await page.waitForSelector('[data-testid="kpi-open"]');
     check('shared accounts: one press signs you in', true);

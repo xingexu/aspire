@@ -449,6 +449,7 @@ dialog.sheet[open]::backdrop{opacity:1}
       <button type="button" data-act="login-mode" data-v="in" data-testid="mode-in">Sign in</button>
       <button type="button" data-act="login-mode" data-v="up" data-testid="mode-up">Create account</button>
     </div>
+    <div class="demo-logins" id="lg-demo" data-testid="demo-logins"></div>
     <div id="lg-up" class="lg-creds">
       <label class="field" for="lg-name">Your name</label>
       <input id="lg-name" class="text-input" autocomplete="name" maxlength="80">
@@ -466,7 +467,6 @@ dialog.sheet[open]::backdrop{opacity:1}
       <input id="lg-pass" class="text-input" type="password" autocomplete="current-password">
     </div>
     <p class="small muted" id="lg-hint" hidden></p>
-    <div class="demo-logins" id="lg-demo" data-testid="demo-logins"></div>
     <p class="err" id="lg-err" role="alert"></p>
     <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" data-testid="login-submit">Sign in</button></div>
   </form>
@@ -909,13 +909,13 @@ dialog.sheet[open]::backdrop{opacity:1}
     $('#lg-role-student').checked = true;
     setLoginMode(mode || 'in');
     openDialog($('#dlg-login'));
-    $(mode === 'up' ? '#lg-name' : '#lg-email').focus();
+    if (mode === 'up') $('#lg-name').focus();
   }
   // Shared accounts anyone can use: pressing one signs in, and the password is on show too.
   const DEMO_LOGINS = [['usc.demo@uwo.ca', 'USC staff'], ...Object.values(CLUBS).map((c) => [c.id + '.demo@uwo.ca', c.short + ' president']), ['zinger.demo@uwo.ca', 'Zinger'], ['nuo.demo@uwo.ca', 'Nuo'], ['zohra.demo@uwo.ca', 'Zohra'], ['ahana.demo@uwo.ca', 'Ahana']];
   function renderDemoLogins() {
-    $('#lg-demo').innerHTML = '<p class="demo-title">Or use a shared account</p><p class="small">Anyone can use these. Password: <b class="mono" data-testid="demo-password">' + esc(D.demoPassword || '') + '</b></p><div class="demo-grid">' +
-      DEMO_LOGINS.map((x) => '<button class="btn ghost small" type="button" data-act="demo-login" data-v="' + x[0] + '" data-testid="demo-' + x[0].split('.')[0] + '">' + esc(x[1]) + '</button>').join('') + '</div>';
+    $('#lg-demo').innerHTML = '<p class="demo-title">Sign in with one press</p><div class="demo-grid">' +
+      DEMO_LOGINS.map((x) => '<button class="btn ghost small" type="button" data-act="demo-login" data-v="' + x[0] + '" data-testid="demo-' + x[0].split('.')[0] + '">' + esc(x[1]) + '</button>').join('') + '</div><p class="small muted">Shared accounts anyone can use. Password: <b class="mono" data-testid="demo-password">' + esc(D.demoPassword || '') + '</b></p>';
   }
   function afterLogin(welcome) {
     closeDialog($('#dlg-login'));
@@ -1404,7 +1404,7 @@ dialog.sheet[open]::backdrop{opacity:1}
         break;
       }
       case 'account': if (me()) toggleAccountMenu($('#account-menu').hidden); else openLogin('in'); break;
-      case 'demo-login': act(api('/api/login', { email: v, password: D.demoPassword }).then(() => refresh()).then(() => afterLogin('Hi, '))); break;
+      case 'demo-login': $('#lg-email').value = v; $('#lg-pass').value = D.demoPassword; $('#lg-err').textContent = ''; $('#lg-form').requestSubmit(); break;
       case 'login': openLogin(v); break;
       case 'login-mode': setLoginMode(v); break;
       case 'signout': act(api('/api/logout', {}).then(() => { toggleAccountMenu(false); CHAT.reset(); UI.thread = null; UI.draftInbox = null; return refresh(); }).then(() => { render(); fade($('#view-' + current())); toast('Signed out.'); })); break;
