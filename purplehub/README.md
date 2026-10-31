@@ -58,7 +58,7 @@ Emails aren't verified yet, because that needs a mail service.
 
 ## The assistant
 
-"Ask Purple Hub" sits in the bottom-right corner. Copy `.env.example` to `.env` and add `OPENAI_API_KEY` to answer with a GPT
+The chat bubble in the bottom-right corner opens the assistant. Copy `.env.example` to `.env` and add `OPENAI_API_KEY` to answer with a GPT
 model (`OPENAI_MODEL`, by default `gpt-4o-mini`), grounded in the real event list. Each question costs a little on your OpenAI
 account. The key stays on the server, and only the conversation text is sent, never who is asking. Without a key, or if the call
 fails, it answers from the same event list and how-to notes using built-in rules.

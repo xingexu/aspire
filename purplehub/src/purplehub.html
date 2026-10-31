@@ -252,7 +252,8 @@ dialog.tour::backdrop{background:transparent}
   .thread-back{display:inline-block;min-height:2.75rem;font-size:0.9375rem;color:var(--ink);flex:none}
 }
 /* the assistant sits in the bottom-right corner on every page */
-.ask-fab{position:fixed;z-index:16;right:max(1rem,env(safe-area-inset-right,0px));bottom:calc(max(var(--ask-lift),1.25rem) + env(safe-area-inset-bottom,0px));min-height:3rem;padding:0.75rem 1.25rem;border:0;border-radius:999px;background:#3A3A44;color:#FFF;font-weight:700;box-shadow:0 8px 24px rgb(20 20 26 / .28);cursor:pointer;transition:background .28s var(--ease),transform .28s var(--ease)}
+.ask-fab{position:fixed;z-index:16;right:max(1rem,env(safe-area-inset-right,0px));bottom:calc(max(var(--ask-lift),1.25rem) + env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:3.5rem;height:3.5rem;padding:0;border:0;border-radius:50%;background:#3A3A44;color:#FFF;box-shadow:0 8px 24px rgb(20 20 26 / .28);cursor:pointer;transition:background .28s var(--ease),transform .28s var(--ease)}
+.ask-fab svg{width:1.625rem;height:1.625rem}
 .ask-fab[aria-expanded="true"]{display:none}
 @media (max-width:1199px){.in-thread .ask-fab{display:none}}
 @media (hover:hover){.ask-fab:hover{background:var(--accent);transform:translateY(-1px)}}
@@ -430,6 +431,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   <section class="view" id="view-week" data-view="week" aria-label="Upcoming events"></section>
   <section class="view" id="view-clubs" data-view="clubs" aria-label="For clubs" hidden></section>
   <section class="view" id="view-usc" data-view="usc" aria-label="Management" hidden></section>
+  <section class="view" id="view-profile" data-view="profile" aria-label="Your profile" hidden></section>
   <section class="view" id="view-messages" data-view="messages" aria-label="Messages" hidden></section>
 
 </main>
@@ -513,7 +515,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   </div>
 </dialog>
 
-<button class="ask-fab" id="ask-fab" type="button" data-act="ask" aria-expanded="false" aria-controls="ask-panel" data-testid="ask-fab">Ask Purple Hub</button>
+<button class="ask-fab" id="ask-fab" type="button" data-act="ask" aria-expanded="false" aria-controls="ask-panel" aria-label="Ask Purple Hub" title="Ask Purple Hub" data-testid="ask-fab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-8l-5 4v-4H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z" fill="currentColor"/></svg></button>
 <section class="ask-panel" id="ask-panel" aria-label="Ask Purple Hub" data-testid="ask-panel" hidden>
   <div class="row spread ask-head"><h2 class="h3">Ask Purple Hub</h2><button class="linkbtn" type="button" data-act="ask-close" data-testid="ask-close">Close</button></div>
   <div class="chat-log ask-log" id="ask-log" role="log" aria-live="polite" data-testid="ask-log"></div>
@@ -588,7 +590,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   const isClub = () => !!me() && me().role === 'club' && me().approved;
   const firstName = (u) => { const n = u.name.replace(/\s*\(.*\)/, '').split(' ')[0]; return n.length > 12 ? n.slice(0, 11) + '…' : n; };
   function gateHTML(role, title) {
-    const words = { admin: ['USC staff only', 'Sign in with your USC account to see this page.'], club: ['Club presidents only', 'Sign in with your Western email to post events and request funding.'], messages: ['Sign in to message', 'Create a free account with your Western email to message the USC or a club, and get their replies here.'] }[role];
+    const words = { admin: ['USC staff only', 'Sign in with your USC account to see this page.'], club: ['Club presidents only', 'Sign in with your Western email to post events and request funding.'], profile: ['Sign in to see your profile', 'Sign in or create an account with your Western email.'], messages: ['Sign in to message', 'Create a free account with your Western email to message the USC or a club, and get their replies here.'] }[role];
     return '<header class="view-head"><h1 class="h1">' + title + '</h1></header>' +
       '<section class="panel gate" data-testid="gate-' + role + '"><h2 class="h3">' + words[0] + '</h2><p>' + words[1] + '</p>' +
       '<div class="row"><button class="btn" type="button" data-act="login" data-v="in">Sign in</button><button class="btn ghost" type="button" data-act="login" data-v="up">Create account</button></div></section>';
@@ -663,7 +665,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function todayHTML(e) {
     const c = CLUBS[e.club];
     return '<article class="poster today-card" data-testid="event-' + e.id + '">' + mediaHTML(e, c) +
-      '<div class="today-body"><p class="today-badge"><span class="live-dot" aria-hidden="true"></span>On today</p><p class="club-line">' + esc(c.name) + '</p><h3 class="today-title">' + esc(e.title) + '</h3>' + fundedTag(e) + '<p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
+      '<div class="today-body"><p class="today-badge"><span class="live-dot" aria-hidden="true"></span>Today</p><p class="club-line">' + esc(c.name) + '</p><h3 class="today-title">' + esc(e.title) + '</h3>' + fundedTag(e) + '<p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
   }
   function renderLists() {
     const today = EVENTS.filter(isToday).filter(matches);
@@ -824,7 +826,18 @@ dialog.sheet[open]::backdrop{opacity:1}
   });
 
   /* ---------- routing ---------- */
-  const VIEWS = { week: renderWeek, messages: renderMessages, clubs: renderClubs, usc: renderUSC };
+  function renderProfile() {
+    const a = me();
+    if (!a) { $('#view-profile').innerHTML = gateHTML('profile', 'Your profile'); return; }
+    const row = (k, v) => '<dt>' + k + '</dt><dd>' + esc(v) + '</dd>', tile = (l, v) => '<article class="kpi"><p class="label">' + l + '</p><p class="value">' + v + '</p></article>';
+    const unread = unreadTotal(), chats = D.threads.length;
+    const tiles = a.role === 'admin' ? tile('Waiting for a decision', D.requests.filter((p) => p.status === 'pending').length + D.funding.filter((f) => f.status === 'pending').length) + tile('Funding approved', money(D.funding.reduce((t, f) => t + (f.status === 'approved' ? f.approvedAmount : 0), 0))) + tile('Chats', chats)
+      : a.role === 'club' ? tile('Your posts', D.mine.length) + tile('Funding applications', D.funding.length) + tile('Chats', chats)
+        : tile('Chats', chats) + tile('New messages', unread);
+    const link = a.role === 'admin' ? ['#usc', 'Open Management'] : a.role === 'club' ? ['#clubs', 'Open your club'] : ['#messages', 'Open Messages'];
+    $('#view-profile').innerHTML = '<header class="view-head"><h1 class="h1" data-testid="profile-name">' + esc(a.name) + '</h1></header><section class="panel"><dl class="review-list">' + row('Email', a.email) + row('Role', a.role === 'admin' ? 'USC staff' : a.role === 'club' ? 'Club president' : 'Student') + (a.club ? row('Club', CLUBS[a.club].name) : '') + '</dl><div class="row"><a class="btn small" href="' + link[0] + '">' + link[1] + '</a></div></section><div class="kpis">' + tiles + '</div>';
+  }
+  const VIEWS = { profile: renderProfile, week: renderWeek, messages: renderMessages, clubs: renderClubs, usc: renderUSC };
   function current() { const h = location.hash.slice(1); return Object.prototype.hasOwnProperty.call(VIEWS, h) ? h : 'week'; }
   function renderAccount() {
     const b = $('#account-btn');
@@ -930,7 +943,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function toggleAccountMenu(show) {
     const m = $('#account-menu'), a = me();
     if (!show || !a) { m.hidden = true; $('#account-btn').setAttribute('aria-expanded', 'false'); return; }
-    m.innerHTML = '<p class="menu-name">' + esc(a.name) + '</p><p class="small muted menu-mail">' + esc(a.email) + '</p><p class="small">' + (a.role === 'admin' ? 'USC staff' : a.role === 'club' ? 'President of ' + esc(CLUBS[a.club].name) : 'Student') + '</p><button class="btn small" type="button" data-act="signout" data-testid="signout">Sign out</button>';
+    m.innerHTML = '<p class="menu-name">' + esc(a.name) + '</p><p class="small muted menu-mail">' + esc(a.email) + '</p><p class="small">' + (a.role === 'admin' ? 'USC staff' : a.role === 'club' ? 'President of ' + esc(CLUBS[a.club].name) : 'Student') + '</p><a class="btn ghost small" href="#profile" data-act="profile" data-testid="view-profile">View profile</a><button class="btn small" type="button" data-act="signout" data-testid="signout">Sign out</button>';
     m.hidden = false;
     $('#account-btn').setAttribute('aria-expanded', 'true');
     fade(m, 180);
@@ -1256,7 +1269,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     { view: 'week', target: () => $('[data-testid="feed"] .poster') , title: 'Each card is an event', text: () => 'The picture is the club’s own Instagram post. ' + tap() + ' it to open the post and see how to register.' },
     { view: 'week', fixed: true, target: () => $('.tabs a[href="#messages"]'), title: 'Want to reach someone?', text: () => 'Open Messages to write to the USC or a club president. A number appears here when they reply.' },
     { view: 'week', top: true, target: () => $('#account-btn'), title: 'Create your account', text: () => 'You can browse without an account. To send messages or post events, press here to sign in or create one with your Western email.' },
-    { view: 'week', fixed: true, target: () => $('#ask-fab'), title: 'Stuck? Just ask', next: 'Finish', last: true, text: () => 'Press “Ask Purple Hub” in the corner and type a question in your own words. “Reset tutorial” at the bottom of the page starts this tour over.' },
+    { view: 'week', fixed: true, target: () => $('#ask-fab'), title: 'Stuck? Just ask', next: 'Finish', last: true, text: () => 'Press the chat bubble in the corner and type a question in your own words. “Reset tutorial” at the bottom of the page starts this tour over.' },
   ];
   let tourGliding = false, tourGlideTimer = 0;
   function placeTour(dy = 0) {
@@ -1406,6 +1419,7 @@ dialog.sheet[open]::backdrop{opacity:1}
         }));
         break;
       }
+      case 'profile': toggleAccountMenu(false); break;
       case 'account': if (me()) toggleAccountMenu($('#account-menu').hidden); else openLogin('in'); break;
       case 'demo-login': $('#lg-email').value = v; $('#lg-pass').value = D.demoPassword; $('#lg-err').textContent = ''; $('#lg-form').requestSubmit(); break;
       case 'login': openLogin(v); break;

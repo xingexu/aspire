@@ -59,7 +59,7 @@ async function newPage(browser, opts) {
   return { ctx, page, errors };
 }
 async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.join(SHOT_DIR, name + '.png'), fullPage: true }); }
-const VIEWS = ['week', 'messages', 'clubs', 'usc'];
+const VIEWS = ['week', 'messages', 'clubs', 'usc', 'profile'];
 const ENGINES = [['chromium', chromium], ['webkit', webkit]];
 // Phones in both orientations, tablets, then Mac windows from a small MacBook to a Studio Display.
 const SIZES = [[320, 568], [375, 667], [390, 844], [430, 932], [844, 390], [768, 1024], [1024, 768], [1199, 800], [1200, 800], [1280, 800], [1512, 982], [1920, 1080], [2560, 1440]];
@@ -81,6 +81,7 @@ const PHONE_BAR_MAX = 1199;
     check('title is Purple Hub', (await page.title()) === 'Purple Hub');
     check('home: has Happening today and Upcoming events', /Happening today/.test(await page.locator('#view-week').innerText()) && /Upcoming events/.test(await page.locator('#view-week').innerText()));
     const today = page.locator('[data-testid="today"] .poster');
+    check('today: the badge says Today, and ASPIRE is at the UCC', /Today/.test(await today.innerText()) && /\bUCC\b/.test(await today.innerText()));
     check('today: ASPIRE is in Happening today and nowhere else', (await today.count()) === 1 && /ASPIRE/.test(await today.innerText()) && !/ASPIRE/.test(await page.locator('[data-testid="feed"]').innerText()) && !/ASPIRE/.test(await page.locator('[data-testid="recent"]').innerText()));
     check('home: lists the 4 real upcoming events', (await feed.count()) === 4);
     const shots = await page.locator('[data-testid="feed"] .poster-shot').evaluateAll((im) => im.map((i) => i.naturalWidth));
@@ -430,6 +431,12 @@ const PHONE_BAR_MAX = 1199;
     await m.page.goto(base + '#usc');
     await m.page.waitForSelector('[data-testid="kpi-open"]');
     check('management: the tab, page and button all say Management', /Management/.test(await m.page.locator('.tabs a[href="#usc"]').innerText()) && (await m.page.locator('#view-usc h1').innerText()) === 'Management' && (await m.page.locator('[data-testid="account"]').innerText()) === 'Management');
+    await m.page.click('[data-testid="account"]');
+    await m.page.click('[data-testid="view-profile"]');
+    await m.page.waitForSelector('[data-testid="profile-name"]');
+    check('profile: View profile opens from the top right, with their details', /usc\.demo@uwo\.ca/.test(await m.page.locator('#view-profile').innerText()) && await m.page.locator('[data-testid="account-menu"]').isHidden());
+    await m.page.click('.tabs a[href="#usc"]');
+    await m.page.waitForSelector('[data-testid="kpi-open"]');
     check('management: the tab has an icon', (await m.page.locator('.tabs a[href="#usc"] svg').count()) === 1);
     const card = m.page.locator('[data-testid^="funding-"]', { hasText: 'Design & Defend' });
     for (const box of await card.locator('.review-checks input').all()) await box.check();
@@ -507,6 +514,7 @@ const PHONE_BAR_MAX = 1199;
     const { ctx, page, errors } = await newPage(browser);
     await page.goto(base);
     const fab = await page.locator('[data-testid="ask-fab"]').boundingBox();
+    check('assistant: is a chat bubble, not a text button', (await page.locator('[data-testid="ask-fab"] svg').count()) === 1 && (await page.locator('[data-testid="ask-fab"]').innerText()).trim() === '');
     check('assistant: sits in the bottom-right corner', fab.x + fab.width > 1440 - 40 && fab.y + fab.height > 900 - 40, fab);
     await page.click('[data-testid="ask-fab"]');
     const box = await page.locator('[data-testid="ask-panel"]').boundingBox();
