@@ -46,5 +46,5 @@ npm run build         # writes PBSN_ASPIRE_FoodLink.pptx
 npm run screenshots   # optional: retakes img/*.png from the app (Playwright + Chromium, Python with Pillow)
 ```
 
-The deck uses Source Sans 3 from Google Fonts. Google Slides has it built in; install it locally before
-opening the file in PowerPoint or Keynote, or line breaks will move.
+The deck uses Source Serif 4 and Source Sans 3 from Google Fonts. Google Slides has both built in; install
+them locally before opening the file in PowerPoint or Keynote, or line breaks will move.

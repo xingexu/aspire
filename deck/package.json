@@ -5,7 +5,7 @@
   "description": "Builds the PBSN ASPIRE: FoodLink pitch deck (.pptx) from build-deck.js.",
   "scripts": {
     "build": "node build-deck.js",
-    "screenshots": "node ../app/build.js && node ../app/test/support/fetch-fonts.js && node screenshots.js && python3 frame_phone.py"
+    "screenshots": "node ../app/build.js && node ../app/test/support/fetch-fonts.js && node screenshots.js && python3 frame.py"
   },
   "dependencies": {
     "pptxgenjs": "^4.0.1"

@@ -249,8 +249,10 @@
 
   /* ================= views: Find food ================= */
   var HELP = [
+    { name: 'USC Food Support walk-in', chip: 'Mon–Thu, 10–4', tone: '',
+      body: 'Take what you need at the food bank in UCC 40F, in the basement near the Peer Support Centre. Monday to Thursday, 10 a.m. to 4 p.m.; closed Friday to Sunday.' },
     { name: 'USC food hamper', chip: 'Check the date', tone: 'warn',
-      body: 'Five to seven days of groceries. Request online, then collect it from a locker in the UCC basement (opening instructions come by email) or from UCC room 40F. Ready in 48 hours at the earliest. The USC page still says requests reopen September 8, 2025.' },
+      body: 'Five to seven days of groceries. Request online, then collect it from UCC 40F or a UCC basement locker (opening instructions come by email). Ready in 48 hours at the earliest. The USC page still says requests reopen September 8, 2025.' },
     { name: 'London Food Bank', chip: 'Students: Sat 9–11 a.m.', tone: '',
       body: '926 Leathorne St. Bring a student card and proof of income, if you have any. Weekdays 9 a.m. to 4 p.m. Phone 519-659-4045.' },
     { name: "St. Paul's Social Services", chip: 'Weekdays', tone: '',
@@ -385,7 +387,7 @@
         return esc(catLabel(r.cat)) + ' (' + r.count + (r.count > 1 ? ' reports' : ' report') + ', ' + esc(rel(r.at, now)) + ')';
       }).join('; ') + '</div>' : '') +
       (changed ? '<div class="msg warn">Someone logged a check at ' + esc(p.name) + ' while you were counting. <button class="btn small" data-act="rs-reload">Load new counts</button></div>' : '') +
-      '<div class="card"><div class="spread" style="margin-bottom:8px"><div class="h3">' + esc(p.name) + ' <span class="muted" style="font-weight:500">· last check ' + (p.lastCheckAt ? esc(clock(p.lastCheckAt)) + ' (' + esc(rel(p.lastCheckAt, now)) + ')' : 'none') + '</span></div></div>' +
+      '<div class="card"><div class="spread" style="margin-bottom:8px"><div class="h3">' + esc(p.name) + ' <span class="muted" style="font-weight:500">· last check ' + (p.lastCheckAt ? esc(dayClock(p.lastCheckAt, now)) + ' (' + esc(rel(p.lastCheckAt, now)) + ')' : 'none') + '</span></div></div>' +
       '<div class="scroll-x"><table class="rs-table"><thead><tr><th>Category</th><th>On shelf now</th><th>Added</th><th class="hide-sm">Removed</th><th>After</th><th class="hide-sm">Lasts</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       '<div class="spread" style="margin-top:12px"><div><span class="taken" data-testid="rs-taken">' + takenTotal + ' taken</span> <span class="muted">since the last check</span></div>' +
       '<div class="muted"><span data-testid="rs-after-total">' + afterTotal + '</span> items on the shelf after this check</div></div></div>' +
@@ -559,8 +561,8 @@
     var partnersOk = m.partners >= m.partnersTarget;
     var paceTxt = (m.pacePct >= 0 ? '+' : '') + m.pacePct + '% vs. target pace';
     var html = '<div class="stack" style="gap:18px">' +
-      '<div><h1 class="h1">Pilot dashboard</h1><p class="lede">Week ' + m.week + ' of ' + m.weeks + '. Is FoodLink meeting its targets?</p></div>' +
-      '<p class="note">Demo data: a simulated six-week pilot, plus anything you do in this demo.</p>' +
+      '<div><div class="title-row"><h1 class="h1">Pilot dashboard</h1><span class="badge" data-testid="sim-badge">Simulated data</span></div><p class="lede">Week ' + m.week + ' of ' + m.weeks + '. Is FoodLink meeting its targets?</p></div>' +
+      '<p class="note">These numbers come from a simulated six-week pilot plus anything you do in this demo. They are not results.</p>' +
       '<div class="kpis-wrap"><div class="kpis">' +
       kpi('kpi-items', 'Items taken', num(m.itemsTaken), 'of ' + num(m.itemsTarget), paceTxt + ' · on track for ~' + num(projected), itemsPct, expectedPct) +
       kpi('kpi-waste', 'Thrown away', m.wastePct + '%', 'target < ' + m.wasteTarget + '%', num(m.removed) + ' of ' + num(m.added) + ' stocked items expired or damaged', Math.min(100, (m.wastePct / (m.wasteTarget * 2)) * 100), 50) +

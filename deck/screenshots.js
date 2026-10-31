@@ -1,4 +1,4 @@
-// Light-theme product screenshots for the PBSN ASPIRE deck, with the clock fixed at a weekday lunchtime.
+// Light-theme product screenshots for the PBSN ASPIRE deck (premium edition), with the clock fixed at a weekday lunchtime.
 const { chromium } = require('playwright');
 const path = require('path'), fs = require('fs'), crypto = require('crypto');
 const APP = path.join(__dirname, '..', 'app');
@@ -25,8 +25,12 @@ async function ctxFor(browser, opts) {
 async function ready(page, sel) {
   await page.waitForSelector(sel);
   await page.evaluate(() => document.fonts.ready);
-  const ok = await page.evaluate(() => document.fonts.check('700 16px "Source Sans 3"'));
-  if (!ok) throw new Error('Source Sans 3 did not load');
+  const ok = await page.evaluate(async () => {
+    await Promise.all(['700 16px "Source Sans 3"', '600 24px "Source Serif 4"'].map((f) => document.fonts.load(f)));
+    const loaded = (fam) => [...document.fonts].some((f) => f.family.replace(/["']/g, '') === fam && f.status === 'loaded');
+    return loaded('Source Sans 3') && loaded('Source Serif 4');
+  });
+  if (!ok) throw new Error('Source Sans 3 / Source Serif 4 did not load');
 }
 (async () => {
   const browser = await chromium.launch();

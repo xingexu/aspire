@@ -374,7 +374,7 @@ global install is found automatically); otherwise it is skipped.
 and dark mode, including presenter mode and live sync between tabs. It needs Playwright with Chromium,
 installed in the project or globally. With a global install, run `NODE_PATH=$(npm root -g) npm run test:ui`.
 It serves Google Fonts from cached copies in `test/fonts/*.bin`. Those files are not committed, so the
-script first downloads any that are missing (4 small files listed in `test/fonts/urls.txt`). Offline, the
+script first downloads any that are missing (8 small files listed in `test/fonts/urls.txt`). Offline, the
 test still runs, and its five "no console errors" checks fail because of the font 404s.
 
 **Not tested:**
