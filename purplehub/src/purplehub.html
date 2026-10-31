@@ -1,0 +1,1113 @@
+<title>Purple Hub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Purple Hub: club events at Western, by USC.">
+<style>
+:root{
+  /* Neutral and see-through: plain translucent boxes over a faded photo of Western. Purple is only an accent, for hover,
+     focus and the walkthrough spotlight. The tab bar and tour card use liquid-glass-react (see glass.jsx). */
+  color-scheme:light;
+  --bg:#F5F5F7; --paper:#FFFFFF; --ink:#16161A; --ink-2:#2A2A30; --muted:#3F3F46;
+  --accent:#4F2683; --accent-soft:rgb(79 38 131 / .08); --accent-card:rgb(245 240 253 / .74);
+  --card:rgb(255 255 255 / .55);
+  --line:rgb(0 0 0 / .12); --tint:rgb(0 0 0 / .06);
+  --usc:#16161A; --usc-soft:rgb(255 255 255 / .55);
+  --mark:#ECECEF; --on-mark:#16161A; --on-club:#16161A;
+  --good:#0F5533; --good-soft:rgb(23 100 63 / .12); --warn:#633800; --warn-soft:rgb(170 110 0 / .14); --bad:#A61B12; --bad-soft:rgb(180 35 24 / .1);
+  --screen:rgb(44 44 54 / .84); --screen-2:rgb(255 255 255 / .1); --screen-ink:#FFFFFF; --screen-muted:#F0F0F3; --bezel:#3A3A44;
+  --rim:inset 0 0 0 1px rgb(255 255 255 / .55);
+  --shadow:var(--rim), 0 8px 24px rgb(20 20 26 / .08);
+  --glass:none;
+  --usc-logo:url("{{USC_LOGO}}");
+  --western:url("{{WESTERN_BG}}");
+  --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --r-card:1.5rem; --r-ctl:999px; --tab-h:3.5rem; --tab-gap:0.5rem;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --btn:rgb(255 255 255 / .86); --btn-shadow:inset 0 0 0 1px rgb(255 255 255 / .9),0 0 0 1px rgb(20 20 26 / .07),0 2px 4px rgb(20 20 26 / .06),0 6px 16px rgb(20 20 26 / .1);
+  --fill:#5B5B66;
+  --toast-lift:1.25rem; --ask-lift:1.25rem; --foot-pad:4.5rem;
+  --tab-y:calc(env(safe-area-inset-top,0px) + 2.625rem);
+}
+*,*::before,*::after{box-sizing:border-box}
+/* Scales with the window on a Mac and honours browser text-size settings; every size below is in rem. */
+html{font-size:clamp(100%,75% + .28vw,118.75%);-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:6rem}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--font-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100dvh}
+.aurora{position:fixed;inset:0 0 auto;height:100lvh;z-index:-1;pointer-events:none;background:var(--western) 62% center/cover no-repeat;opacity:.3}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+p{margin:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:0.375rem}
+.wrap{max-width:75rem;margin:0 auto;padding-left:max(1rem,env(safe-area-inset-left,0px));padding-right:max(1rem,env(safe-area-inset-right,0px))}
+
+/* top bar: brand and help sit on the page. The tab bar floats: top centre on a Mac, a bottom bar on a phone or tablet. */
+.top{position:relative;z-index:13;padding-top:env(safe-area-inset-top,0px)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;min-height:5.25rem;padding-block:0.75rem}
+.usc-logo{display:inline-block;flex:none;width:3rem;height:3rem;border-radius:50%;background:var(--usc-logo) center/contain no-repeat;box-shadow:0 4px 14px rgb(20 20 26 / .35)}
+.brand{display:inline-flex;align-items:center;gap:0.75rem;text-decoration:none;min-width:0}
+.brand-text{display:grid;gap:3px;min-width:0}
+.brand-name{display:inline-flex;align-items:center;gap:0.4375rem;font:800 1.625rem/1 var(--font-display);letter-spacing:-.03em}
+.brand .brand-by{font:500 0.7812rem/1.2 var(--font-body);color:var(--muted);white-space:nowrap}
+@media (max-width:420px){.brand-name{font-size:1.25rem}}
+.tab-anchor{position:fixed;z-index:14;left:50%;top:var(--tab-y);width:0;height:0}
+.tabs{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;gap:2px;width:max-content;padding:0.3125rem;border-radius:999px;background:var(--card);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%)}
+.tabs a{display:flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;padding:0.5625rem 1rem;min-height:2.5rem;border-radius:999px;color:var(--ink);font-weight:600;font-size:0.9375rem;line-height:1.1;transition:background .28s var(--ease),color .28s var(--ease)}
+.tabs a:hover{background:var(--accent-soft);color:var(--accent)}
+.tabs a{position:relative;z-index:1}
+.tabs a[aria-current="page"],.tabs a[aria-current="page"]:hover{background:none;color:var(--ink);font-weight:700}
+.tab-glider{position:absolute;left:0;top:0;border-radius:999px;background:#FFF;box-shadow:0 0 0 1px rgb(20 20 26 / .06),0 2px 8px rgb(20 20 26 / .16);pointer-events:none}
+.tab-glider.ready{transition:transform .42s var(--ease),width .42s var(--ease),height .42s var(--ease)}
+.lab-short{display:none}
+/* Once the library has adopted the tabs, it draws the glass and the position. Its layers blend with the page, so the anchor
+   must not be a stacking context (that would isolate them and leave the blur nothing to blur); each layer gets the z-index instead. */
+.lg-on .tab-anchor{position:static;width:auto;height:auto}
+.lg-on .tab-anchor > *{z-index:14!important}
+.tabs,.tour-card{text-shadow:none}
+.lg-on .tabs{position:relative;transform:none;background:rgb(255 255 255 / .4);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:999px}
+.lg-on .tab-anchor .glass{display:flex!important;vertical-align:top}
+.tab-anchor .pointer-events-none,.tour-anchor .pointer-events-none{pointer-events:none}
+.lg-slot{display:block}
+.lg-frost-only .glass__warp{filter:none!important;-webkit-backdrop-filter:blur(20px) saturate(170%)}
+.lg-frost-only .tabs{background:rgb(255 255 255 / .82)}
+@media (max-width:1199px){
+  :root{--toast-lift:calc(var(--tab-h) + var(--tab-gap) + 0.875rem);--ask-lift:calc(var(--tab-h) + var(--tab-gap) + 0.75rem);--foot-pad:calc(var(--tab-h) + var(--tab-gap) + 4.5rem + env(safe-area-inset-bottom,0px));--tab-y:calc(100dvh - env(safe-area-inset-bottom,0px) - var(--tab-gap) - var(--tab-h) / 2)}
+  html{scroll-padding-top:1rem;scroll-padding-bottom:calc(var(--tab-h) + 1.5rem)}
+  .tabs{width:min(100vw - 1rem - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px),40rem);height:var(--tab-h)}
+  .tabs a{flex:1 1 0;min-width:0;flex-direction:column;gap:2px;padding:0.25rem 0;min-height:0;font-size:0.6875rem;font-weight:600;border-radius:999px}
+  .lab-long{display:none}
+  .lab-short{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  main.wrap{padding-bottom:2.5rem}
+}
+@media (max-width:420px){.brand-by{display:none}.usc-logo{width:2.625rem;height:2.625rem}}
+
+main{padding-block:1.75rem 4.5rem}
+.view{display:grid;gap:1.75rem}
+.view-head{display:grid;gap:0.5rem;max-width:50rem}
+.eyebrow{font:600 0.75rem/1.2 var(--font-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.h1{font:800 clamp(2.25rem,5.4vw,3.75rem)/1.02 var(--font-display);letter-spacing:-.03em;margin:2px 0 0.25rem;text-wrap:balance}
+.h2{font:750 clamp(1.5rem,3vw,2rem)/1.1 var(--font-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.h3{font:650 1.1875rem/1.25 var(--font-body);margin:0;letter-spacing:-.005em}
+.lede{font-size:1.125rem;line-height:1.5;color:var(--ink-2);max-width:62ch}
+.muted{color:var(--muted)}
+.small{font-size:0.875rem}
+.mono{font-family:var(--font-mono);letter-spacing:.02em}
+.row{display:flex;gap:0.625rem;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.panel{background:var(--card);border-radius:var(--r-card);padding:1.25rem;box-shadow:var(--shadow);display:grid;gap:0.875rem;align-content:start;min-width:0}
+:is(.panel,.poster,.kpi,.btn.ghost){-webkit-backdrop-filter:var(--glass);backdrop-filter:var(--glass)}
+:is(.panel,.poster,.kpi){transition:box-shadow .32s var(--ease),background .32s var(--ease),transform .32s var(--ease)}
+@media (hover:hover){:is(.poster,.kpi):hover{background:var(--accent-card);box-shadow:inset 0 0 0 1.5px var(--accent),0 12px 30px rgb(79 38 131 / .16);transform:translateY(-2px)}}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.125rem;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+
+/* buttons, chips */
+.btn{appearance:none;border:0;background:var(--btn);color:var(--ink);box-shadow:var(--btn-shadow);font-weight:650;font-size:0.9688rem;padding:0.625rem 1rem;border-radius:var(--r-ctl);cursor:pointer;min-height:2.75rem;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;text-decoration:none;transition:transform .28s var(--ease),background .28s var(--ease),color .28s var(--ease),box-shadow .28s var(--ease)}
+.btn:active{transform:scale(.97);transition-duration:.1s}
+@media (hover:hover){.btn:not([disabled]):hover{color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent),0 8px 20px rgb(79 38 131 / .16);transform:translateY(-1px)}}
+.btn.ghost{background:rgb(255 255 255 / .34);color:var(--ink);box-shadow:var(--rim)}
+.btn.small{min-height:2.375rem;padding:0.4375rem 0.8125rem;font-size:0.9062rem}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.err{color:var(--bad);font-weight:600;font-size:0.9062rem;min-height:1.2em}
+
+/* tally mark */
+
+/* posters (club event cards) */
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(18.75rem,100%),1fr));gap:1.125rem}
+.poster{background:var(--card);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.club-line{display:flex;align-items:center;gap:0.625rem;font-weight:650;font-size:0.875rem;min-width:0}
+.club-line span:last-child{overflow-wrap:anywhere}
+.poster-title{font:800 1.6875rem/1.04 var(--font-display);letter-spacing:-.025em;margin:0.25rem 0 0;text-wrap:balance}
+.poster-body{padding:1rem 1.125rem 1.125rem;display:grid;gap:0.5rem;flex:1;align-content:start}
+.when{font-weight:650}
+.place{color:var(--muted);font-size:0.9062rem}
+.actions{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem}
+.poster-embed{display:block;width:100%;aspect-ratio:4/5;border:0;background:#fff}
+.shot-link{display:block;line-height:0}
+.poster-shot{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
+.post-link{display:inline-flex;align-items:center;gap:0.375rem;min-height:2.75rem;font-size:0.9375rem;font-weight:600;text-underline-offset:3px;transition:color .28s var(--ease)}
+.post-link:hover{color:var(--accent)}
+.source-note{font-size:1.0625rem;color:var(--ink-2);margin-top:-1rem;max-width:62ch}
+.empty{color:var(--muted);padding:1.5rem 0}
+
+/* clubs */
+.ev-title{font-weight:650;overflow-wrap:anywhere}
+.row-item > div{min-width:0}
+.row-item .post-link{min-height:2rem}
+
+/* USC dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(14.375rem,100%),1fr));gap:1rem}
+.kpi{background:var(--card);border-radius:var(--r-card);padding:1.125rem;box-shadow:var(--shadow);display:grid;gap:0.375rem;align-content:start;min-width:0}
+.kpi .label{font-size:0.8438rem;color:var(--muted);font-weight:650}
+.kpi .value{font:800 2.5rem/1 var(--font-display);font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+
+/* dialogs, toast, footer */
+dialog.sheet{border:0;border-radius:1.75rem;padding:0;width:min(27.5rem,calc(100vw - 2rem));background:rgb(255 255 255 / .88);color:var(--ink);box-shadow:var(--rim),0 30px 80px rgb(20 20 26 / .55);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
+dialog.sheet::backdrop{background:rgb(18 18 22 / .4)}
+.sheet-body{padding:1.375rem;display:grid;gap:0.75rem}
+.sheet-body label.field{font-weight:650;font-size:0.9062rem}
+.hint{font-size:0.8438rem;color:var(--muted)}
+.hint b{color:var(--ink)}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:0.5rem}
+legend{font-weight:650;font-size:0.9062rem;margin-bottom:0.375rem}
+.radio{display:grid;grid-template-columns:1.25rem minmax(0,1fr);gap:0.625rem;align-items:start;padding:0.625rem 0.75rem;border-radius:0.625rem;box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer}
+.radio:has(input:checked){box-shadow:inset 0 0 0 2px var(--ink)}
+.radio input{margin:3px 0 0;width:1.125rem;height:1.125rem;accent-color:var(--ink)}
+.radio small{display:block;color:var(--muted);font-size:0.8125rem}
+.toast{position:fixed;left:50%;bottom:calc(var(--toast-lift) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgb(48 48 58 / .94);color:#FFF;padding:0.75rem 1rem;border-radius:0.75rem;font-weight:650;box-shadow:var(--shadow);width:max-content;max-width:calc(100vw - 2rem);z-index:30}
+footer.foot{border-top:1px solid var(--line);padding-bottom:var(--foot-pad)}
+footer.foot .wrap{padding-block:1.375rem;display:flex;flex-wrap:wrap;gap:0.625rem 1.25rem;align-items:center;justify-content:space-between;font-size:0.8438rem;color:var(--muted)}
+.foot-note{display:flex;align-items:center;gap:0.75rem;flex:1 1 17.5rem;min-width:0}
+.foot-note .usc-logo{width:2.25rem;height:2.25rem}
+.foot-links{display:flex;flex-wrap:wrap;gap:0.25rem 1.125rem}
+.noscript{margin:1rem;padding:1rem;border-radius:1rem;background:var(--bad-soft);color:var(--ink)}
+.linkbtn{appearance:none;border:0;background:none;padding:0.375rem 0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:0.8438rem}
+
+/* walkthrough: a spotlight on the real interface and a card that explains it */
+dialog.tour{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ink);overflow:hidden}
+dialog.tour::backdrop{background:transparent}
+.tour-spot{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:1.25rem;box-shadow:0 0 0 3px var(--accent),0 0 22px 4px rgb(79 38 131 / .45),0 0 0 200vmax rgb(18 18 22 / .55);pointer-events:none;transition:left .46s var(--ease),top .46s var(--ease),width .46s var(--ease),height .46s var(--ease),opacity .3s ease}
+.tour-spot.off{box-shadow:0 0 0 200vmax rgb(18 18 22 / .55)}
+.tour-anchor{position:fixed;left:50%;top:50%;width:0;height:0;transition:left .46s var(--ease),top .46s var(--ease)}
+.tour-card{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:min(27rem,100vw - 1.5rem);max-height:calc(100dvh - 1.5rem);overflow-y:auto;display:grid;gap:0.625rem;padding:1.375rem;border-radius:1.75rem;background:rgb(255 255 255 / .9);box-shadow:var(--rim),0 24px 70px rgb(20 20 26 / .5);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
+.lg-on .tour-card{position:static;transform:none;background:rgb(255 255 255 / .74);box-shadow:var(--rim);-webkit-backdrop-filter:none;backdrop-filter:none}
+.lg-on .tour-anchor .glass{display:flex!important;vertical-align:top}
+.lg-frost-only .tour-card{background:rgb(255 255 255 / .94)}
+/* A dialog is always its own stacking context, so blending here would isolate the card and stop its blur. */
+.tour-anchor > span{mix-blend-mode:normal!important}
+.view-ghost{position:fixed;z-index:12;margin:0;pointer-events:none}
+.text-input{width:100%;font-size:1rem;padding:0.75rem 0.875rem;border-radius:0.75rem;border:1.5px solid var(--line);background:rgb(255 255 255 / .7);color:var(--ink)}
+.text-input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.role-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem}
+.role-pick .radio{align-items:center}
+@media (max-width:420px){.role-pick{grid-template-columns:1fr}}
+.chat-log{display:flex;flex-direction:column;gap:0.5rem;height:min(46dvh,24rem);overflow-y:auto;padding:0.25rem}
+.chat-msg{max-width:88%;padding:0.625rem 0.875rem;border-radius:1rem;background:var(--tint);overflow-wrap:anywhere;animation:fadein .3s ease both}
+.chat-msg.me{align-self:flex-end;background:#EDE9F5}
+.chat-msg img{display:block;width:8rem;border-radius:0.5rem;margin-top:0.5rem}
+.chat-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.chat-actions:empty{display:none}
+.chat-form{display:flex;gap:0.5rem}
+.chat-form[hidden]{display:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.lg-creds{display:grid;gap:0.5rem}
+.row.spread{justify-content:space-between}
+.tools{display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end}
+.tool{display:grid;gap:0.25rem;font-size:0.875rem;font-weight:600;min-width:9rem;flex:1 1 9rem}
+.tool.grow{flex:3 1 16rem}
+.tools .text-input{background:rgb(255 255 255 / .78);height:3rem;padding-block:0;font-size:1rem}
+.rows{list-style:none;margin:0;padding:0;display:grid}
+.row-item{display:flex;flex-wrap:wrap;gap:0.75rem 1rem;align-items:center;justify-content:space-between;padding:0.875rem 0;border-top:1px solid var(--line)}
+.row-item:first-child{border-top:0;padding-top:0.25rem}
+.grow{flex:1 1 14rem;min-width:0}
+.ev-title{font-weight:650;overflow-wrap:anywhere}
+.row-item > div{min-width:0}
+.row-item .post-link{min-height:2rem}
+.pill{font-size:0.8125rem;font-weight:650;padding:0.25rem 0.625rem;border-radius:999px;background:var(--warn-soft);color:var(--warn)}
+.pill.approved{background:var(--good-soft);color:var(--good)}
+.pill.declined{background:var(--bad-soft);color:var(--bad)}
+.chat-actions .btn{white-space:normal;text-align:left}
+.top-actions{display:flex;align-items:center;gap:0.5rem;flex:none}
+/* past events: a tidy gallery, muted until you point at one */
+.past{display:grid;gap:1rem;margin-top:1.5rem}
+.past-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(13.5rem,46%),1fr));gap:1.5rem 1rem}
+.past-card{display:grid;gap:0.25rem;align-content:start;min-width:0;text-decoration:none;color:inherit}
+.past-shot{display:block;width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:1.125rem;margin-bottom:0.5rem;background:var(--card);filter:saturate(.55) opacity(.92);box-shadow:0 6px 18px rgb(20 20 26 / .12);transition:filter .32s var(--ease),transform .32s var(--ease),box-shadow .32s var(--ease)}
+.past-date{font-size:0.8125rem;font-weight:600;color:var(--muted)}
+.past-title{font:700 1.0625rem/1.25 var(--font-body)}
+.past-meta{font-size:0.875rem;color:var(--muted)}
+.past-card:hover .past-title{color:var(--accent)}
+@media (hover:hover){.past-card:hover .past-shot{filter:none;transform:translateY(-2px);box-shadow:0 0 0 1.5px var(--accent),0 12px 30px rgb(79 38 131 / .18)}}
+.req-shot{flex:none;width:4.5rem;height:5.5rem;object-fit:cover;border-radius:0.75rem}
+/* messages: a plain two-pane inbox; one pane at a time on a phone */
+.msg-app{display:grid;grid-template-columns:minmax(0,20rem) minmax(0,1fr);height:min(70dvh,42rem);min-height:26rem;border-radius:var(--r-card);overflow:hidden;background:rgb(255 255 255 / .72);box-shadow:var(--shadow)}
+.inbox{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+.new-chat{display:grid;gap:0.25rem;padding:0.875rem;font-size:0.8125rem;font-weight:600;border-bottom:1px solid var(--line)}
+.new-chat .text-input{height:2.75rem;padding-block:0;font-size:0.9375rem}
+.inbox-list{overflow-y:auto;flex:1;min-height:0}
+.inbox-none{padding:1rem}
+.inbox-item{appearance:none;border:0;display:grid;gap:0.25rem;width:100%;text-align:left;padding:0.875rem;background:none;color:inherit;cursor:pointer;border-bottom:1px solid var(--line);min-height:3.75rem;transition:background .24s var(--ease)}
+.inbox-item:hover{background:var(--accent-soft)}
+.inbox-item[aria-current="true"]{background:rgb(0 0 0 / .07)}
+.inbox-top,.inbox-bottom{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;min-width:0}
+.inbox-top b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inbox-top time{flex:none;font-size:0.75rem;color:var(--muted)}
+.inbox-preview{font-size:0.875rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.unread{flex:none;display:inline-grid;place-items:center;min-width:1.25rem;height:1.25rem;padding:0 0.3125rem;border-radius:999px;background:var(--accent);color:#FFF;font:700 0.75rem/1 var(--font-body)}
+.tab-badge{position:absolute;top:0.125rem;right:0.25rem}
+.lab-long + .lab-short + .tab-badge[hidden]{display:none}
+.thread{display:flex;flex-direction:column;min-width:0;min-height:0}
+.thread-head{display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.125rem;border-bottom:1px solid var(--line)}
+.thread-back{display:none}
+.thread-log{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:0.5rem;padding:1.125rem}
+.thread-empty{margin:auto;color:var(--muted)}
+.thread-none{margin:auto;text-align:center;padding:1.5rem;display:grid;gap:0.25rem}
+.bubble{align-self:flex-start;max-width:min(78%,32rem);padding:0.625rem 0.875rem;border-radius:1.125rem 1.125rem 1.125rem 0.375rem;background:#FFF;box-shadow:0 1px 2px rgb(20 20 26 / .1);overflow-wrap:anywhere;animation:fadein .28s ease both}
+.bubble.mine{align-self:flex-end;border-radius:1.125rem 1.125rem 0.375rem 1.125rem;background:#3A3A44;color:#FFF}
+.bubble time{display:block;margin-top:0.125rem;font-size:0.6875rem;color:var(--muted)}
+.bubble.mine time{color:#E4E4E9}
+.composer{display:flex;gap:0.5rem;padding:0.75rem;border-top:1px solid var(--line)}
+@media (max-width:760px){
+  .msg-app{grid-template-columns:minmax(0,1fr);height:calc(100dvh - 15rem);min-height:22rem}
+  .msg-app .thread{display:none}
+  .msg-app.reading .inbox{display:none}
+  .msg-app.reading .thread{display:flex}
+  .inbox{border-right:0}
+  .thread-back{display:inline-block;min-height:2.75rem;font-size:0.9375rem;color:var(--ink);flex:none}
+}
+/* the assistant sits in the bottom-right corner on every page */
+.ask-fab{position:fixed;z-index:16;right:max(1rem,env(safe-area-inset-right,0px));bottom:calc(max(var(--ask-lift),1.25rem) + env(safe-area-inset-bottom,0px));min-height:3rem;padding:0.75rem 1.25rem;border:0;border-radius:999px;background:#3A3A44;color:#FFF;font-weight:700;box-shadow:0 8px 24px rgb(20 20 26 / .28);cursor:pointer;transition:background .28s var(--ease),transform .28s var(--ease)}
+.ask-fab[aria-expanded="true"]{display:none}
+@media (max-width:1199px){.in-thread .ask-fab{display:none}}
+@media (hover:hover){.ask-fab:hover{background:var(--accent);transform:translateY(-1px)}}
+.ask-panel{position:fixed;z-index:17;right:max(1rem,env(safe-area-inset-right,0px));bottom:calc(max(var(--ask-lift),1.25rem) + env(safe-area-inset-bottom,0px));width:min(24rem,100vw - 2rem);height:min(34rem,100dvh - var(--ask-lift) - 2.5rem);display:flex;flex-direction:column;gap:0.625rem;padding:1rem;border-radius:1.5rem;background:rgb(255 255 255 / .96);box-shadow:0 24px 70px rgb(20 20 26 / .28)}
+.ask-panel[hidden]{display:none}
+.ask-log{flex:1;height:auto;min-height:0}
+.chat-msg{white-space:pre-line}
+.chat-msg.typing{color:var(--muted);font-style:italic}
+.mode-pick{display:grid;grid-template-columns:1fr 1fr;gap:0.25rem;padding:0.25rem;border-radius:999px;background:var(--tint)}
+.mode-pick button{appearance:none;border:0;background:none;color:var(--ink);font-weight:650;min-height:2.5rem;border-radius:999px;cursor:pointer;transition:background .24s var(--ease)}
+.mode-pick button[aria-pressed="true"]{background:#FFF;box-shadow:0 1px 4px rgb(20 20 26 / .16)}
+#lg-up[hidden],#lg-club-wrap[hidden],#lg-invite-wrap[hidden]{display:none}
+.demo-note{background:var(--tint);border-radius:0.75rem;padding:0.75rem;font-size:0.875rem;display:grid;gap:0.375rem;justify-items:start}
+.gate{max-width:36rem}
+dialog.sheet,dialog.tour{opacity:0;transition:opacity .3s ease,transform .36s var(--ease),overlay .3s allow-discrete,display .3s allow-discrete}
+dialog.sheet{transform:translateY(10px) scale(.98)}
+dialog.sheet[open],dialog.tour[open]{opacity:1;transform:none}
+@starting-style{dialog.sheet[open],dialog.tour[open]{opacity:0}dialog.sheet[open]{transform:translateY(10px) scale(.98)}}
+dialog.sheet::backdrop{opacity:0;transition:opacity .3s ease,overlay .3s allow-discrete,display .3s allow-discrete}
+dialog.sheet[open]::backdrop{opacity:1}
+@starting-style{dialog.sheet[open]::backdrop{opacity:0}}
+.toast:not([hidden]){animation:fadein .3s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.tour-media:empty{display:none}
+.tour-media .usc-logo{width:5.25rem;height:5.25rem}
+.tour-media .tour-count{font:600 0.8125rem/1.2 var(--font-body);color:var(--muted)}
+.tour-title{font:750 1.5rem/1.15 var(--font-display);letter-spacing:-.015em;margin:0;text-wrap:balance}
+.tour-text{font-size:1.0312rem;line-height:1.45;color:var(--ink-2)}
+.tour-bar{height:0.3125rem;border-radius:999px;background:var(--tint);overflow:hidden;margin-top:0.25rem}
+.tour-bar i{display:block;height:100%;border-radius:999px;background:var(--fill);transition:width .46s var(--ease)}
+.tour-actions{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin-top:0.375rem}
+.tour-actions .grow{flex:1 1 auto}
+@media (hover:none){.tour-actions .btn:focus-visible{outline:none}}
+@media (max-height:480px){
+  .tour-card{width:min(36rem,100vw - 24px);padding:0.875rem 1.125rem;gap:0.375rem}
+  .tour-media .usc-logo{width:3rem;height:3rem}
+  .tour-media   .tour-title{font-size:1.25rem}
+  .tour-text{font-size:0.9375rem}
+  .tour-actions{margin-top:0}
+}
+.tour-actions .linkbtn{color:var(--ink);min-height:2.75rem;font-size:0.9375rem}
+@media (prefers-reduced-transparency: reduce){
+  :root{--card:#FFFFFF;--screen:#1C1C1E;--glass:none}
+  .tabs,.tour-card,dialog.sheet{background:#FFFFFF;-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<noscript><p class="noscript">Purple Hub needs JavaScript. If this opened in a preview, open the file in Safari or Chrome instead.</p></noscript>
+<div class="aurora" aria-hidden="true"></div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#week" aria-label="Purple Hub, by USC. Home.">
+      <span class="usc-logo" data-testid="usc-logo"></span>
+      <span class="brand-text">
+        <span class="brand-name">Purple Hub</span>
+        <span class="brand-by">by USC</span>
+      </span>
+    </a>
+    <div class="top-actions">
+    <button class="btn small" type="button" data-act="account" data-testid="account" id="account-btn">Sign in</button>
+    </div>
+  </div>
+</header>
+<div class="tab-anchor" id="tab-anchor">
+    <nav class="tabs" aria-label="Sections">
+      <span class="tab-glider" id="tab-glider" aria-hidden="true"></span>
+      <a href="#week" aria-label="Home"><span class="lab-long">Home</span><span class="lab-short">Home</span></a>
+      <a href="#messages" aria-label="Messages"><span class="lab-long">Messages</span><span class="lab-short">Messages</span><span class="unread tab-badge" id="msg-badge" data-testid="msg-badge" hidden></span></a>
+      <a href="#clubs" aria-label="For clubs"><span class="lab-long">For clubs</span><span class="lab-short">Clubs</span></a>
+      <a href="#usc" aria-label="USC dashboard"><span class="lab-long">USC dashboard</span><span class="lab-short">USC</span></a>
+    </nav>
+</div>
+
+<main class="wrap">
+  <section class="view" id="view-week" data-view="week" aria-label="Upcoming events"></section>
+  <section class="view" id="view-clubs" data-view="clubs" aria-label="For clubs" hidden></section>
+  <section class="view" id="view-usc" data-view="usc" aria-label="USC dashboard" hidden></section>
+  <section class="view" id="view-messages" data-view="messages" aria-label="Messages" hidden></section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="usc-logo"></span>
+    <div class="foot-links">
+      <button class="linkbtn" type="button" data-act="tour-reset" data-testid="tour-reset">Reset tutorial</button>
+    </div>
+  </div>
+</footer>
+
+<dialog id="dlg-login" class="sheet" aria-labelledby="lg-title">
+  <form id="lg-form" class="sheet-body" novalidate>
+    <h2 id="lg-title" class="sr-only">Sign in or create an account</h2>
+    <div class="mode-pick" role="group" aria-label="Sign in or create an account">
+      <button type="button" data-act="login-mode" data-v="in" data-testid="mode-in">Sign in</button>
+      <button type="button" data-act="login-mode" data-v="up" data-testid="mode-up">Create account</button>
+    </div>
+    <div id="lg-up" class="lg-creds">
+      <label class="field" for="lg-name">Your name</label>
+      <input id="lg-name" class="text-input" autocomplete="name" maxlength="80">
+      <fieldset><legend>I am a</legend><div class="role-pick">
+        <label class="radio"><input type="radio" name="lg-role" value="student" id="lg-role-student" checked><span>Student</span></label>
+        <label class="radio"><input type="radio" name="lg-role" value="club" id="lg-role-club"><span>Club president</span></label>
+        <label class="radio"><input type="radio" name="lg-role" value="admin" id="lg-role-admin"><span>USC staff</span></label>
+      </div></fieldset>
+      <div id="lg-club-wrap" class="lg-creds"><label class="field" for="lg-club">Your club</label><select id="lg-club" class="text-input"></select></div>
+      <div id="lg-invite-wrap" class="lg-creds"><label class="field" for="lg-invite">USC invite code</label><input id="lg-invite" class="text-input" autocomplete="off"></div>
+    </div>
+    <div class="lg-creds">
+      <label class="field" for="lg-email">Western email</label>
+      <input id="lg-email" class="text-input" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="you@uwo.ca">
+      <label class="field" for="lg-pass">Password</label>
+      <input id="lg-pass" class="text-input" type="password" autocomplete="current-password">
+    </div>
+    <p class="small muted" id="lg-hint" hidden></p>
+    <p class="err" id="lg-err" role="alert"></p>
+    <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" data-testid="login-submit">Sign in</button></div>
+  </form>
+  <div id="lg-who" class="sheet-body" hidden></div>
+</dialog>
+
+<dialog id="dlg-chat" class="sheet chat" aria-labelledby="chat-title" data-testid="chat">
+  <div class="sheet-body">
+    <div class="row spread"><h2 id="chat-title" class="h3">Post assistant</h2><button class="btn ghost small" type="button" data-close>Close</button></div>
+    <div class="chat-log" id="chat-log" role="log" aria-live="polite" data-testid="chat-log"></div>
+    <div class="chat-actions" id="chat-actions"></div>
+    <form class="chat-form" id="chat-form" novalidate><label class="sr-only" for="chat-input">Your answer</label><input id="chat-input" class="text-input" autocomplete="off"><button class="btn" type="submit" data-testid="chat-send">Send</button></form>
+  </div>
+</dialog>
+
+<dialog id="tour" class="tour" aria-labelledby="tour-title" aria-describedby="tour-text" data-testid="tour">
+  <div class="tour-spot off" id="tour-spot" data-testid="tour-spot"></div>
+  <div class="tour-anchor" id="tour-anchor">
+    <div class="tour-card" id="tour-card" data-testid="tour-card">
+      <div class="tour-media" id="tour-media"></div>
+      <p class="tour-count" id="tour-count" data-testid="tour-count"></p>
+      <div aria-live="polite" style="display:grid;gap:8px">
+        <h2 class="tour-title" id="tour-title" data-testid="tour-title"></h2>
+        <p class="tour-text" id="tour-text" data-testid="tour-text"></p>
+      </div>
+      <div class="tour-bar" aria-hidden="true"><i id="tour-progress"></i></div>
+      <div class="tour-actions">
+        <button class="linkbtn" type="button" data-act="tour-skip" data-testid="tour-skip">Skip</button>
+        <span class="grow"></span>
+        <button class="btn ghost" type="button" data-act="tour-back" data-testid="tour-back">Back</button>
+        <button class="btn" type="button" data-act="tour-next" data-testid="tour-next" id="tour-next">Next</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<button class="ask-fab" id="ask-fab" type="button" data-act="ask" aria-expanded="false" aria-controls="ask-panel" data-testid="ask-fab">Ask Purple Hub</button>
+<section class="ask-panel" id="ask-panel" aria-label="Ask Purple Hub" data-testid="ask-panel" hidden>
+  <div class="row spread ask-head"><h2 class="h3">Ask Purple Hub</h2><button class="linkbtn" type="button" data-act="ask-close" data-testid="ask-close">Close</button></div>
+  <div class="chat-log ask-log" id="ask-log" role="log" aria-live="polite" data-testid="ask-log"></div>
+  <div class="chat-actions" id="ask-actions"></div>
+  <form class="chat-form" id="ask-form" novalidate><label class="sr-only" for="ask-input">Your question</label><input id="ask-input" class="text-input" autocomplete="off" maxlength="500" placeholder="Ask a question" data-testid="ask-input"><button class="btn" type="submit" data-testid="ask-send">Send</button></form>
+</section>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- helpers ---------- */
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const money = (n) => '$' + Number(n).toLocaleString('en-CA', { maximumFractionDigits: 2 });
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- clubs and events: real ones from src/data.json, plus approved club posts from the server ---------- */
+  const DATA = {{DATA}};
+  const EVENT_IMG = {{EVENT_IMAGES}};
+  const CLUBS = DATA.clubs, CATEGORIES = DATA.categories;
+  const POST = (code) => 'https://www.instagram.com/p/' + code + '/';
+  const STATIC_EVENTS = DATA.events.map((e) => ({ ...e, at: new Date(e.at).getTime(), ends: e.ends ? new Date(e.ends).getTime() : 0, post: POST(e.code) }));
+  let EVENTS = STATIC_EVENTS.slice();
+  const shot = (e) => e.img || EVENT_IMG[e.shot || e.id];
+  const live = (e) => !e.past && (e.ends || 0) >= Date.now();
+  const postLink = (e) => (e.post ? '<a class="post-link" href="' + e.post + '" target="_blank" rel="noopener">View on Instagram</a>' : '');
+
+  /* ---------- talking to the server ---------- */
+  const OFFLINE = location.protocol === 'file:';
+  async function api(path, body, method) {
+    if (OFFLINE) throw new Error('This needs the Purple Hub server. Open Purple Hub from its web address to use this.');
+    const r = await fetch(path, { method: method || (body ? 'POST' : 'GET'), headers: { 'content-type': 'application/json', 'x-purplehub': '1' }, body: body ? JSON.stringify(body) : undefined });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Something went wrong. Please try again.');
+    return j;
+  }
+  let D = { user: null, posts: [], mine: [], requests: [], accounts: [], threads: [] };
+  const UI = { q: '', club: 'All', cat: 'All', thread: null, draftInbox: null };
+  const unreadTotal = () => D.threads.reduce((t, x) => t + x.unread, 0);
+  // Reloads everything this person may see. New messages arrive here too, pushed by the stream below.
+  async function refresh(announce) {
+    if (OFFLINE) return;
+    const before = new Map(D.threads.map((t) => [t.id, t.unread])), hadUser = D.user && D.user.id;
+    D = await api('/api/data');
+    EVENTS = [...STATIC_EVENTS, ...D.posts];
+    if (D.user && hadUser !== D.user.id) openStream();
+    if (!D.user) closeStream();
+    if (announce) {
+      const fresh = D.threads.find((t) => t.unread > (before.get(t.id) || 0) && !(current() === 'messages' && UI.thread === t.id));
+      if (fresh) toast('New message from ' + fresh.title);
+    }
+    if (current() === 'week') { renderLists(); renderAccount(); } else render();
+    markOpenThreadRead();
+  }
+  let stream = null;
+  function openStream() {
+    closeStream();
+    if (!window.EventSource) return;
+    stream = new EventSource('/api/stream');
+    stream.addEventListener('change', () => { refresh(true).catch(() => {}); });
+  }
+  function closeStream() { if (stream) { stream.close(); stream = null; } }
+  const act = (p) => p.catch((e) => { toast(e.message); });
+  const me = () => D.user;
+  const isAdmin = () => !!me() && me().role === 'admin' && me().approved;
+  const isClub = () => !!me() && me().role === 'club' && me().approved;
+  const firstName = (u) => { const n = u.name.replace(/\s*\(.*\)/, '').split(' ')[0]; return n.length > 12 ? n.slice(0, 11) + '…' : n; };
+  function gateHTML(role, title) {
+    const words = { admin: ['USC staff only', 'Sign in with your USC account to see this page.'], club: ['Club presidents only', 'Sign in with your Western email to post events and request funding.'], messages: ['Sign in to message', 'Create a free account with your Western email to message the USC or a club, and get their replies here.'] }[role];
+    return '<header class="view-head"><h1 class="h1">' + title + '</h1></header>' +
+      '<section class="panel gate" data-testid="gate-' + role + '"><h2 class="h3">' + words[0] + '</h2><p>' + words[1] + '</p>' +
+      '<div class="row"><button class="btn" type="button" data-act="login" data-v="in">Sign in</button><button class="btn ghost" type="button" data-act="login" data-v="up">Create account</button></div></section>';
+  }
+
+  /* ---------- home: upcoming and past events ---------- */
+  function mediaHTML(e, c) {
+    const alt = 'Picture of ' + esc(c.short) + '’s post for ' + esc(e.title) + '.';
+    if (shot(e)) {
+      const img = '<img class="poster-shot" src="' + shot(e) + '" alt="' + alt + '">';
+      return e.post ? '<a class="shot-link" href="' + e.post + '" target="_blank" rel="noopener" aria-label="Open the ' + esc(e.title) + ' post on Instagram">' + img + '</a>' : img;
+    }
+    return '<iframe class="poster-embed" src="' + e.post + 'embed/" loading="lazy" title="' + esc(c.short) + '’s Instagram post for ' + esc(e.title) + '" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>';
+  }
+  function posterHTML(e) {
+    const c = CLUBS[e.club];
+    return '<article class="poster" data-testid="event-' + e.id + '">' + mediaHTML(e, c) +
+      '<div class="poster-body"><p class="club-line">' + esc(c.name) + '</p><h3 class="poster-title">' + esc(e.title) + '</h3>' +
+      '<p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
+  }
+  function matches(e) {
+    const c = CLUBS[e.club], q = UI.q.trim().toLowerCase();
+    if (UI.club !== 'All' && e.club !== UI.club) return false;
+    if (UI.cat !== 'All' && e.cat !== UI.cat) return false;
+    return !q || [e.title, c.name, c.short, e.place, e.date, e.cat, e.hosts || ''].join(' ').toLowerCase().includes(q);
+  }
+  function renderLists() {
+    const up = EVENTS.filter(live).filter(matches).sort((a, b) => a.ends - b.ends);
+    const past = EVENTS.filter((e) => !live(e)).filter(matches).sort((a, b) => b.at - a.at);
+    $('#feed').innerHTML = up.map(posterHTML).join('') || '<p class="empty">No upcoming events match that.</p>';
+    $('#past-grid').innerHTML = past.map((e) => {
+      const inner = (shot(e) ? '<img class="past-shot" src="' + shot(e) + '" alt="">' : '<span class="past-shot"></span>') +
+        '<span class="past-date">' + esc(e.date) + '</span><span class="past-title">' + esc(e.title) + '</span><span class="past-meta">' + esc(e.hosts || CLUBS[e.club].short) + '</span>';
+      return e.post ? '<a class="past-card" data-testid="past-' + e.id + '" href="' + e.post + '" target="_blank" rel="noopener" aria-label="' + esc(e.title) + ', ' + esc(e.date) + '. Open on Instagram">' + inner + '</a>' : '<div class="past-card" data-testid="past-' + e.id + '">' + inner + '</div>';
+    }).join('') || '<p class="empty">No past events match that.</p>';
+  }
+  function renderWeek() {
+    const opt = (value, label, on) => '<option value="' + esc(value) + '"' + (on ? ' selected' : '') + '>' + esc(label) + '</option>';
+    $('#view-week').innerHTML =
+      '<header class="view-head"><h1 class="h1">Upcoming events</h1></header>' +
+      '<div class="tools" id="event-tools" data-testid="tools">' +
+        '<label class="tool grow"><span>Search</span><input id="ev-search" class="text-input" type="search" placeholder="Search events" value="' + esc(UI.q) + '" data-testid="search"></label>' +
+        '<label class="tool"><span>Sort by club</span><select id="ev-club" class="text-input" data-testid="sort-club">' + opt('All', 'All clubs', UI.club === 'All') + Object.values(CLUBS).map((c) => opt(c.id, c.short, UI.club === c.id)).join('') + '</select></label>' +
+        '<label class="tool"><span>Category</span><select id="ev-cat" class="text-input" data-testid="sort-cat">' + opt('All', 'All categories', UI.cat === 'All') + CATEGORIES.map((c) => opt(c, c, UI.cat === c)).join('') + '</select></label>' +
+      '</div>' +
+      '<div class="feed" id="feed" data-testid="feed"></div>' +
+      '<section class="past" data-testid="recent"><h2 class="h2">Past events</h2><div class="past-grid" id="past-grid"></div></section>';
+    renderLists();
+  }
+
+  /* ---------- club presidents: their posts and funding requests ---------- */
+  const STATUS = { pending: 'Waiting for USC approval', approved: 'Approved', declined: 'Declined' };
+  const FUNDING = { pending: 'waiting for the USC', approved: 'approved', declined: 'declined' };
+  const pill = (status, text) => '<span class="pill ' + status + '">' + esc(text) + '</span>';
+  function fundingLine(p) {
+    return p.funding ? '<p class="small">Funding: <b>' + money(p.funding.amount) + '</b> for ' + esc(p.funding.purpose) + ' (' + FUNDING[p.funding.status] + ')</p>' : '';
+  }
+  function renderClubs() {
+    const u = me();
+    if (!u || u.role !== 'club') { $('#view-clubs').innerHTML = gateHTML('club', 'For clubs'); return; }
+    const c = CLUBS[u.club];
+    if (!u.approved) {
+      $('#view-clubs').innerHTML = '<header class="view-head"><h1 class="h1">' + esc(c.name) + '</h1></header><section class="panel gate" data-testid="club-waiting"><h2 class="h3">Waiting for the USC</h2><p>The USC confirms each club president before they can post or read club messages. You’ll be able to use this page as soon as they do.</p></section>';
+      return;
+    }
+    const listed = STATIC_EVENTS.filter((e) => e.club === c.id && live(e)).sort((a, b) => a.ends - b.ends);
+    $('#view-clubs').innerHTML =
+      '<header class="view-head"><h1 class="h1">' + esc(c.name) + '</h1><p class="small">Signed in as ' + esc(u.email) + '</p></header>' +
+      '<section class="panel"><div class="row spread"><h2 class="h3">Your posts</h2><button class="btn small" type="button" data-act="chat" data-testid="chat-open">Add a post</button></div>' +
+        (D.mine.length ? '<ul class="rows">' + D.mine.map((p) => '<li class="row-item" data-testid="mine-' + p.id + '"><div><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + '</p>' + fundingLine(p) + '</div><div class="row">' + pill(p.status, STATUS[p.status]) + '<button class="btn ghost small" type="button" data-act="remove-post" data-id="' + p.id + '" data-testid="remove-' + p.id + '">Remove</button></div></li>').join('') + '</ul>'
+          : '<p class="muted">Nothing yet. Add a post, and the USC will review it before it appears on Home.</p>') + '</section>' +
+      (listed.length ? '<section class="panel"><h2 class="h3">Already on Home</h2><ul class="rows">' + listed.map((e) => '<li class="row-item"><div><p class="ev-title">' + esc(e.title) + '</p><p class="small muted">' + esc(e.date) + ' · ' + esc(e.place) + '</p></div>' + postLink(e) + '</li>').join('') + '</ul></section>' : '');
+  }
+
+  /* ---------- USC: approvals, funding and new club presidents ---------- */
+  function requestHTML(p) {
+    const c = CLUBS[p.club], fund = p.funding;
+    return '<li class="row-item request" data-testid="request-' + p.id + '">' + (p.img ? '<img class="req-shot" src="' + p.img + '" alt="">' : '') +
+      '<div class="grow"><p class="small muted">' + esc(c.short) + '</p><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + ' · ' + esc(p.cat) + '</p>' + fundingLine(p) + postLink(p) + '</div>' +
+      '<div class="row">' +
+        (p.status === 'pending' ? '<button class="btn small" type="button" data-act="review" data-v="approved" data-id="' + p.id + '" data-testid="approve-' + p.id + '">Approve post</button><button class="btn ghost small" type="button" data-act="review" data-v="declined" data-id="' + p.id + '" data-testid="decline-' + p.id + '">Decline post</button>' : pill(p.status, STATUS[p.status])) +
+        (fund && fund.status === 'pending' ? '<button class="btn small" type="button" data-act="fund" data-v="approved" data-id="' + p.id + '" data-testid="fund-yes-' + p.id + '">Approve ' + money(fund.amount) + '</button><button class="btn ghost small" type="button" data-act="fund" data-v="declined" data-id="' + p.id + '" data-testid="fund-no-' + p.id + '">Decline funding</button>' : '') +
+      '</div></li>';
+  }
+  function renderUSC() {
+    if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'USC dashboard'); return; }
+    const open = D.requests.filter((p) => p.status === 'pending' || (p.funding && p.funding.status === 'pending'));
+    const done = D.requests.filter((p) => !open.includes(p));
+    const sum = (st) => D.requests.reduce((t, p) => t + (p.funding && p.funding.status === st ? p.funding.amount : 0), 0);
+    const tile = (label, value, id) => '<article class="kpi" data-testid="' + id + '"><p class="label">' + label + '</p><p class="value">' + value + '</p></article>';
+    $('#view-usc').innerHTML =
+      '<header class="view-head"><h1 class="h1">USC dashboard</h1></header>' +
+      '<div class="kpis">' + tile('Waiting for a decision', open.length + D.accounts.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
+      (D.accounts.length ? '<section class="panel"><h2 class="h3">New club presidents</h2><ul class="rows">' + D.accounts.map((a) => '<li class="row-item" data-testid="account-' + a.id + '"><div><p class="ev-title">' + esc(a.name) + '</p><p class="small muted">' + esc(a.email) + ' · says they run ' + esc(CLUBS[a.club] ? CLUBS[a.club].name : a.club) + '</p></div><div class="row"><button class="btn small" type="button" data-act="account-yes" data-id="' + a.id + '" data-testid="account-yes-' + a.id + '">Confirm</button><button class="btn ghost small" type="button" data-act="account-no" data-id="' + a.id + '">Decline</button></div></li>').join('') + '</ul></section>' : '') +
+      '<section class="panel"><h2 class="h3">Requests</h2>' + (open.length ? '<ul class="rows">' + open.map(requestHTML).join('') + '</ul>' : '<p class="muted">Nothing is waiting. New requests from club presidents appear here.</p>') + '</section>' +
+      (done.length ? '<section class="panel"><h2 class="h3">Decided</h2><ul class="rows">' + done.map(requestHTML).join('') + '</ul></section>' : '');
+  }
+
+  /* ---------- messages: each person talks to an inbox (the USC or a club), and that inbox's staff can answer ---------- */
+  const inboxLabel = (x) => (x === 'usc' ? 'USC' : CLUBS[x].short);
+  const inboxFull = (x) => (x === 'usc' ? 'University Students’ Council' : CLUBS[x].name);
+  function clock(ts) {
+    const d = new Date(ts), now = new Date();
+    return d.toDateString() === now.toDateString() ? d.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+  }
+  function renderMessages() {
+    const box = $('#view-messages');
+    if (!me()) { box.innerHTML = gateHTML('messages', 'Messages'); return; }
+    const draft = $('#msg-input') ? $('#msg-input').value : '';
+    const wide = matchMedia('(min-width:761px)').matches;
+    const own = isAdmin() ? 'usc' : isClub() ? me().club : null;
+    const options = ['usc', ...Object.keys(CLUBS)].filter((x) => x !== own);
+    if (!UI.draftInbox && !D.threads.some((t) => t.id === UI.thread)) UI.thread = wide && D.threads[0] ? D.threads[0].id : null;
+    const open = D.threads.find((t) => t.id === UI.thread);
+    const showing = open || UI.draftInbox;
+    const lastOf = (t) => t.messages[t.messages.length - 1];
+    const list = D.threads.map((t) => {
+      const l = lastOf(t);
+      return '<button class="inbox-item" type="button" data-act="thread" data-v="' + t.id + '" aria-current="' + (t.id === UI.thread) + '" data-testid="thread-' + t.id + '"><span class="inbox-top"><b>' + esc(t.title) + '</b><time>' + (l ? clock(l.at) : '') + '</time></span><span class="inbox-bottom"><span class="inbox-preview">' + (l ? (l.mine ? 'You: ' : '') + esc(l.body) : '') + '</span>' + (t.unread ? '<span class="unread" aria-label="' + t.unread + ' new">' + t.unread + '</span>' : '') + '</span></button>';
+    }).join('');
+    let pane;
+    if (showing) {
+      const title = open ? open.title : inboxLabel(UI.draftInbox), sub = open ? open.subtitle : inboxFull(UI.draftInbox);
+      const bubbles = open ? open.messages.map((m) => '<div class="bubble' + (m.mine ? ' mine' : '') + '">' + esc(m.body) + '<time>' + clock(m.at) + '</time></div>').join('') : '<p class="thread-empty">Write your first message to ' + esc(title) + '.</p>';
+      pane = '<div class="thread-head"><button class="linkbtn thread-back" type="button" data-act="thread-back" data-testid="thread-back">Back</button><div><h2 class="h3" data-testid="thread-title">' + esc(title) + '</h2>' + (sub !== title ? '<p class="small muted">' + esc(sub) + '</p>' : '') + '</div></div>' +
+        '<div class="thread-log" id="msg-log" role="log" aria-live="polite" data-testid="msg-log">' + bubbles + '</div>' +
+        '<form class="composer" id="msg-form" novalidate><label class="sr-only" for="msg-input">Your message</label><input id="msg-input" class="text-input" maxlength="2000" autocomplete="off" placeholder="Write a message" data-testid="msg-input"><button class="btn" type="submit" data-testid="msg-send">Send</button></form>';
+    } else {
+      pane = '<div class="thread-none"><h2 class="h3">Your messages</h2><p class="muted">Choose a chat, or start a new one with the USC or a club.</p></div>';
+    }
+    box.innerHTML = '<header class="view-head"><h1 class="h1">Messages</h1></header>' +
+      '<div class="msg-app' + (showing ? ' reading' : '') + '">' +
+        '<aside class="inbox"><label class="new-chat"><span>Start a new chat</span><select id="new-chat" class="text-input" data-testid="new-chat"><option value="">Choose who to message</option>' + options.map((x) => '<option value="' + x + '">' + esc(inboxFull(x)) + '</option>').join('') + '</select></label>' +
+          '<div class="inbox-list" data-testid="inbox-list">' + (list || '<p class="muted inbox-none">No chats yet.</p>') + '</div></aside>' +
+        '<section class="thread" aria-label="Conversation">' + pane + '</section>' +
+      '</div>';
+    if ($('#msg-input')) $('#msg-input').value = draft;
+    const l = $('#msg-log'); if (l) l.scrollTop = l.scrollHeight;
+  }
+  function markOpenThreadRead() {
+    if (current() !== 'messages' || !UI.thread) return;
+    const t = D.threads.find((x) => x.id === UI.thread);
+    if (!t || !t.unread) return;
+    t.unread = 0;
+    renderAccount();
+    const it = $('[data-testid="thread-' + t.id + '"] .unread'); if (it) it.remove();
+    api('/api/threads/' + t.id + '/read', {}).catch(() => {});
+  }
+  document.addEventListener('submit', (e) => {
+    if (e.target.id !== 'msg-form') return;
+    e.preventDefault();
+    const input = $('#msg-input'), body = input.value.trim();
+    if (!body) return;
+    input.value = '';
+    act((async () => {
+      const r = await api('/api/messages', UI.thread ? { thread: UI.thread, body } : { inbox: UI.draftInbox, body });
+      UI.thread = r.thread; UI.draftInbox = null;
+      await refresh();
+      if ($('#msg-input')) $('#msg-input').focus();
+    })());
+  });
+
+  /* ---------- routing ---------- */
+  const VIEWS = { week: renderWeek, messages: renderMessages, clubs: renderClubs, usc: renderUSC };
+  function current() { const h = location.hash.slice(1); return Object.prototype.hasOwnProperty.call(VIEWS, h) ? h : 'week'; }
+  function renderAccount() {
+    const b = $('#account-btn');
+    b.textContent = me() ? firstName(me()) : 'Sign in';
+    b.setAttribute('aria-label', me() ? 'Account: ' + me().name : 'Sign in');
+    $('.tabs a[href="#clubs"]').hidden = !(me() && me().role === 'club');
+    $('.tabs a[href="#usc"]').hidden = !isAdmin();
+    const n = unreadTotal(), badge = $('#msg-badge');
+    badge.hidden = !n; badge.textContent = n > 9 ? '9+' : n;
+    document.documentElement.classList.toggle('in-thread', current() === 'messages' && !!(UI.thread || UI.draftInbox));
+    $('.tabs a[href="#messages"]').setAttribute('aria-label', n ? 'Messages, ' + n + ' new' : 'Messages');
+    moveGlider();
+  }
+  function render() { VIEWS[current()](); renderAccount(); }
+  function fade(el, ms) { if (el && el.animate && !still()) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms || 300, easing: 'ease' }); }
+  // Cards rise into place one after another. Only transform moves, so the page's own fade is untouched.
+  function rise(els) { if (still()) return; [...els].slice(0, 14).forEach((el, i) => { if (el.animate) el.animate([{ transform: 'translateY(12px)' }, { transform: 'none' }], { duration: 480, delay: i * 28, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }); }); }
+  const CARDS = ':is(.poster,.past-card,.panel,.kpi)';
+  function moveGlider() {
+    const a = $('.tabs a[aria-current="page"]'), g = $('#tab-glider');
+    if (!g) return;
+    g.style.opacity = a ? 1 : 0;
+    if (!a) return;
+    g.style.width = a.offsetWidth + 'px'; g.style.height = a.offsetHeight + 'px';
+    g.style.transform = 'translate(' + a.offsetLeft + 'px,' + a.offsetTop + 'px)';
+    requestAnimationFrame(() => g.classList.add('ready'));
+  }
+  // Cross-fade: the old page is a throwaway copy fading out above the new one, so the swap itself stays instant.
+  function ghostOf(section) {
+    if (!section || !section.animate || still()) return;
+    const r = section.getBoundingClientRect();
+    if (!r.height) return;
+    const g = section.cloneNode(true);
+    [g, ...g.querySelectorAll('*')].forEach((el) => [...el.attributes].forEach((a) => { if (a.name === 'id' || a.name === 'name' || a.name === 'for' || a.name.startsWith('data-') || a.name.startsWith('aria-')) el.removeAttribute(a.name); }));
+    g.classList.add('view-ghost');
+    g.setAttribute('aria-hidden', 'true');
+    g.inert = true;
+    Object.assign(g.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
+    document.body.appendChild(g);
+    g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, easing: 'ease' }).onfinish = () => g.remove();
+  }
+  let lastView = null;
+  function route() {
+    const v = current();
+    if (lastView !== null && lastView !== v) ghostOf($('#view-' + lastView));
+    document.querySelectorAll('[data-view]').forEach((s) => { s.hidden = s.dataset.view !== v; });
+    document.querySelectorAll('.tabs a').forEach((a) => { if (a.getAttribute('href') === '#' + v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    render();
+    if (lastView !== null && lastView !== v) { window.scrollTo(0, 0); const t = $('#toast'); if (t) t.hidden = true; }
+    if (lastView !== null && lastView !== v) { fade($('#view-' + v), 360); rise($('#view-' + v).querySelectorAll(CARDS)); }
+    lastView = v;
+  }
+  window.addEventListener('hashchange', () => markOpenThreadRead());
+  function go(v) { if (current() !== v) { location.hash = '#' + v; route(); } else { render(); fade($('#view-' + v)); } }
+  window.addEventListener('hashchange', route);
+  // The liquid glass library re-parents the tab bar and sizes change with the window, so re-measure whenever it resizes.
+  if (window.ResizeObserver) new ResizeObserver(moveGlider).observe($('.tabs'));
+
+  /* ---------- dialogs ---------- */
+  function openDialog(d) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
+  function closeDialog(d) { if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); }
+
+  /* ---------- sign-in and create-account dialog ---------- */
+  let loginMode = 'in';
+  function setLoginMode(mode) {
+    loginMode = mode;
+    const up = mode === 'up';
+    document.querySelectorAll('[data-act="login-mode"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === mode));
+    $('#lg-up').hidden = !up;
+    $('#lg-pass').autocomplete = up ? 'new-password' : 'current-password';
+    $('[data-testid="login-submit"]').textContent = up ? 'Create account' : 'Sign in';
+    $('#lg-err').textContent = '';
+    setLoginRole($('input[name="lg-role"]:checked').value);
+  }
+  function setLoginRole(role) {
+    const up = loginMode === 'up';
+    $('#lg-club-wrap').hidden = !(up && role === 'club');
+    $('#lg-invite-wrap').hidden = !(up && role === 'admin');
+    $('#lg-hint').textContent = !up ? '' : role === 'club' ? 'Choose a new password just for Purple Hub, not your Western one. The USC confirms club presidents before they can post.' : role === 'admin' ? 'Choose a new password just for Purple Hub, not your Western one. USC staff need an invite code.' : 'Choose a new password just for Purple Hub, not your Western one.';
+    $('#lg-hint').hidden = !up;
+  }
+  function openLogin(mode) {
+    $('#lg-form').hidden = false; $('#lg-who').hidden = true;
+    $('#lg-pass').value = ''; $('#lg-invite').value = '';
+    $('#lg-role-student').checked = true;
+    setLoginMode(mode || 'in');
+    openDialog($('#dlg-login'));
+    $(mode === 'up' ? '#lg-name' : '#lg-email').focus();
+  }
+  function openAccount() {
+    const who = $('#lg-who'), a = me();
+    who.innerHTML = '<h2 class="h3">' + esc(a.name) + '</h2><p class="muted">' + esc(a.email) + '</p><p>' + (a.role === 'admin' ? 'USC staff' : a.role === 'club' ? (a.approved ? 'President of ' : 'Waiting to be confirmed as president of ') + esc(CLUBS[a.club].name) : 'Student') + '</p><div class="row end"><button class="btn ghost" type="button" data-close>Close</button><button class="btn" type="button" data-act="signout" data-testid="signout">Sign out</button></div>';
+    $('#lg-form').hidden = true; who.hidden = false;
+    openDialog($('#dlg-login'));
+  }
+  $('#lg-club').innerHTML = Object.values(CLUBS).map((c) => '<option value="' + c.id + '">' + esc(c.name) + '</option>').join('');
+  $('#lg-form').addEventListener('change', (e) => { if (e.target.name === 'lg-role') setLoginRole(e.target.value); });
+  $('#lg-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const up = loginMode === 'up', submit = $('[data-testid="login-submit"]');
+    const body = { email: $('#lg-email').value, password: $('#lg-pass').value };
+    if (up) Object.assign(body, { name: $('#lg-name').value, role: $('input[name="lg-role"]:checked').value, club: $('#lg-club').value, invite: $('#lg-invite').value });
+    submit.disabled = true;
+    try {
+      await api(up ? '/api/signup' : '/api/login', body);
+      $('#lg-pass').value = ''; $('#lg-invite').value = '';
+      await refresh();
+      closeDialog($('#dlg-login'));
+      CHAT.reset();
+      const u = me();
+      go(u.role === 'admin' ? 'usc' : u.role === 'club' ? 'clubs' : current());
+      toast((up ? 'Welcome, ' : 'Hi, ') + firstName(u) + '.');
+    } catch (err) {
+      if (!up) $('#lg-pass').value = '';
+      $('#lg-err').textContent = err.message;
+    } finally { submit.disabled = false; }
+  });
+
+  /* ---------- chat bubbles and buttons, shared by the post assistant and help ---------- */
+  function say(logId, text, who, img) {
+    const m = document.createElement('div');
+    m.className = 'chat-msg' + (who === 'me' ? ' me' : '');
+    m.textContent = text;
+    if (img) { const i = document.createElement('img'); i.src = img; i.alt = 'Your picture'; m.appendChild(i); }
+    const log = $(logId);
+    log.appendChild(m);
+    log.scrollTop = log.scrollHeight;
+  }
+  function setButtons(boxId, list) {
+    const box = $(boxId);
+    box.textContent = '';
+    list.forEach((b) => { box.appendChild(b); });
+  }
+  function chatBtn(label, fn, ghost, testid) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn small' + (ghost ? ' ghost' : ''); b.textContent = label;
+    if (testid) b.dataset.testid = testid;
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  /* ---------- post assistant ----------
+     A step-by-step form written as a chat, for club presidents.
+     Instagram: a pasted link shows the post through Instagram's public embed. Importing a club's posts automatically would
+     need its Instagram business login and a server. */
+  const CHAT = { step: 0, d: {}, reset() { this.step = 0; this.d = {}; $('#chat-log').textContent = ''; setButtons('#chat-actions', []); } };
+  const IG_LINK = /instagram\.com\/(?:[\w.]+\/)?(p|reel)\/([\w-]+)/i;
+  const CONNECT_TEXT = 'For now, paste the link to each post and I’ll show it here. Pulling in new posts automatically needs your Instagram business login and a server, which Purple Hub doesn’t have yet.';
+  const CHAT_STEPS = [
+    { ask: 'Paste the link to your Instagram post. If you don’t have one, press No link.', input: 'text', skip: 'No link',
+      take(v, d) { const m = v.match(IG_LINK); if (!m) return 'That doesn’t look like a post link. It should look like instagram.com/p/ABC123.'; d.post = 'https://www.instagram.com/' + m[1].toLowerCase() + '/' + m[2] + '/'; } },
+    { ask: 'What’s the event called?', input: 'text', take(v, d) { if (!v || v.length > 80) return 'Please give it a name of up to 80 characters.'; d.title = v; } },
+    { ask: 'When is it? For example: Thursday, Nov 12, 6 to 8 p.m.', input: 'text', take(v, d) { if (!v || v.length > 80) return 'Please give a day and time, up to 80 characters.'; d.date = v; } },
+    { ask: 'Where is it?', input: 'text', take(v, d) { if (!v || v.length > 100) return 'Please give a place, up to 100 characters.'; d.place = v; } },
+    { ask: 'What’s the last day of the event? It moves to Past events after that.', input: 'date',
+      take(v, d) { const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m) return 'Please pick a date.'; const t = new Date(+m[1], +m[2] - 1, +m[3], 23, 59).getTime(); if (t < Date.now()) return 'That date has already passed. Please pick a later one.'; d.ends = t; } },
+    { ask: 'Which category fits best?', input: 'choice', options: CATEGORIES, pick(c, d) { d.cat = c; } },
+    { ask: 'Want to add a picture?', input: 'file' },
+    { ask: 'Do you need funding from the USC for this event?', input: 'choice', options: ['No funding', 'Request funding'], pick(c, d) { d.wantsFunding = c === 'Request funding'; } },
+    { ask: 'How much do you need? For example: 250', input: 'text', when: (d) => d.wantsFunding,
+      take(v, d) { const n = Number(v.replace(/[$,\s]/g, '')); if (!v || !Number.isFinite(n) || n <= 0 || n > 100000) return 'Please enter a dollar amount, like 250.'; d.amount = Math.round(n * 100) / 100; } },
+    { ask: 'What will the money pay for?', input: 'text', when: (d) => d.wantsFunding, take(v, d) { if (!v || v.length > 200) return 'Please say what it’s for, up to 200 characters.'; d.purpose = v; } },
+  ];
+  function nextStep() { CHAT.step++; askStep(); }
+  function askStep() {
+    const form = $('#chat-form'), input = $('#chat-input');
+    while (CHAT_STEPS[CHAT.step] && CHAT_STEPS[CHAT.step].when && !CHAT_STEPS[CHAT.step].when(CHAT.d)) CHAT.step++;
+    const st = CHAT_STEPS[CHAT.step];
+    if (!st) { showPreview(); return; }
+    say('#chat-log', st.ask);
+    if (st.input === 'choice') {
+      form.hidden = true;
+      setButtons('#chat-actions', st.options.map((c) => chatBtn(c, () => { say('#chat-log', c, 'me'); st.pick(c, CHAT.d); nextStep(); }, true, 'chat-opt-' + c.replace(/\s/g, '-'))));
+      return;
+    }
+    if (st.input === 'file') {
+      form.hidden = true;
+      const pick = document.createElement('input');
+      pick.type = 'file'; pick.accept = 'image/*'; pick.hidden = true; pick.dataset.testid = 'chat-file';
+      pick.addEventListener('change', () => { if (pick.files[0]) readPicture(pick.files[0]); });
+      const buttons = [pick, chatBtn('Choose a picture', () => pick.click())];
+      if (CHAT.d.post) buttons.push(chatBtn('Use my Instagram post', () => { say('#chat-log', 'Use my Instagram post', 'me'); nextStep(); }, true, 'chat-skip'));
+      setButtons('#chat-actions', buttons);
+      return;
+    }
+    form.hidden = false;
+    input.type = st.input; input.value = '';
+    setButtons('#chat-actions', st.skip ? [chatBtn(st.skip, () => { say('#chat-log', st.skip, 'me'); nextStep(); }, true, 'chat-skip')] : []);
+    input.focus();
+  }
+  function readPicture(file) {
+    const fail = () => say('#chat-log', 'I couldn’t read that picture. Please try a JPG or PNG.');
+    if (!/^image\//.test(file.type)) { fail(); return; }
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onerror = () => { URL.revokeObjectURL(url); fail(); };
+    im.onload = () => {
+      // Shrunk because the browser only has a few MB of storage. Redrawing also strips anything but pixels.
+      const scale = Math.min(1, 640 / im.naturalWidth), c = document.createElement('canvas');
+      c.width = Math.round(im.naturalWidth * scale); c.height = Math.round(im.naturalHeight * scale);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      CHAT.d.img = c.toDataURL('image/jpeg', 0.72);
+      say('#chat-log', 'Here’s my picture', 'me', CHAT.d.img);
+      nextStep();
+    };
+    im.src = url;
+  }
+  function showPreview() {
+    const d = CHAT.d;
+    $('#chat-form').hidden = true;
+    say('#chat-log', 'Here’s your request:\n' + d.title + '\n' + d.date + '\n' + d.place + '\n' + d.cat + '\n' + (d.post ? 'Instagram post linked' : 'No Instagram link') + '\n' + (d.wantsFunding ? 'Funding: ' + money(d.amount) + ' for ' + d.purpose : 'No funding'), null, d.img);
+    setButtons('#chat-actions', [chatBtn('Request approval', requestApproval, false, 'chat-request'), chatBtn('Start over', startChat, true)]);
+  }
+  async function requestApproval() {
+    const d = CHAT.d;
+    if (!isClub()) return;
+    setButtons('#chat-actions', []);
+    try {
+      await api('/api/posts', { title: d.title, date: d.date, place: d.place, ends: d.ends, post: d.post || '', img: d.img || '', cat: d.cat, funding: d.wantsFunding ? { amount: d.amount, purpose: d.purpose } : null });
+      await refresh();
+    } catch (e) {
+      say('#chat-log', e.message);
+      setButtons('#chat-actions', [chatBtn('Try again', requestApproval, false, 'chat-request'), chatBtn('Start over', startChat, true)]);
+      return;
+    }
+    say('#chat-log', 'Sent to the USC. You’ll see the decision under Your posts, and it appears on Home once it’s approved.');
+    setButtons('#chat-actions', [chatBtn('Add another', startChat, true), chatBtn('See my posts', () => { closeDialog($('#dlg-chat')); go('clubs'); })]);
+  }
+  function startChat() {
+    CHAT.reset();
+    say('#chat-log', 'Hi, ' + me().short + ' president. A few short questions and I’ll send your post to the USC for approval. You can ask for funding along the way. Type “start over” at any time.');
+    askStep();
+  }
+  function openChat() {
+    if (!isClub()) return;
+    openDialog($('#dlg-chat'));
+    if (!$('#chat-log').children.length) startChat();
+  }
+  $('#chat-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('#chat-input').value.trim(), st = CHAT_STEPS[CHAT.step];
+    if (!st) return;
+    if (v) say('#chat-log', v, 'me');
+    $('#chat-input').value = '';
+    if (/^start over$/i.test(v)) { startChat(); return; }
+    if (/^(help|\?)$/i.test(v)) { say('#chat-log', 'Answer each question and press Send. Type “start over” to begin again, or press Close to leave.'); return; }
+    if (st.input === 'text' && /\b(connect|sync|instagram login)\b/i.test(v)) { say('#chat-log', CONNECT_TEXT); return; }
+    const err = st.take(v, CHAT.d);
+    if (err) { say('#chat-log', err); return; }
+    nextStep();
+  });
+
+  /* ---------- the assistant, bottom-right: answers come from the server ---------- */
+  const ASK = { history: [], busy: false };
+  const SUGGESTIONS = ['What’s on this week?', 'How do I sign up for an event?', 'How do I message a club?'];
+  function toggleAsk(open) {
+    const p = $('#ask-panel'), show = open === undefined ? p.hidden : open;
+    p.hidden = !show;
+    $('#ask-fab').setAttribute('aria-expanded', show);
+    if (!show) { $('#ask-fab').focus(); return; }
+    fade(p, 220);
+    if (!$('#ask-log').children.length) {
+      say('#ask-log', 'Hi! Ask me anything about events, clubs, funding or messaging.');
+      setButtons('#ask-actions', SUGGESTIONS.map((q, i) => chatBtn(q, () => askQuestion(q), true, 'ask-q-' + i)).concat(chatBtn('Show me around', () => { toggleAsk(false); startTour(); }, true, 'ask-tour')));
+    }
+    $('#ask-input').focus();
+  }
+  async function askQuestion(q) {
+    if (ASK.busy) return;
+    ASK.busy = true;
+    setButtons('#ask-actions', []);
+    say('#ask-log', q, 'me');
+    ASK.history.push({ role: 'user', content: q });
+    const dots = document.createElement('div');
+    dots.className = 'chat-msg typing'; dots.textContent = 'Thinking…'; dots.dataset.testid = 'ask-typing';
+    const log = $('#ask-log'); log.appendChild(dots); log.scrollTop = log.scrollHeight;
+    try {
+      const r = await api('/api/chat', { messages: ASK.history.slice(-10) });
+      ASK.history.push({ role: 'assistant', content: r.reply });
+      dots.remove();
+      say('#ask-log', r.reply);
+    } catch (e) {
+      ASK.history.pop();
+      dots.remove();
+      say('#ask-log', e.message);
+    } finally { ASK.busy = false; $('#ask-input').focus(); }
+  }
+  $('#ask-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('#ask-input').value.trim();
+    if (!v || ASK.busy) return;
+    $('#ask-input').value = '';
+    askQuestion(v);
+  });
+
+  /* ---------- walkthrough ---------- */
+  const TOUR_KEY = 'purplehub-tour-seen-v1';
+  let tourSeenMem = false, tourAt = -1;
+  function tourSeen() { try { return tourSeenMem || window.localStorage.getItem(TOUR_KEY) === '1'; } catch (e) { return tourSeenMem; } }
+  function markTourSeen() { tourSeenMem = true; try { window.localStorage.setItem(TOUR_KEY, '1'); } catch (e) { /* storage blocked: remembered until the page reloads */ } }
+  const onPhoneBar = () => matchMedia('(max-width:1199px)').matches;
+  const tap = () => (matchMedia('(pointer:coarse)').matches ? 'Tap' : 'Click');
+  // Written for someone who rarely uses apps: one idea per step.
+  const TOUR = [
+    { media: 'logo', title: 'Welcome to Purple Hub', next: 'Show me how', text: () => 'This is where you find club events at Western and reach the people running them. This short tour shows you how.' },
+    { view: 'week', fixed: true, target: () => $('.tabs'), title: 'These buttons change the page', text: () => tap() + ' a button to open that page. They stay at the ' + (onPhoneBar() ? 'bottom' : 'top') + ' of your screen, so you can always get back.' },
+    { view: 'week', target: () => $('#event-tools'), title: 'Find what you’re looking for', text: () => 'Type in the search bar, or sort by club or category.' },
+    { view: 'week', target: () => $('[data-testid="feed"] .poster') , title: 'Each card is an event', text: () => 'The picture is the club’s own Instagram post. ' + tap() + ' it to open the post and see how to register.' },
+    { view: 'week', fixed: true, target: () => $('.tabs a[href="#messages"]'), title: 'Want to reach someone?', text: () => 'Open Messages to write to the USC or a club president. A number appears here when they reply.' },
+    { view: 'week', top: true, target: () => $('#account-btn'), title: 'Create your account', text: () => 'You can browse without an account. To send messages or post events, press here to sign in or create one with your Western email.' },
+    { view: 'week', fixed: true, target: () => $('#ask-fab'), title: 'Stuck? Just ask', next: 'Finish', last: true, text: () => 'Press “Ask Purple Hub” in the corner and type a question in your own words. “Reset tutorial” at the bottom of the page starts this tour over.' },
+  ];
+  let tourGliding = false, tourGlideTimer = 0;
+  function placeTour(dy = 0) {
+    if (tourAt < 0) return;
+    const spot = $('#tour-spot'), card = $('#tour-card'), anchor = $('#tour-anchor');
+    const vw = innerWidth, vh = innerHeight, gap = 16, edge = 12;
+    const w = card.offsetWidth, h = card.offsetHeight;
+    const fitX = (x) => Math.min(Math.max(x, edge + w / 2), vw - edge - w / 2);
+    const fitY = (y) => Math.min(Math.max(y, edge + h / 2), vh - edge - h / 2);
+    let cx = vw / 2, cy = vh / 2;
+    const t = TOUR[tourAt].target ? TOUR[tourAt].target() : null;
+    if (t && t.getClientRects().length) {
+      const b = t.getBoundingClientRect(), pad = 6;
+      const r = { left: b.left, right: b.right, width: b.width, height: b.height, top: b.top - dy, bottom: b.bottom - dy };
+      spot.classList.remove('off');
+      let spotH = r.height + pad * 2;
+      cx = r.left + r.width / 2;
+      if (vh - r.bottom - pad >= h + gap + edge) cy = r.bottom + pad + gap + h / 2;
+      else if (r.top - pad >= h + gap + edge) cy = r.top - pad - gap - h / 2;
+      else if (vw - r.right - pad >= w + gap + edge) { cx = r.right + pad + gap + w / 2; cy = r.top + h / 2; }
+      else if (r.left - pad >= w + gap + edge) { cx = r.left - pad - gap - w / 2; cy = r.top + h / 2; }
+      else if (r.top > vh / 2 && r.top - pad - gap - edge > 0 && r.height < vh / 3) { cy = edge + h / 2; } // short screen: card at the top, away from a target at the bottom
+      else { cy = vh - edge - h / 2; spotH = Math.max(24, vh - edge - h - gap - (r.top - pad)); } // too tall: light its top and dock the card below
+      Object.assign(spot.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: spotH + 'px' });
+    } else {
+      spot.classList.add('off');
+      Object.assign(spot.style, { left: '50%', top: '50%', width: '0px', height: '0px' });
+    }
+    anchor.style.left = fitX(cx) + 'px';
+    anchor.style.top = fitY(cy) + 'px';
+  }
+  function showTourStep(i) {
+    tourAt = i;
+    const st = TOUR[i];
+    if (st.view && current() !== st.view) { location.hash = '#' + st.view; route(); }
+    $('#tour-media').innerHTML = st.media === 'logo' ? '<span class="usc-logo"></span>' : '';
+    $('#tour-count').textContent = 'Step ' + (i + 1) + ' of ' + TOUR.length;
+    $('#tour-title').textContent = st.title;
+    $('#tour-text').textContent = st.text();
+    fade($('#tour-card .tour-title')); fade($('#tour-text')); fade($('#tour-media'));
+    $('#tour-progress').style.width = ((i + 1) / TOUR.length) * 100 + '%';
+    $('[data-act="tour-back"]').hidden = i === 0;
+    $('[data-act="tour-skip"]').hidden = !!st.last;
+    $('#tour-next').textContent = st.next || 'Next';
+    const t = st.target ? st.target() : null;
+    let dy = 0;
+    if (st.top) dy = -window.scrollY;
+    else if (t && !st.fixed) {
+      // Centre the target and the card together, so the card has room beside what it points at.
+      const box = t.getBoundingClientRect(), stack = box.height + 16 + $('#tour-card').offsetHeight;
+      dy = box.top - (stack <= innerHeight - 24 ? (innerHeight - stack) / 2 : 12);
+    }
+    dy = Math.max(-window.scrollY, Math.min(dy, document.documentElement.scrollHeight - innerHeight - window.scrollY));
+    clearTimeout(tourGlideTimer);
+    if (dy && !still()) {
+      tourGliding = true;
+      window.scrollBy({ top: dy, behavior: 'smooth' });
+      placeTour(dy);
+      tourGlideTimer = setTimeout(() => { tourGliding = false; placeTour(); }, 650);
+    } else {
+      tourGliding = false;
+      if (dy) window.scrollBy(0, dy);
+      placeTour();
+    }
+    $('#tour-next').focus({ preventScroll: true });
+  }
+  function resetTour() {
+    tourSeenMem = false;
+    try { window.localStorage.removeItem(TOUR_KEY); } catch (e) { /* storage blocked */ }
+    startTour();
+  }
+  function startTour() {
+    const d = $('#tour');
+    if (d.open) return;
+    openDialog(d);
+    showTourStep(0);
+  }
+  function endTour() {
+    markTourSeen();
+    tourAt = -1;
+    closeDialog($('#tour'));
+  }
+  function nextTourStep() { if (TOUR[tourAt].last) endTour(); else showTourStep(tourAt + 1); }
+  $('#tour').addEventListener('cancel', (e) => { e.preventDefault(); endTour(); });
+  let tourFrame = 0;
+  const queuePlaceTour = () => { if (tourAt >= 0 && !tourGliding && !tourFrame) tourFrame = requestAnimationFrame(() => { tourFrame = 0; placeTour(); }); };
+  window.addEventListener('resize', queuePlaceTour);
+  window.addEventListener('scroll', queuePlaceTour, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(queuePlaceTour).observe($('#tour-card'));
+
+  /* ---------- toast, reset ---------- */
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $('#toast');
+    t.getAnimations().forEach((a) => a.cancel());
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      if (!t.animate || still()) { t.hidden = true; return; }
+      const out = t.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease', fill: 'forwards' });
+      out.onfinish = () => { t.hidden = true; out.cancel(); };
+    }, 2800);
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'ev-search') { UI.q = e.target.value; renderLists(); }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'ev-club') { UI.club = e.target.value; renderLists(); fade($('#feed')); rise(document.querySelectorAll('#feed .poster')); }
+    if (e.target.id === 'ev-cat') { UI.cat = e.target.value; renderLists(); fade($('#feed')); rise(document.querySelectorAll('#feed .poster')); }
+  });
+  document.addEventListener('click', (e) => {
+    const closer = e.target.closest('[data-close]');
+    if (closer) { const d = closer.closest('dialog'); if (d) closeDialog(d); return; }
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const id = b.dataset.id, v = b.dataset.v;
+    switch (b.dataset.act) {
+      case 'ask': toggleAsk(); break;
+      case 'ask-close': toggleAsk(false); break;
+      case 'tour-reset': resetTour(); break;
+      case 'chat': openChat(); break;
+      case 'thread': UI.thread = v; UI.draftInbox = null; if ($('#msg-input')) $('#msg-input').value = ''; renderMessages(); fade($('#msg-log')); markOpenThreadRead(); if ($('#msg-input')) $('#msg-input').focus({ preventScroll: true }); break;
+      case 'thread-back': UI.thread = null; UI.draftInbox = null; if ($('#msg-input')) $('#msg-input').value = ''; renderMessages(); break;
+      case 'remove-post': act(api('/api/posts/' + id, undefined, 'DELETE').then(() => refresh()).then(() => toast('Post removed.'))); break;
+      case 'review': act(api('/api/posts/' + id + '/review', { status: v }).then(() => refresh()).then(() => toast(v === 'approved' ? 'Approved. It’s on Home now.' : 'Post declined.'))); break;
+      case 'fund': act(api('/api/posts/' + id + '/funding', { status: v }).then(() => refresh()).then(() => toast(v === 'approved' ? 'Funding approved.' : 'Funding declined.'))); break;
+      case 'account-yes': act(api('/api/accounts/' + id + '/decide', { approve: true }).then(() => refresh()).then(() => toast('Club president confirmed.'))); break;
+      case 'account-no': act(api('/api/accounts/' + id + '/decide', { approve: false }).then(() => refresh()).then(() => toast('Declined. They keep a student account.'))); break;
+      case 'account': if (me()) openAccount(); else openLogin('in'); break;
+      case 'login': openLogin(v); break;
+      case 'login-mode': setLoginMode(v); break;
+      case 'signout': act(api('/api/logout', {}).then(() => { closeDialog($('#dlg-login')); CHAT.reset(); UI.thread = null; UI.draftInbox = null; return refresh(); }).then(() => { render(); fade($('#view-' + current())); toast('Signed out.'); })); break;
+      case 'tour-next': nextTourStep(); break;
+      case 'tour-back': showTourStep(tourAt - 1); break;
+      case 'tour-skip': endTour(); break;
+      default: break;
+    }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#ask-panel').hidden && !document.querySelector('dialog[open]')) toggleAsk(false); });
+  document.addEventListener('change', (e) => {
+    if (e.target.id !== 'new-chat' || !e.target.value) return;
+    const inbox = e.target.value, have = D.threads.find((t) => t.inbox === inbox && t.title === inboxLabel(inbox));
+    UI.thread = have ? have.id : null; UI.draftInbox = have ? null : inbox;
+    renderMessages(); markOpenThreadRead(); if ($('#msg-input')) $('#msg-input').focus();
+  });
+
+    route();
+  if (!tourSeen()) startTour();
+  refresh().catch(() => {});
+})();
+</script>
+<!--GLASS_BUNDLE-->

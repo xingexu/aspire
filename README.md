@@ -1,17 +1,15 @@
-# PBSN ASPIRE: CoWork
+# PBSN ASPIRE: Purple Hub
 
-Our answer to the PBSN Aspire 2026 case, *Driving Engagement for Western's University Students' Council*. We chose
-PD USC (Professional Development USC) and built **CoWork**: club events that count toward a student's confirmed
-record, with a ladder that ends in USC advocacy and Council. See [`cowork/README.md`](cowork/README.md).
+Our answer to the PBSN Aspire 2026 case, *Driving Engagement for Western's University Students' Council*. We built **Purple Hub**: one place to find club events at Western, message the USC or a club president, and let clubs post events and request funding with USC approval. See [`purplehub/README.md`](purplehub/README.md).
 
-Open this folder in VS Code and press **F5** ("Run CoWork"), or run `cd cowork && npm start` and open
-http://localhost:3001. No packages to install. To share it, send [`cowork/CoWork.html`](cowork/CoWork.html): it's one
+Open this folder in VS Code and press **F5** ("Run Purple Hub"), or run `cd purplehub && npm start` and open
+http://localhost:3001. Run `npm install` first, and have PostgreSQL installed. To share a read-only copy of the events, send [`purplehub/PurpleHub.html`](purplehub/PurpleHub.html): it's one
 complete file.
 
 ## Earlier idea: FoodLink
 
 The `app/` and `deck/` folders hold our earlier direction, FoodLink (USC Food Support Services), which we have
-replaced with CoWork. They still run as described below.
+replaced with Purple Hub. They still run as described below.
 
 FoodLink gives Western students walk-up access to free food without a form or a name: two campus shelves
 with live stock counts, sealed surplus from campus partners that students reserve with an anonymous code,

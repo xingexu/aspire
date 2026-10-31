@@ -2,12 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run CoWork",
+      "name": "Run Purple Hub",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceFolder}/cowork",
-      "program": "${workspaceFolder}/cowork/server.js",
-      "preLaunchTask": "CoWork: build",
+      "cwd": "${workspaceFolder}/purplehub",
+      "program": "${workspaceFolder}/purplehub/server.js",
+      "preLaunchTask": "Purple Hub: build",
       "skipFiles": ["<node_internals>/**"],
       "serverReadyAction": {
         "pattern": "listening on (https?://\\S+)",

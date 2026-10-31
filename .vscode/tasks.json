@@ -2,17 +2,17 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "CoWork: build",
+      "label": "Purple Hub: build",
       "type": "shell",
-      "command": "node build.js",
-      "options": { "cwd": "${workspaceFolder}/cowork" },
+      "command": "npm install --no-audit --no-fund && node build.js",
+      "options": { "cwd": "${workspaceFolder}/purplehub" },
       "problemMatcher": []
     },
     {
-      "label": "CoWork: test",
+      "label": "Purple Hub: test",
       "type": "shell",
       "command": "npm install --no-audit --no-fund && npx playwright install chromium webkit && npm run test:ui",
-      "options": { "cwd": "${workspaceFolder}/cowork" },
+      "options": { "cwd": "${workspaceFolder}/purplehub" },
       "group": "test",
       "problemMatcher": []
     },

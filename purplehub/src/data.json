@@ -1,0 +1,26 @@
+{
+  "categories": ["Competitions", "Workshops", "Networking", "Social"],
+  "clubs": {
+    "pbsn": { "id": "pbsn", "name": "Pre-Business Students’ Network", "short": "PBSN", "ig": "pbsnuwo" },
+    "wfn": { "id": "wfn", "name": "Western Founders Network", "short": "WFN", "ig": "westernfoundersnetwork" },
+    "w5": { "id": "w5", "name": "W5", "short": "W5", "ig": "w5uwo" },
+    "csa": { "id": "csa", "name": "CSA", "short": "CSA", "ig": "csawestern" },
+    "caisa": { "id": "caisa", "name": "CAISA", "short": "CAISA", "ig": "caisawestern" },
+    "taw": { "id": "taw", "name": "TAW", "short": "TAW", "ig": "tawuwo" }
+  },
+  "events": [
+    { "id": "aspire", "cat": "Competitions", "club": "pbsn", "title": "ASPIRE case competition", "at": "2026-10-31T09:30", "ends": "2026-10-31T23:59", "date": "Saturday, Oct 31, 9:30 a.m. to 6 p.m.", "place": "Location not posted", "code": "De-P8hUoIia", "about": "PBSN’s beginner case competition for first-year students, in teams of up to 4, with second-year mentors. Sign-ups closed Oct 29." },
+    { "id": "csaagm", "cat": "Social", "club": "csa", "title": "CSA Annual General Meeting", "at": "2026-11-02T18:00", "ends": "2026-11-02T20:00", "date": "Monday, Nov 2, 6 to 8 p.m.", "place": "Somerville House, room 2316", "code": "DfBGkkKRKRm", "about": "Games, free snacks and member merch. Free bubble tea for the first 50 members." },
+    { "id": "design", "cat": "Competitions", "club": "wfn", "title": "Design & Defend", "at": "2026-11-05T12:00", "ends": "2026-11-05T23:59", "date": "Thursday, Nov 5 (time not posted)", "place": "Morrissette Entrepreneurship Building", "code": "DfIUIdovMCz", "about": "WFN and Figma. Learn Figma, then pitch your design in teams of 3 to 4. No design experience needed. Dinner and merch. Register by Nov 2 through WFN’s bio link." },
+    { "id": "sprint", "cat": "Competitions", "club": "w5", "title": "Innovation Sprint", "at": "2026-11-07T12:00", "ends": "2026-11-08T23:59", "date": "Saturday, Nov 7 to Sunday, Nov 8", "place": "Location not posted", "code": "DfF-a0BnXi-", "about": "Two days building your own business idea, open to all students, with W5 mentors. First place $400 and a Front Row Ventures interview. Sign up by Nov 4 at 11:59 p.m. through W5’s bio link." },
+    { "id": "fullstack", "cat": "Workshops", "club": "wfn", "title": "Full Stack Foundations", "at": "2026-10-20T20:00", "ends": "2026-11-20T22:00", "date": "Weekly, 8 to 10 p.m., until Nov 20", "place": "Social Science Centre, room 2036 (may change weekly)", "code": "DepjeXqBWoq", "about": "WFN’s Projects Team teaches coding from scratch, beginners welcome. The session calendar is in WFN’s bio." },
+    { "id": "workshop", "shot": "aspire", "cat": "Workshops", "club": "pbsn", "hosts": "PBSN × Ivey Case Comp Club", "title": "Case Competition Fundamentals workshop", "at": "2026-10-29T18:00", "date": "Oct 29", "place": "For ASPIRE competitors", "code": "De-P8hUoIia", "past": true },
+    { "id": "panels", "cat": "Networking", "club": "pbsn", "hosts": "PBSN × WFN × W5", "title": "Career Panels", "at": "2026-10-26T18:00", "date": "Oct 26 and 27", "place": "Morrissette Entrepreneurship Building, Collaborators Space", "code": "DezQ40ZIJp0", "past": true },
+    { "id": "succsale", "cat": "Social", "club": "taw", "title": "Succ Sale", "at": "2026-10-23T12:00", "date": "Oct 23, 26 and 27", "place": "UCC atrium", "code": "De10m1pG_K8", "past": true },
+    { "id": "caisaagm", "cat": "Social", "club": "caisa", "title": "CAISA Annual General Meeting", "at": "2026-10-08T19:30", "date": "Oct 8, 7:30 to 8:30 p.m.", "place": "Somerville House, room 3345", "code": "DeFNRjkFV6G", "past": true },
+    { "id": "barnight", "cat": "Social", "club": "taw", "title": "TAW Bar Night", "at": "2026-10-03T22:00", "date": "Oct 3", "place": "Lost Love", "code": "Dd2YINNyqKf", "past": true },
+    { "id": "pbsnagm", "cat": "Networking", "club": "pbsn", "title": "PBSN Annual General Meeting", "at": "2026-09-19T15:30", "date": "Sept 19, 3:30 to 5:30 p.m.", "place": "Ivey Business School", "code": "DdZVS2jIEZD", "past": true },
+    { "id": "ignition", "cat": "Social", "club": "csa", "title": "Ignition 2026", "at": "2026-09-16T19:00", "date": "Sept 16, 7 to 9 p.m.", "place": "UCC, room 146", "code": "DdNR1VzRE-F", "about": "CSA’s welcome event: meet the exec team, play games, make friends and pick up member merch.", "past": true },
+    { "id": "w5agm", "cat": "Networking", "club": "w5", "title": "W5 Annual General Meeting", "at": "2026-09-14T15:00", "date": "Sept 14, 3 to 5 p.m.", "place": "Morrissette Institute for Entrepreneurship, Alumni Commons, room 2110", "code": "DdHqaGAJzUk", "past": true }
+  ]
+}
