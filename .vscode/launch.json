@@ -2,7 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run FoodLink",
+      "name": "Run Counts",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/counts",
+      "program": "${workspaceFolder}/counts/server.js",
+      "preLaunchTask": "Counts: build",
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "pattern": "listening on (https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    },
+    {
+      "name": "Run FoodLink (earlier idea)",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/app",

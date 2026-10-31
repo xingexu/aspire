@@ -2,6 +2,21 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Counts: build",
+      "type": "shell",
+      "command": "node build.js",
+      "options": { "cwd": "${workspaceFolder}/counts" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Counts: test",
+      "type": "shell",
+      "command": "npm install --no-audit --no-fund && npm run test:ui",
+      "options": { "cwd": "${workspaceFolder}/counts" },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
       "label": "FoodLink: npm install",
       "type": "shell",
       "command": "npm install --no-audit --no-fund",

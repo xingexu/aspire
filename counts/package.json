@@ -1,0 +1,14 @@
+{
+  "name": "counts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Counts: club events that count, by PD USC. Prototype for the PBSN Aspire 2026 case.",
+  "scripts": {
+    "build": "node build.js",
+    "start": "node build.js && node server.js",
+    "test:ui": "node build.js && node test/support/fetch-fonts.js && node test/ui.test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

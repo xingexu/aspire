@@ -1,0 +1,1159 @@
+<title>Counts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Counts: club events that count, by PD USC. A prototype for the PBSN Aspire 2026 case.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@500;600&family=Schibsted+Grotesk:wght@400..700&display=swap">
+<style>
+:root{
+  /* Layout: sticky top bar with brand and section tabs over a 1200px content column.
+     Club posters carry all the colour; the USC layer stays ink on paper with one highlighter mark. */
+  --paper:#F4F3F6; --card:#FFFFFF; --ink:#16141B; --ink-2:#47424F; --muted:#6B6574; --line:#E2DFE7; --tint:#ECEAF0;
+  --usc:#4F2683; --usc-soft:#EBE5F5;
+  --mark:#FFE45C; --on-mark:#16141B; --on-club:#FFFFFF;
+  --good:#17714A; --good-soft:#E1F2E8; --warn:#9A4A06; --warn-soft:#FCEBD6; --bad:#B42318; --bad-soft:#FDE7E5;
+  --screen:#0F0E13; --screen-2:#1C1A22; --screen-ink:#F4F2F8; --screen-muted:#A9A2B5; --bezel:#23212A;
+  --shadow:0 1px 2px rgb(22 20 27 / .06), 0 10px 30px rgb(22 20 27 / .07);
+  --font-display:"Bricolage Grotesque","Schibsted Grotesk",system-ui,sans-serif;
+  --font-body:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r-card:16px; --r-ctl:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111015; --card:#1A1820; --ink:#F2F0F5; --ink-2:#CBC6D3; --muted:#9F98AA; --line:#2E2B35; --tint:#25222C;
+    --usc:#B8A1EC; --usc-soft:#2A2339;
+    --mark:#F7DC4F; --on-mark:#16141B; --on-club:#FFFFFF;
+    --good:#5CC48C; --good-soft:#16291F; --warn:#F2A65A; --warn-soft:#33230F; --bad:#FF7B70; --bad-soft:#3A1715;
+    --screen:#08070B; --screen-2:#17151D; --screen-ink:#F4F2F8; --screen-muted:#A9A2B5; --bezel:#2C2933;
+    --shadow:0 1px 2px rgb(0 0 0 / .45), 0 10px 30px rgb(0 0 0 / .35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111015; --card:#1A1820; --ink:#F2F0F5; --ink-2:#CBC6D3; --muted:#9F98AA; --line:#2E2B35; --tint:#25222C;
+  --usc:#B8A1EC; --usc-soft:#2A2339;
+  --mark:#F7DC4F; --on-mark:#16141B; --on-club:#FFFFFF;
+  --good:#5CC48C; --good-soft:#16291F; --warn:#F2A65A; --warn-soft:#33230F; --bad:#FF7B70; --bad-soft:#3A1715;
+  --screen:#08070B; --screen-2:#17151D; --screen-ink:#F4F2F8; --screen-muted:#A9A2B5; --bezel:#2C2933;
+  --shadow:0 1px 2px rgb(0 0 0 / .45), 0 10px 30px rgb(0 0 0 / .35);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 var(--font-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--paper)}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+p{margin:0}
+:focus-visible{outline:3px solid var(--usc);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--paper);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:8px 20px;min-height:64px;flex-wrap:wrap;padding-block:8px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font:800 26px/1 var(--font-display);letter-spacing:-.03em}
+.brand .tally{width:30px;height:22px}
+.brand-by{font:500 12.5px/1.2 var(--font-body);color:var(--muted);letter-spacing:0;margin-top:3px}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1;justify-content:flex-end}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{white-space:nowrap;text-decoration:none;padding:8px 13px;border-radius:999px;color:var(--ink-2);font-weight:600;font-size:15px}
+.tabs a:hover{background:var(--tint);color:var(--ink)}
+.tabs a[aria-current="page"]{background:var(--ink);color:var(--paper)}
+@media (max-width:900px){.top{position:relative;top:0}.tabs{flex:1 1 100%;flex-wrap:wrap;justify-content:flex-start;margin-inline:-6px;overflow:visible}.tabs a{padding:7px 11px;font-size:14.5px}}
+
+main{padding-block:28px 72px}
+.view{display:grid;gap:28px}
+.view-head{display:grid;gap:8px;max-width:800px}
+.eyebrow{font:600 12px/1.2 var(--font-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.h1{font:800 clamp(36px,5.4vw,60px)/1.02 var(--font-display);letter-spacing:-.03em;margin:2px 0 4px;text-wrap:balance}
+.h2{font:750 clamp(24px,3vw,32px)/1.1 var(--font-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.h3{font:650 19px/1.25 var(--font-body);margin:0;letter-spacing:-.005em}
+.lede{font-size:18px;line-height:1.5;color:var(--ink-2);max-width:62ch}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.mono{font-family:var(--font-mono);letter-spacing:.02em}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.panel{background:var(--card);border-radius:var(--r-card);padding:20px;box-shadow:var(--shadow);display:grid;gap:14px;align-content:start;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+
+/* why it matters */
+.why{display:grid;gap:5px;max-width:74ch}
+.why .tag{justify-self:start;font:700 11.5px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--mark);color:var(--on-mark);padding:5px 8px 4px;border-radius:4px;transform:rotate(-1.5deg)}
+.why p{color:var(--ink-2)}
+.why cite{font-style:normal;font-size:13px;color:var(--muted)}
+
+/* buttons, chips */
+.btn{appearance:none;border:0;background:var(--ink);color:var(--paper);font-weight:650;font-size:15.5px;padding:10px 16px;border-radius:var(--r-ctl);cursor:pointer;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:transform .12s ease, opacity .12s ease}
+.btn:hover{opacity:.88}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1.5px var(--muted);opacity:1}
+.btn.small{min-height:38px;padding:7px 13px;font-size:14.5px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.chip{appearance:none;border:0;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);border-radius:999px;padding:8px 14px;font-weight:600;font-size:14.5px;cursor:pointer;min-height:40px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.count-line{font-size:14px;color:var(--muted);margin-top:-12px}
+.done-line{display:inline-flex;align-items:center;gap:6px;font-weight:650;color:var(--good);font-size:14.5px}
+.done-line.muted{color:var(--muted)}
+.done-line svg{flex:none}
+.err{color:var(--bad);font-weight:600;font-size:14.5px;min-height:1.2em}
+
+/* tally mark */
+.tally{width:26px;height:19px;flex:none}
+.tallies{color:var(--ink);display:block;max-width:100%}
+
+/* posters (club event cards) */
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.poster{background:var(--card);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0;transition:transform .18s ease}
+.poster:hover{transform:translateY(-2px)}
+.poster-top{background:var(--club);color:var(--on-club);padding:16px 18px 20px;position:relative;min-height:156px;display:flex;flex-direction:column;gap:10px}
+.club-line{display:flex;align-items:center;gap:10px;font-weight:650;font-size:14px;padding-right:96px;min-width:0}
+.club-line span:last-child{overflow-wrap:anywhere}
+.mono-badge{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;border-radius:9px;background:rgb(255 255 255 / .16);box-shadow:inset 0 0 0 1.5px rgb(255 255 255 / .6);font:800 13px/1 var(--font-display);letter-spacing:.02em;color:var(--on-club)}
+.mono-badge.solid{background:var(--club);box-shadow:none}
+.mono-badge.sm{width:26px;height:26px;border-radius:7px;font-size:11px}
+.mono-badge.lg{width:64px;height:64px;border-radius:16px;font-size:24px}
+.poster-title{font:800 27px/1.04 var(--font-display);letter-spacing:-.025em;margin:auto 0 0;text-wrap:balance;max-width:17ch}
+.sticker{position:absolute;top:14px;right:14px;display:inline-flex;align-items:center;gap:6px;background:var(--mark);color:var(--on-mark);font:800 14px/1 var(--font-display);padding:7px 10px 7px 8px;border-radius:6px;transform:rotate(3deg);box-shadow:0 2px 0 rgb(0 0 0 / .18)}
+.sticker .tally{width:20px;height:15px}
+.new-flag{align-self:flex-start;font:700 11.5px/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:rgb(255 255 255 / .92);color:var(--club);padding:5px 8px;border-radius:4px}
+.poster-body{padding:16px 18px 18px;display:grid;gap:8px;flex:1;align-content:start}
+.when{font-weight:650}
+.place{color:var(--muted);font-size:14.5px}
+.blurb{color:var(--ink-2)}
+.promises{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 0;padding:0;list-style:none}
+.promises li{font-size:12.5px;font-weight:650;padding:4px 9px;border-radius:999px;background:var(--tint);color:var(--ink-2)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.empty{color:var(--muted);padding:24px 0}
+
+/* record */
+.record-head{display:flex;gap:20px;align-items:flex-end;justify-content:space-between;max-width:none;flex-wrap:wrap}
+.record-head > div{max-width:720px;display:grid;gap:8px}
+.seal{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--usc-soft);color:var(--usc);font:700 13px/1.15 var(--font-body);transform:rotate(-2deg)}
+.seal .tally{width:30px;height:22px}
+.next-card{display:flex;align-items:center;gap:12px 18px;flex-wrap:wrap;padding:16px 18px;border-radius:var(--r-card);background:var(--screen);color:var(--screen-ink);box-shadow:inset 0 0 0 1px var(--line)}
+.next-card .eyebrow{color:var(--mark);flex-basis:100%}
+.next-text{font:700 19px/1.3 var(--font-body);flex:1 1 320px;min-width:0}
+.next-card .btn{background:var(--mark);color:var(--on-mark)}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:12px}
+@media (max-width:960px){.ladder{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.ladder{grid-template-columns:1fr}}
+.rung{background:var(--card);border-radius:var(--r-card);padding:16px;display:grid;gap:8px;align-content:start;box-shadow:var(--shadow);min-width:0}
+.rung .step{font:600 12px/1 var(--font-mono);color:var(--muted)}
+.rung h3{font:800 24px/1.05 var(--font-display);letter-spacing:-.02em;margin:0}
+.rung .state{justify-self:start;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--tint);color:var(--ink-2)}
+.rung[data-state="done"] .state{background:var(--good-soft);color:var(--good)}
+.rung[data-state="next"]{box-shadow:var(--shadow), inset 0 0 0 2px var(--ink)}
+.rung[data-state="next"] .state{background:var(--mark);color:var(--on-mark)}
+.rung[data-state="wait"] .state{background:var(--warn-soft);color:var(--warn)}
+.rung-count{display:flex;align-items:center;gap:10px;min-height:26px;font-size:13.5px;color:var(--muted);font-weight:600}
+.rung .what{font-weight:600}
+.rung-why{font-size:14px;color:var(--ink-2)}
+.rung-why cite{font-style:normal;color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+.activity{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.activity li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:10px;align-items:start}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:7px;background:var(--line)}
+.dot.ok{background:var(--good)}
+.it-text{font-weight:600}
+.it-by{font-size:13.5px;color:var(--muted)}
+.resume{margin:0;font:500 14px/1.55 var(--font-body);white-space:pre-wrap;overflow-wrap:anywhere;background:var(--tint);border-radius:12px;padding:14px;min-height:52px}
+.rep{align-content:start}
+
+/* clubs */
+.club-switch{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin;min-width:0}
+.club-pill{appearance:none;border:0;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);border-radius:999px;padding:5px 14px 5px 6px;font-weight:650;font-size:14.5px;cursor:pointer;min-height:40px}
+.club-pill .mono-badge{background:var(--club);box-shadow:none}
+.club-pill[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
+.club-hero{display:flex;align-items:center;gap:16px;background:var(--club);color:var(--on-club);border-radius:var(--r-card);padding:20px;min-width:0}
+.club-hero-name{font:800 clamp(26px,3.4vw,36px)/1.05 var(--font-display);letter-spacing:-.025em;margin:0}
+.club-hero p{opacity:.9}
+.meter{display:grid;gap:6px}
+.meter-top{display:flex;justify-content:space-between;gap:12px;font-weight:600;font-size:14.5px}
+.bar{height:10px;border-radius:999px;background:var(--tint);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--ink)}
+.bar.short i{background:var(--warn)}
+.meter-note{font-size:13px;color:var(--warn);font-weight:600}
+.mini-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mini-kpis .v{display:block;font:800 36px/1 var(--font-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.mini-kpis .l{display:block;font-size:13.5px;color:var(--muted);margin-top:4px}
+.ev-rows,.pitch-rows{list-style:none;margin:0;padding:0;display:grid}
+.ev-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.ev-row:first-child{border-top:0;padding-top:4px}
+.ev-title{font-weight:650}
+.ev-side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.ev-row{grid-template-columns:1fr}.ev-side{justify-content:flex-start}}
+.on-pill{display:inline-flex;align-items:center;gap:6px;background:var(--mark);color:var(--on-mark);font-weight:750;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.on-pill .tally{width:18px;height:14px}
+.code-chip{font-size:13.5px;color:var(--ink-2);background:var(--tint);padding:6px 10px;border-radius:8px}
+.promise-form{grid-column:1/-1;display:grid;gap:8px;background:var(--tint);border-radius:12px;padding:14px}
+.promise-form label{display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer;min-height:32px}
+.promise-form input{width:18px;height:18px;accent-color:var(--ink);flex:none}
+.door-sign{grid-column:1/-1;justify-self:start;width:min(100%,340px);background:var(--club);color:var(--on-club);border-radius:12px;padding:16px;display:grid;gap:6px;transform:rotate(-1deg)}
+.ds-club{font-weight:650;font-size:13px;opacity:.9}
+.ds-title{font:800 22px/1.05 var(--font-display);letter-spacing:-.02em}
+.ds-counts{justify-self:start;display:inline-flex;align-items:center;gap:6px;background:var(--mark);color:var(--on-mark);font:800 13.5px/1 var(--font-display);padding:6px 9px;border-radius:6px;margin-top:4px}
+.ds-counts .tally{width:18px;height:14px}
+.ds-code{font-size:14px}
+.ds-code b{font-size:18px}
+.ds-prom{font-size:12.5px;opacity:.9}
+.pitch-row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--line)}
+.pitch-row:first-child{border-top:0;padding-top:2px}
+.ok{color:var(--good);font-weight:700;display:inline-flex;gap:6px;align-items:center}
+.ticks{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ticks li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
+.ticks li::before{content:"";width:18px;height:18px;margin-top:3px;border-radius:5px;background:var(--mark) center/12px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.4 4.6 9 10 3.2' fill='none' stroke='%2316141B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.table-wrap{overflow-x:auto;min-width:0}
+table.cmp{border-collapse:collapse;width:100%;min-width:520px;font-size:15px}
+table.cmp th,table.cmp td{text-align:left;padding:11px 12px;border-top:1px solid var(--line);vertical-align:top}
+table.cmp thead th{border-top:0;font-size:13px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.06em}
+table.cmp tbody th{font-weight:650;width:24%}
+table.cmp td.us{font-weight:650}
+table.cmp td.us mark{background:var(--mark);color:var(--on-mark);padding:0 3px;border-radius:3px}
+
+/* USC dashboard */
+.sim-banner{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.sim-banner b{font-weight:750}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.kpi{background:var(--card);border-radius:var(--r-card);padding:18px;box-shadow:var(--shadow);display:grid;gap:6px;align-content:start;min-width:0}
+.kpi .label{font-size:13.5px;color:var(--muted);font-weight:650}
+.kpi .value{font:800 40px/1 var(--font-display);font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+.kpi .delta{justify-self:start;font-size:12.5px;font-weight:750;color:var(--good);background:var(--good-soft);padding:3px 8px;border-radius:999px}
+.kpi .kpi-why{font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.spark{width:100%;height:52px;color:var(--ink)}
+.pool{display:grid;gap:4px}
+.pool .bar i{background:var(--good)}
+.funnel{display:grid;gap:10px}
+.f-row{display:grid;grid-template-columns:96px minmax(0,1fr) 64px;gap:12px;align-items:center}
+.f-row .f-label{font-weight:650;font-size:14.5px}
+.f-row .bar{height:22px;border-radius:6px}
+.f-row .bar i{border-radius:6px}
+.f-row .f-val{font:700 15px/1 var(--font-body);text-align:right}
+.f-row .f-delta{color:var(--good);font-size:12px;display:block;margin-top:3px}
+.pipeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pipeline div{background:var(--tint);border-radius:12px;padding:12px}
+.pipeline .v{display:block;font:800 30px/1 var(--font-display);font-variant-numeric:tabular-nums}
+.pipeline .l{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+@media (max-width:420px){.pipeline{grid-template-columns:1fr}}
+.screen{background:var(--screen);color:var(--screen-ink);border-radius:14px;padding:18px;display:grid;gap:12px;box-shadow:inset 0 0 0 8px var(--bezel);padding:22px}
+.screen-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.screen-head b{font:800 22px/1 var(--font-display);letter-spacing:-.02em}
+.screen-head span{color:var(--screen-muted);font-size:13px}
+.screen-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.screen-list li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--screen-2);border-radius:10px;padding:10px 12px}
+.screen-list .t{font-weight:700}
+.screen-list .s{color:var(--screen-muted);font-size:13px}
+.screen-list .c{font:800 12px/1 var(--font-display);background:var(--mark);color:var(--on-mark);padding:6px 8px;border-radius:5px}
+.screen-foot{color:var(--screen-muted);font-size:13px}
+.desk-label{font-size:13px;font-weight:650;color:var(--muted)}
+
+/* why page */
+.why-page{display:grid;gap:44px}
+.why-hero{display:grid;gap:10px;max-width:880px}
+.why-block{display:grid;gap:16px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.fact{background:var(--card);border-radius:var(--r-card);padding:18px;box-shadow:var(--shadow);display:grid;gap:6px;align-content:start;margin:0}
+.fact .big{font:800 clamp(34px,4vw,46px)/1 var(--font-display);letter-spacing:-.03em}
+.fact cite{font-style:normal;font-size:13px;color:var(--muted)}
+.fact.quote p{font:700 clamp(22px,2.6vw,28px)/1.2 var(--font-display);letter-spacing:-.015em}
+.how{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:how}
+@media (max-width:860px){.how{grid-template-columns:1fr}}
+.how li{background:var(--card);border-radius:var(--r-card);padding:18px;box-shadow:var(--shadow);display:grid;gap:6px;align-content:start;counter-increment:how}
+.how li::before{content:counter(how);font:800 15px/1 var(--font-mono);background:var(--mark);color:var(--on-mark);width:30px;height:30px;border-radius:8px;display:grid;place-items:center}
+.how b{font-size:17px}
+.ladder-line{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:860px){.ladder-line{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.ladder-line{grid-template-columns:1fr}}
+.ladder-line div{border-radius:12px;background:var(--card);box-shadow:var(--shadow);padding:14px;display:grid;gap:4px}
+.ladder-line b{font:800 20px/1.1 var(--font-display)}
+.ladder-line span{font-size:14px;color:var(--ink-2)}
+.budget td.amt,.budget th.amt{text-align:right;white-space:nowrap}
+.budget tfoot td{font-weight:750;border-top:2px solid var(--ink)}
+.targets{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.targets li{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;display:grid;gap:2px}
+.targets b{font:800 26px/1.05 var(--font-display);letter-spacing:-.02em}
+.targets span{font-size:14px;color:var(--ink-2)}
+.targets li.rule-tile{background:var(--screen);color:var(--screen-ink);box-shadow:inset 0 0 0 1px var(--line);align-content:center}
+.targets li.rule-tile span{color:var(--screen-ink);font-weight:600;font-size:15px}
+.targets li.rule-tile b{color:var(--mark);font-size:15px;font-family:var(--font-body);letter-spacing:.06em;text-transform:uppercase}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.timeline li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline b{font-weight:750}
+@media (max-width:520px){.timeline li{grid-template-columns:1fr;gap:2px}}
+.next30{margin:0;padding-left:22px;display:grid;gap:8px}
+.sources{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14.5px;color:var(--ink-2)}
+.sources a{color:var(--ink);text-underline-offset:3px}
+.team{font-size:14.5px;color:var(--muted)}
+
+/* live demo */
+.demo-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;max-width:none}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:980px){.steps{grid-template-columns:1fr}}
+.step-btn{appearance:none;border:0;width:100%;height:100%;text-align:left;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line);border-radius:12px;padding:12px;cursor:pointer;font-weight:600;font-size:14.5px;line-height:1.3;min-height:64px}
+.step-btn .n{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--tint);font:700 14px/1 var(--font-mono)}
+.step-btn[data-state="next"]{box-shadow:inset 0 0 0 2px var(--ink)}
+.step-btn[data-state="next"] .n{background:var(--mark);color:var(--on-mark)}
+.step-btn[data-state="done"]{color:var(--muted)}
+.step-btn[data-state="done"] .n{background:var(--good);color:var(--paper)}
+.caption{min-height:74px}
+.stage{display:grid;grid-template-columns:minmax(0,370px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.phone{width:min(100%,370px);border-radius:38px;padding:11px;background:var(--bezel);box-shadow:var(--shadow);justify-self:center}
+.phone-screen{background:var(--paper);border-radius:28px;min-height:600px;overflow:hidden;display:flex;flex-direction:column}
+.ph-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 16px 10px;font-weight:700;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line)}
+.ph-bar .tally{width:20px;height:15px;color:var(--ink)}
+.ph-body{padding:14px;display:grid;gap:10px;align-content:start}
+.notif{margin:10px 10px 0;display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:14px;padding:12px;box-shadow:var(--shadow);font-size:14px;animation:drop .4s ease both}
+.notif .tally{width:22px;height:16px;margin-top:2px}
+@keyframes drop{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}
+.mini-ev{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:center;background:var(--card);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+.mini-ev .mono-badge{width:30px;height:30px;border-radius:8px;font-size:11px}
+.mini-ev b{display:block;font-size:14.5px;line-height:1.25}
+.mini-ev .mono-badge{color:var(--on-club)}
+.mini-ev .meta{display:block;font-size:12.5px;color:var(--muted)}
+.mini-ev .fresh{color:var(--warn);font-weight:700}
+.success{display:grid;gap:10px;justify-items:start;padding:8px 4px}
+.plus-one{font:800 64px/1 var(--font-display);letter-spacing:-.04em;background:var(--mark);color:var(--on-mark);padding:6px 14px 10px;border-radius:12px;transform:rotate(-3deg);animation:pop .45s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{from{transform:scale(.6) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(-3deg);opacity:1}}
+.success h3{font:800 26px/1.05 var(--font-display);margin:0}
+.mini-rungs{display:grid;gap:8px}
+.mini-rung{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);font-weight:650;font-size:14.5px}
+.mini-rung em{font-style:normal;font-size:12.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--tint);color:var(--ink-2)}
+.mini-rung em.ok{background:var(--good-soft);color:var(--good)}
+.mini-rung em.wait{background:var(--warn-soft);color:var(--warn)}
+.desk{display:grid;gap:14px;min-width:0}
+.desk .panel{animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* dialogs, toast, footer */
+dialog.sheet{border:0;border-radius:18px;padding:0;width:min(440px,calc(100vw - 32px));background:var(--card);color:var(--ink);box-shadow:0 30px 80px rgb(0 0 0 / .35)}
+dialog.sheet::backdrop{background:rgb(10 9 14 / .55)}
+.sheet-body{padding:22px;display:grid;gap:12px}
+.sheet-body label.field{font-weight:650;font-size:14.5px}
+.code-input{width:100%;font:600 28px/1 var(--font-mono);letter-spacing:.3em;text-transform:uppercase;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.code-input:focus{outline:3px solid var(--usc);outline-offset:1px}
+.hint{font-size:13.5px;color:var(--muted)}
+.hint b{color:var(--ink)}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}
+legend{font-weight:650;font-size:14.5px;margin-bottom:6px}
+.radio{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:10px;box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer}
+.radio:has(input:checked){box-shadow:inset 0 0 0 2px var(--ink)}
+.radio input{margin:3px 0 0;width:18px;height:18px;accent-color:var(--ink)}
+.radio small{display:block;color:var(--muted);font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:12px;font-weight:650;box-shadow:var(--shadow);width:max-content;max-width:calc(100vw - 32px);z-index:30}
+footer.foot{border-top:1px solid var(--line)}
+footer.foot .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+.linkbtn{appearance:none;border:0;background:none;padding:6px 0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:13.5px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#week" aria-label="Counts, home">
+      <svg class="tally" viewBox="0 0 30 22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 3v16M10.5 3v16M16 3v16M21.5 3v16"/><path d="M2 16.5 26 5.5"/></g></svg>
+      <span>counts<span class="brand-by" style="display:block">a PD USC program</span></span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#week">This week</a>
+      <a href="#record">My record</a>
+      <a href="#clubs">For clubs</a>
+      <a href="#usc">USC dashboard</a>
+      <a href="#why">Why it works</a>
+      <a href="#demo">Live demo</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="view" id="view-week" data-view="week" aria-label="This week"></section>
+  <section class="view" id="view-record" data-view="record" aria-label="My record" hidden></section>
+  <section class="view" id="view-clubs" data-view="clubs" aria-label="For clubs" hidden></section>
+  <section class="view" id="view-usc" data-view="usc" aria-label="USC dashboard" hidden></section>
+  <section class="view" id="view-demo" data-view="demo" aria-label="Live demo" hidden></section>
+
+  <section class="view why-page" id="view-why" data-view="why" aria-label="Why it works" hidden>
+    <header class="why-hero">
+      <p class="eyebrow">Our answer to the Aspire 2026 case · Initiative: PD USC</p>
+      <h1 class="h1">Everything you do at Western should count.</h1>
+      <p class="lede">Counts is a PD USC program. Clubs keep their brand and run the events students already like. The USC adds reach, a small payment for every new face, and proof students can take into an interview. The path ends at Council.</p>
+    </header>
+
+    <section class="why-block" aria-labelledby="w-problem">
+      <h2 class="h2" id="w-problem">The problem</h2>
+      <div class="facts">
+        <div class="fact"><p class="big">24.6%</p><p>turnout in the February 2026 USC election, down from 34.6% in 2023.</p></div>
+        <div class="fact"><p class="big">16 of 51</p><p>faculty and affiliate seats on Council were vacant in early October 2026.</p></div>
+        <div class="fact"><p class="big">A few</p><p>familiar places are where most students stay. They rarely reach the full range of what the USC offers.</p></div>
+      </div>
+      <aside class="why"><span class="tag">Why it matters</span><p>The USC isn’t short of offerings. Students don’t see a reason to step in, so fewer of them ever get close to running for Council.</p><cite>Source: Aspire 2026 case</cite></aside>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-care">
+      <h2 class="h2" id="w-care">What students care about right now</h2>
+      <div class="facts">
+        <div class="fact"><p class="big">48,000</p><p>jobs held by Canadians aged 15 to 24 disappeared in September 2026 alone.</p><cite>The Hub, Oct 9, 2026</cite></div>
+        <blockquote class="fact quote"><p>“A hiring problem, not a firing problem.”</p><cite>Centre for the Study of Living Standards, Sept 2026, on Canada’s youth job market</cite></blockquote>
+      </div>
+      <aside class="why"><span class="tag">Why it matters</span><p>Students give their time to whatever helps them get hired. PD USC exists for exactly that, and the case lists it among the USC programs students underuse.</p><cite>Source: Aspire 2026 case, Table 1</cite></aside>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-insight">
+      <h2 class="h2" id="w-insight">Clubs have the brands. The USC has the reach.</h2>
+      <div class="grid2">
+        <div class="panel"><h3 class="h3">Clubs</h3><ul class="ticks"><li>240+ clubs reach 17,000+ students a year.</li><li>Students’ sense of belonging sits in smaller communities like these.</li><li>Promotion is each club’s own job, and a club needs 30 paid members and four events a year to stay ratified.</li></ul></div>
+        <div class="panel"><h3 class="h3">The USC</h3><ul class="ticks"><li>The Spoke, The Wave and the USC Now app reach students every day.</li><li>It approves every club event in WesternLink, 3 to 10 business days ahead, so it already sees what’s coming.</li><li>It can confirm what a student actually did. A club poster can’t.</li></ul></div>
+      </div>
+      <aside class="why"><span class="tag">Why it matters</span><p>Today the two don’t trade. The USC funds clubs through a Grant Fund that takes about three weeks to decide and won’t pay for regular events. Counts makes the trade one checkbox.</p><cite>Sources: USC Club Executive Manual; USC Clubs Event Proposal How-To; USC Grant Fund application</cite></aside>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-how">
+      <h2 class="h2" id="w-how">How it works</h2>
+      <ol class="how">
+        <li><b>A club makes its event count.</b><span>One box on the WesternLink proposal it already files, plus three promises: open to everyone, free, and someone at the door.</span></li>
+        <li><b>The USC promotes it.</b><span>The event goes into the USC Now feed and onto the screens at The Spoke and The Wave.</span></li>
+        <li><b>Students check in and climb.</b><span>A door code confirms the visit. Each student new to the club earns it $3 from employer partners, and every step goes on the student’s record.</span></li>
+      </ol>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-ladder">
+      <h2 class="h2" id="w-ladder">From showing up to Council</h2>
+      <div class="ladder-line">
+        <div><b>1 · Show up</b><span>Check in at a club you haven’t been to. Confirmed by the door code.</span></div>
+        <div><b>2 · Pitch in</b><span>Greet, keep time or set up. Confirmed by the club president.</span></div>
+        <div><b>3 · Lead</b><span>Run an event or join an executive team. Confirmed by the club.</span></div>
+        <div><b>4 · Represent</b><span>Policy Fellows or a run for Council. With the USC advocacy team.</span></div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h3 class="h3">Policy Fellows</h3><p>Each term, 10 to 15 students work with the USC’s advocacy team (an executive, an associate VP and three coordinators) on one issue: research, a one-page brief, one meeting with a city councillor or MPP, and a presentation to Council. This term’s issue is youth jobs.</p></div>
+        <div class="panel"><h3 class="h3">Run for It</h3><p>Campaign skills taught as professional development before the by-elections and the February election: public speaking, budgeting and persuasion. Several faculty president races went uncontested in 2026.</p></div>
+      </div>
+      <aside class="why"><span class="tag">Why it matters</span><p>The case asks for ways to bolster interest in student government. Every rung is a real professional skill, so the ladder gives students a career reason to climb toward Council. The Grant Fund can’t pay for advocacy, so the USC’s own advocacy team runs the top rung.</p><cite>Sources: Aspire 2026 case; USC Grant Fund application</cite></aside>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-new">
+      <h2 class="h2" id="w-new">What’s actually new</h2>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="cmp">
+            <thead><tr><th scope="col"></th><th scope="col">USC Grant Fund today</th><th scope="col">Counts</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Club effort</th><td>A seven-page application</td><td class="us">One checkbox on the event proposal</td></tr>
+              <tr><th scope="row">Timing</th><td>About three weeks to review, before the event</td><td class="us">Paid after the event</td></tr>
+              <tr><th scope="row">Pays for</th><td>Costs in a budget</td><td class="us"><mark>Each student new to the club</mark></td></tr>
+              <tr><th scope="row">Regular events</th><td>Not covered (“ongoing program costs”)</td><td class="us">That’s what it’s for</td></tr>
+              <tr><th scope="row">Promotion</th><td>The club’s job alone</td><td class="us">The USC promotes it too</td></tr>
+              <tr><th scope="row">What students get</th><td>Nothing directly</td><td class="us">A confirmed record and a path to Council</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="why"><span class="tag">Why it matters</span><p>Western’s Co-Curricular Record already exists, but students have to write reflections and find a staff validator, and it lists 482 approved activities. Counts records each step at the door and would feed that record, not replace it.</p><cite>Sources: USC Grant Fund application; Western Co-Curricular Record; Western Experiential Learning</cite></aside>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-cost">
+      <h2 class="h2" id="w-cost">Cost and who pays</h2>
+      <div class="panel">
+        <div class="table-wrap">
+          <table class="cmp budget">
+            <thead><tr><th scope="col">Winter 2027 pilot · 11 weeks · 20 clubs</th><th scope="col" class="amt">Amount</th><th scope="col">Basis</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Payments to clubs</th><td class="amt">$4,500</td><td>$3 for each of up to 1,500 first-timers, capped at $150 an event</td></tr>
+              <tr><th scope="row">Promotion at The Spoke and The Wave</th><td class="amt">$700</td><td>Screen slides, table tents and door signs</td></tr>
+              <tr><th scope="row">Run for It workshops</th><td class="amt">$500</td><td>Two sessions, catered by The Wave</td></tr>
+              <tr><th scope="row">Policy Fellows</th><td class="amt">$200</td><td>Printing and materials for 10 to 15 fellows</td></tr>
+              <tr><th scope="row">Counts tab in USC Now</th><td class="amt">$0 extra</td><td>Part of the app overhaul the USC already plans</td></tr>
+              <tr><th scope="row">Contingency</th><td class="amt">$600</td><td>About 10%</td></tr>
+            </tbody>
+            <tfoot><tr><td>Total</td><td class="amt">$6,500</td><td>Our estimates</td></tr></tfoot>
+          </table>
+        </div>
+        <p><b>Who pays:</b> three employer partners at $2,500 each ($7,500), signed by PD USC’s Industry Relations Director. If only two sign, the rate drops to $2 a first-timer and the pilot still fits. No new student fee.</p>
+      </div>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-know">
+      <h2 class="h2" id="w-know">How we’ll know it works</h2>
+      <ul class="targets">
+        <li><b>1,200</b><span>students new to a club</span></li>
+        <li><b>20 clubs</b><span>at least 8 of them outside careers</span></li>
+        <li><b>150</b><span>students move up a rung</span></li>
+        <li><b>10 + 25</b><span>Policy Fellows and Run for It sign-ups</span></li>
+        <li><b>+15 points</b><span>awareness of PD USC, USC Now poll, January to April</span></li>
+        <li><b>Under $6</b><span>per first-timer, all costs in</span></li>
+        <li><b>No drop</b><span>in attendance at the same clubs’ other events</span></li>
+        <li class="rule-tile"><b>Decision rule</b><span>In April, open Counts to every club if five of the seven targets are met.</span></li>
+      </ul>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-when">
+      <h2 class="h2" id="w-when">Timeline and next 30 days</h2>
+      <div class="grid2">
+        <div class="panel">
+          <ol class="timeline">
+            <li><b>November 2026</b><span>Approve the pilot, name an owner, sign employer partners.</span></li>
+            <li><b>December</b><span>Recruit 20 clubs; add the box to WesternLink; train club executives.</span></li>
+            <li><b>January to March 2027</b><span>Eleven-week pilot. Policy Fellows on youth jobs. Run for It before the February election.</span></li>
+            <li><b>April</b><span>Publish results and decide.</span></li>
+            <li><b>September 2027</b><span>Open to every club at Clubs Week.</span></li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3 class="h3">Next 30 days</h3>
+          <ol class="next30">
+            <li>Name an owner: PD USC’s director, with a staff member from the clubs office.</li>
+            <li>Sign three employer partners through PD USC’s Industry Relations Director.</li>
+            <li>Recruit 20 clubs at a club executive session.</li>
+            <li>Ask Western whether USC-confirmed steps can go on the Co-Curricular Record.</li>
+            <li>Add the “Make it count” box to the WesternLink event proposal.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="why-block" aria-labelledby="w-src">
+      <h2 class="h3" id="w-src">Sources</h2>
+      <ol class="sources">
+        <li>PBSN, Aspire Case Competition 2026: Driving Engagement for Western’s University Students’ Council.</li>
+        <li><a href="https://westernusc.ca/wp-content/uploads/2026/08/USC-Club-Executive-Manual-2.pdf" target="_blank" rel="noopener">USC Club Executive Manual</a></li>
+        <li><a href="https://westernusc.ca/wp-content/uploads/2024/09/USC-CLUBS-EVENT-PROPOSAL-HOW-TO.pdf" target="_blank" rel="noopener">USC Clubs Event Proposal How-To</a></li>
+        <li><a href="https://westernusc.forms-db.com/view.php?id=73485" target="_blank" rel="noopener">USC Grant Fund application</a></li>
+        <li><a href="https://westernusc.ca/services/grants-and-recognition/" target="_blank" rel="noopener">USC Grants and Awards</a></li>
+        <li><a href="https://westernusc.ca/jobs/usc-professional-development-application/" target="_blank" rel="noopener">PD USC committee posting</a></li>
+        <li><a href="https://experience.uwo.ca/students/co-curricular/wccr.html" target="_blank" rel="noopener">Western Co-Curricular Record</a> and <a href="https://experience.uwo.ca/about/facts_and_figures.html" target="_blank" rel="noopener">Experiential Learning by the numbers</a></li>
+        <li><a href="https://thehub.ca/2026/10/09/canada-shed-68000-jobs-in-september-statistics-canada-reports/" target="_blank" rel="noopener">The Hub, Oct 9, 2026</a></li>
+        <li><a href="https://csls.ca/wp-content/uploads/2026/08/CSLS_Youth_Labour_press_release_Sept_2026_FINAL.pdf" target="_blank" rel="noopener">Centre for the Study of Living Standards, Sept 2026</a></li>
+      </ol>
+      <p class="team">Team: Xinge Xu (Zinger), Nuo Zhang, Zohra Khawaja, Ahana Gehlot.</p>
+    </section>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span>Prototype for the PBSN Aspire 2026 case. Clubs, students and pilot numbers here are fictional or simulated.</span>
+    <button class="linkbtn" type="button" data-act="reset" data-testid="reset-all">Reset demo data</button>
+  </div>
+</footer>
+
+<dialog id="dlg-checkin" class="sheet" aria-labelledby="ci-title">
+  <form id="ci-form" class="sheet-body" novalidate>
+    <h2 id="ci-title" class="h3">Check in</h2>
+    <p class="muted" id="ci-event"></p>
+    <label class="field" for="ci-code">Door code</label>
+    <input id="ci-code" class="code-input" name="code" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="4" inputmode="text">
+    <p class="hint">It’s on the sign at the door. Demo code: <b class="mono" id="ci-hint"></b></p>
+    <p class="err" id="ci-err" role="alert"></p>
+    <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" id="ci-submit">Check in</button></div>
+  </form>
+  <div id="ci-done" class="sheet-body" hidden></div>
+</dialog>
+
+<dialog id="dlg-pitch" class="sheet" aria-labelledby="pi-title">
+  <form id="pi-form" class="sheet-body" novalidate>
+    <h2 id="pi-title" class="h3">Pitch in</h2>
+    <p class="muted" id="pi-event"></p>
+    <fieldset><legend>Pick a role</legend><div id="pi-roles" style="display:grid;gap:8px"></div></fieldset>
+    <p class="err" id="pi-err" role="alert"></p>
+    <p class="small muted">The club president confirms it after the event. Then it goes on your record as a real example for interviews.</p>
+    <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Ask to pitch in</button></div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- helpers ---------- */
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const money = (n) => '$' + Number(n).toLocaleString('en-CA', { maximumFractionDigits: 0 });
+  const num = (n) => Number(n).toLocaleString('en-CA');
+  let uidN = 0;
+  const uid = (p) => p + Date.now().toString(36) + (uidN++).toString(36);
+  const DAY = 864e5;
+  const startOfDay = (ts) => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const NOW = Date.now();
+  const D0 = (() => { const d = new Date(NOW); d.setHours(0, 0, 0, 0); if (new Date(NOW).getHours() >= 17) d.setDate(d.getDate() + 1); return d.getTime(); })();
+  const T = (day, h, m = 0) => { const d = new Date(D0); d.setDate(d.getDate() + day); d.setHours(h, m, 0, 0); return d.getTime(); };
+  function when(ts) {
+    const d = new Date(ts);
+    const diff = Math.round((startOfDay(ts) - startOfDay(Date.now())) / DAY);
+    const time = d.toLocaleTimeString('en-CA', d.getMinutes() ? { hour: 'numeric', minute: '2-digit' } : { hour: 'numeric' });
+    let day;
+    if (diff === 0) day = 'Today';
+    else if (diff === 1) day = 'Tomorrow';
+    else if (diff === -1) day = 'Yesterday';
+    else if (diff > 1 && diff < 7) day = d.toLocaleDateString('en-CA', { weekday: 'long' });
+    else day = d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+    return day + ', ' + time;
+  }
+  const dayWord = (ts) => { const w = when(ts).split(',')[0]; return w === 'Today' ? 'Tonight' : w; };
+
+  const TALLY = '<svg class="tally" viewBox="0 0 30 22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 3v16M10.5 3v16M16 3v16M21.5 3v16"/><path d="M2 16.5 26 5.5"/></g></svg>';
+  const CHECK = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function tallies(n, label) {
+    if (!n) return '';
+    const groups = [];
+    for (let left = n; left > 0; left -= 5) groups.push(Math.min(5, left));
+    const w = groups.length * 34;
+    let d = '';
+    groups.forEach((g, gi) => {
+      const x0 = gi * 34 + 5;
+      for (let i = 0; i < Math.min(g, 4); i++) d += 'M' + (x0 + i * 6) + ' 3v16';
+      if (g === 5) d += 'M' + (x0 - 3) + ' 16.5 ' + (x0 + 21) + ' 5.5';
+    });
+    return '<svg class="tallies" viewBox="0 0 ' + w + ' 22" width="' + w + '" height="22" role="img" aria-label="' + n + ' ' + esc(label) + '"><path d="' + d + '" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
+  }
+  const why = (text, source) => '<aside class="why"><span class="tag">Why it matters</span><p>' + text + '</p>' + (source ? '<cite>Source: ' + source + '</cite>' : '') + '</aside>';
+
+  /* ---------- demo world (fictional clubs and people) ---------- */
+  const CLUBS = {
+    law:      { id: 'law', name: 'Pre-Law Society', mono: 'PL', color: '#1E3A8A', interest: 'Careers', paid: 27, held: 2, firstTimers: 0, earned: 0, president: 'Jordan' },
+    film:     { id: 'film', name: 'Night Owls Film Club', mono: 'NO', color: '#B4410E', interest: 'Create', paid: 41, held: 3, firstTimers: 38, earned: 114, president: 'Priya' },
+    kitchen:  { id: 'kitchen', name: 'Heritage Kitchen', mono: 'HK', color: '#9D174D', interest: 'Culture', paid: 58, held: 5, firstTimers: 61, earned: 183, president: 'Lina' },
+    robotics: { id: 'robotics', name: 'Circuit Breakers', mono: 'CB', color: '#0F766E', interest: 'Build', paid: 33, held: 2, firstTimers: 22, earned: 66, president: 'Owen' },
+    climb:    { id: 'climb', name: 'Climb Club', mono: 'CC', color: '#0B5F8A', interest: 'Move', paid: 64, held: 6, firstTimers: 47, earned: 141, president: 'Sam' },
+    founders: { id: 'founders', name: 'Founders Garage', mono: 'FG', color: '#4D6B12', interest: 'Careers', paid: 29, held: 1, firstTimers: 15, earned: 45, president: 'Ade' },
+  };
+  const EVENTS = [
+    { id: 'mock', club: 'law', title: 'Mock trial night', at: T(0, 18, 30), place: 'UCC, room 315', code: 'LAW4', blurb: 'Argue a real case in ten minutes. No law background needed.', roles: ['Greeter', 'Timekeeper'], seededOn: false },
+    { id: 'films', club: 'film', title: 'Short films and pizza', at: T(0, 20), place: 'Natural Sciences Centre, room 145', code: 'OWL7', blurb: 'Five student shorts and one vote for the best. Stay for the pizza.', roles: ['Greeter'], seededOn: true },
+    { id: 'dumplings', club: 'kitchen', title: 'Dumpling night', at: T(1, 18), place: 'The Wave, event space', code: 'FOLD', blurb: 'Learn to fold three kinds. Everyone leaves with a box.', roles: ['Setup', 'Greeter'], seededOn: true },
+    { id: 'arm', club: 'robotics', title: 'Build a robot arm in two hours', at: T(2, 17), place: 'Spencer Engineering Building, room 2100', code: 'BOLT', blurb: 'Teams of three, all parts provided. No experience needed.', roles: ['Setup'], seededOn: true },
+    { id: 'boulder', club: 'climb', title: 'First-timer bouldering', at: T(3, 16), place: 'Western Student Recreation Centre', code: 'GRIP', blurb: 'Shoes provided. We teach you the first three moves.', roles: ['Greeter'], seededOn: true },
+    { id: 'pitchnight', club: 'founders', title: 'Pitch night: 90 seconds, no slides', at: T(3, 18, 30), place: 'Social Science Centre, room 2028', code: 'PTCH', blurb: 'Pitch an idea or vote on the best one. Founders give feedback.', roles: ['Timekeeper'], seededOn: true },
+    { id: 'lsat', club: 'law', title: 'LSAT study circle', at: T(6, 17, 30), place: 'Weldon Library, room 121', code: 'READ', blurb: 'One logic game, three ways to solve it. Bring a pencil.', roles: ['Greeter'], seededOn: true },
+    { id: 'recipes', club: 'kitchen', title: 'Family recipes night', at: T(-9, 18), place: 'The Wave, event space', code: 'SPCE', blurb: '', roles: [], past: true },
+    { id: 'intro', club: 'climb', title: 'Intro night', at: T(-16, 17), place: 'Western Student Recreation Centre', code: 'ROPE', blurb: '', roles: [], past: true },
+  ];
+  const ROLE_DESC = { Greeter: 'Welcome first-timers at the door', Timekeeper: 'Keep the event on schedule', Setup: 'Set up the room before it starts' };
+  const ROLE_LINE = { Greeter: 'welcoming first-time attendees', Timekeeper: 'keeping the program on schedule', Setup: 'setting up the room and materials' };
+  const PAYOUT = 3, CAP = 150;
+  const SIM = { week: 6, weeks: 11, clubs: 20, outside: 13, events: 64, firstTimers: 742, checkins: 1918, paid: 2190, pool: 7500, showUp: 1310, pitchIn: 164, lead: 41, fellows: 12, runForIt: 11, vacant: 16, byWeek: [64, 98, 121, 140, 151, 168] };
+  const evById = (id) => EVENTS.find((e) => e.id === id);
+
+  /* ---------- state ---------- */
+  function fresh() {
+    const optedIn = {};
+    EVENTS.forEach((e) => { if (e.seededOn) optedIn[e.id] = true; });
+    return {
+      v: 1, optedIn,
+      checkins: [
+        { id: 'c-intro', event: 'intro', student: 'me', at: T(-16, 17, 10), first: true, live: false },
+        { id: 'c-recipes', event: 'recipes', student: 'me', at: T(-9, 18, 5), first: true, live: false },
+      ],
+      pitches: [], fellows: false, fellowsAt: 0, runForIt: false, runForItAt: 0, promoted: false, demo: [], demoAt: -1, club: 'law',
+    };
+  }
+  const KEY = 'counts-demo-v1';
+  function storeGet() { try { return window.localStorage.getItem(KEY); } catch (e) { return null; } }
+  function storeSet(v) { try { window.localStorage.setItem(KEY, v); } catch (e) { /* storage blocked: the demo still works in memory */ } }
+  function load() {
+    const raw = storeGet();
+    if (raw) { try { const s = JSON.parse(raw); if (s && s.v === 1 && Array.isArray(s.checkins) && Array.isArray(s.pitches)) return s; } catch (e) { /* ignore bad data */ } }
+    return fresh();
+  }
+  let S = load();
+  const UI = { filter: 'All', optin: null };
+  let chan = null;
+  try { chan = new BroadcastChannel('counts-demo'); chan.onmessage = (m) => { if (m.data && m.data.v === 1) { S = m.data; render(); } }; } catch (e) { chan = null; }
+  function commit() {
+    storeSet(JSON.stringify(S));
+    try { if (chan) chan.postMessage(S); } catch (e) { /* ignore */ }
+    render();
+  }
+
+  /* ---------- rules ---------- */
+  function firstWithClub(s, student, club) {
+    return !s.checkins.some((c) => c.student === student && evById(c.event) && evById(c.event).club === club);
+  }
+  function checkIn(s, eventId, code, student = 'me', at = Date.now()) {
+    const ev = evById(eventId);
+    if (!ev || ev.past || !s.optedIn[eventId]) return { ok: false, error: 'This event isn’t taking check-ins right now.' };
+    if (s.checkins.some((c) => c.student === student && c.event === eventId)) return { ok: false, already: true, error: 'You’re already checked in here.' };
+    if (String(code || '').trim().toUpperCase() !== ev.code) return { ok: false, error: 'That code doesn’t match this event. It’s on the sign at the door.' };
+    const first = firstWithClub(s, student, ev.club);
+    s.checkins.push({ id: uid('c'), event: eventId, student, at, first, live: true });
+    return { ok: true, first, club: CLUBS[ev.club], event: ev };
+  }
+  function payout(s, eventId) {
+    return Math.min(PAYOUT * s.checkins.filter((c) => c.event === eventId && c.first && c.live).length, CAP);
+  }
+  function requestPitch(s, eventId, role, student = 'me') {
+    const ev = evById(eventId);
+    if (!ev || ev.past || !s.optedIn[eventId]) return { ok: false, error: 'This event isn’t open for helpers.' };
+    if (!ev.roles.includes(role)) return { ok: false, error: 'Pick a role first.' };
+    if (s.pitches.some((p) => p.student === student && p.event === eventId)) return { ok: false, error: 'You’ve already asked to pitch in here.' };
+    s.pitches.push({ id: uid('p'), event: eventId, role, student, status: 'requested', at: Date.now() });
+    return { ok: true };
+  }
+  function confirmPitch(s, id) {
+    const p = s.pitches.find((x) => x.id === id);
+    if (!p || p.status === 'confirmed') return false;
+    p.status = 'confirmed'; p.confirmedAt = Date.now();
+    return true;
+  }
+  function optIn(s, eventId, promises) {
+    if (!promises || !promises.open || !promises.free || !promises.door) return { ok: false, error: 'Tick all three promises to turn Counts on.' };
+    s.optedIn[eventId] = true;
+    return { ok: true };
+  }
+  function clubSummary(s, id) {
+    const c = CLUBS[id];
+    const liveFirst = s.checkins.filter((x) => x.live && x.first && evById(x.event).club === id).length;
+    const liveEarned = EVENTS.filter((e) => e.club === id).reduce((t, e) => t + payout(s, e.id), 0);
+    return { first: c.firstTimers + liveFirst, earned: c.earned + liveEarned, liveFirst, liveEarned };
+  }
+  function record(s, student = 'me') {
+    const checks = s.checkins.filter((c) => c.student === student).sort((a, b) => a.at - b.at);
+    const clubs = [...new Set(checks.map((c) => evById(c.event).club))];
+    const pitches = s.pitches.filter((p) => p.student === student);
+    const confirmed = pitches.filter((p) => p.status === 'confirmed');
+    const items = [];
+    checks.forEach((c) => { const ev = evById(c.event); items.push({ at: c.at, text: 'Checked in at ' + ev.title, club: ev.club, by: c.first ? 'Door code · first time with this club' : 'Door code', ok: true }); });
+    pitches.forEach((p) => { const ev = evById(p.event); items.push({ at: p.confirmedAt || p.at, text: 'Pitched in as ' + p.role.toLowerCase() + ' at ' + ev.title, club: ev.club, by: p.status === 'confirmed' ? 'Confirmed by ' + CLUBS[ev.club].president + ', club president' : 'Waiting for the club to confirm', ok: p.status === 'confirmed' }); });
+    if (s.fellows) items.push({ at: s.fellowsAt, text: 'Applied to Policy Fellows: youth jobs', club: null, by: 'In review by the USC advocacy team', ok: false });
+    if (s.runForIt) items.push({ at: s.runForItAt, text: 'Saved a spot at Run for It', club: null, by: 'Workshop before the by-elections', ok: false });
+    items.sort((a, b) => b.at - a.at);
+    const rungs = [
+      { n: clubs.length, done: clubs.length > 0, pending: 0 },
+      { n: confirmed.length, done: confirmed.length > 0, pending: pitches.length - confirmed.length },
+      { n: 0, done: false, pending: 0 },
+      { n: 0, done: false, pending: s.fellows ? 1 : 0 },
+    ];
+    const resume = [];
+    if (clubs.length) resume.push('Took part in events with ' + clubs.length + ' student club' + (clubs.length > 1 ? 's' : '') + ' (' + clubs.map((k) => CLUBS[k].name).join(', ') + '), confirmed by the USC.');
+    confirmed.forEach((p) => { const ev = evById(p.event); resume.push('Volunteered as ' + p.role.toLowerCase() + ' for ' + CLUBS[ev.club].name + '’s ' + ev.title + ', ' + ROLE_LINE[p.role] + '; confirmed by the club president.'); });
+    return { checks, clubs, pitches, confirmed, items, rungs, resume };
+  }
+  function nextStep(r, s) {
+    if (!r.rungs[0].done) return { text: 'Check in at any event this week. Your first one starts your record.', act: 'week' };
+    if (!r.rungs[1].done) return r.rungs[1].pending ? { text: 'Your pitch-in is waiting for the club to confirm it.', act: null } : { text: 'Pitch in at your next event. Clubs always need greeters, and it gives you a real example for interviews.', act: 'week' };
+    if (!s.fellows) return { text: 'You’ve pitched in. Apply to Policy Fellows: this term’s issue is youth jobs.', act: 'fellows' };
+    return s.runForIt ? { text: 'Next, ask a club about joining its executive team.', act: null } : { text: 'Next, save a spot at Run for It before the by-elections, or ask a club about its executive team.', act: 'runforit' };
+  }
+  function dashboard(s) {
+    const live = s.checkins.filter((c) => c.live);
+    const first = live.filter((c) => c.first).length;
+    const paid = EVENTS.reduce((t, e) => t + payout(s, e.id), 0);
+    const newEvents = EVENTS.filter((e) => !e.seededOn && !e.past && s.optedIn[e.id]).length;
+    const pitchLive = s.pitches.filter((p) => p.status === 'confirmed').length;
+    const rep = (s.fellows ? 1 : 0) + (s.runForIt ? 1 : 0);
+    const byWeek = SIM.byWeek.slice();
+    byWeek[byWeek.length - 1] += first;
+    return {
+      firstTimers: SIM.firstTimers + first, dFirst: first,
+      checkins: SIM.checkins + live.length,
+      events: SIM.events + newEvents, dEvents: newEvents,
+      paid: SIM.paid + paid, dPaid: paid, pool: SIM.pool,
+      ladder: [['Show up', SIM.showUp, 0], ['Pitch in', SIM.pitchIn + pitchLive, pitchLive], ['Lead', SIM.lead, 0], ['Represent', SIM.fellows + SIM.runForIt + rep, rep]],
+      fellows: SIM.fellows + (s.fellows ? 1 : 0), dFellows: s.fellows ? 1 : 0,
+      runForIt: SIM.runForIt + (s.runForIt ? 1 : 0), dRun: s.runForIt ? 1 : 0,
+      byWeek,
+    };
+  }
+
+  /* ---------- shared pieces ---------- */
+  function posterHTML(e) {
+    const c = CLUBS[e.club];
+    const mine = S.checkins.find((x) => x.student === 'me' && x.event === e.id);
+    const pitch = S.pitches.find((p) => p.student === 'me' && p.event === e.id);
+    return '<article class="poster" style="--club:' + c.color + '" data-testid="event-' + e.id + '">' +
+      '<div class="poster-top">' +
+        '<div class="club-line"><span class="mono-badge">' + esc(c.mono) + '</span><span>' + esc(c.name) + '</span></div>' +
+        (e.seededOn ? '' : '<span class="new-flag">New this week</span>') +
+        '<h3 class="poster-title">' + esc(e.title) + '</h3>' +
+        '<span class="sticker">' + TALLY + 'Counts</span>' +
+      '</div>' +
+      '<div class="poster-body">' +
+        '<p class="when">' + esc(when(e.at)) + '</p>' +
+        '<p class="place">' + esc(e.place) + '</p>' +
+        '<p class="blurb">' + esc(e.blurb) + '</p>' +
+        '<ul class="promises" aria-label="The club promises"><li>Open to everyone</li><li>Free</li><li>Someone at the door</li></ul>' +
+        '<div class="actions">' +
+          (mine ? '<p class="done-line" data-testid="checked-' + e.id + '">' + CHECK + 'Checked in' + (mine.first ? ' · first time with this club' : '') + '</p>'
+                : '<button class="btn" type="button" data-act="checkin" data-id="' + e.id + '">I’m here</button>') +
+          (pitch ? '<p class="done-line muted">' + (pitch.status === 'confirmed' ? 'Pitched in' : 'Asked to pitch in') + ' as ' + esc(pitch.role.toLowerCase()) + '</p>'
+                 : (e.roles.length ? '<button class="btn ghost" type="button" data-act="pitchin" data-id="' + e.id + '">Pitch in</button>' : '')) +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+  function upcoming() { return EVENTS.filter((e) => !e.past && S.optedIn[e.id]).sort((a, b) => a.at - b.at); }
+  function spokeScreen() {
+    const list = upcoming().slice(0, 4);
+    return '<div class="screen" data-testid="spoke-screen">' +
+      '<div class="screen-head"><b>These count this week</b><span>Open to everyone · free · check in on USC Now</span></div>' +
+      '<ul class="screen-list">' + list.map((e) => { const c = CLUBS[e.club]; return '<li><span class="mono-badge solid" style="--club:' + c.color + '">' + esc(c.mono) + '</span><div><p class="t">' + esc(e.title) + '</p><p class="s">' + esc(c.name) + ' · ' + esc(when(e.at)) + '</p></div><span class="c">Counts</span></li>'; }).join('') + '</ul>' +
+      '<p class="screen-foot">Showing on the screens at The Spoke and The Wave</p>' +
+    '</div>';
+  }
+  function meter(label, v, max) {
+    const short = v < max;
+    return '<div class="meter"><div class="meter-top"><span>' + label + '</span><span class="mono">' + v + ' / ' + max + '</span></div><div class="bar' + (short ? ' short' : '') + '"><i style="width:' + Math.min(100, (v / max) * 100) + '%"></i></div>' + (short ? '<p class="meter-note">' + (max - v) + ' to go</p>' : '') + '</div>';
+  }
+  function spark(values) {
+    const w = 240, h = 52, pad = 4, max = Math.max(...values), n = values.length;
+    const pts = values.map((v, i) => [pad + (i * (w - 2 * pad)) / (n - 1), h - pad - (v / max) * (h - 2 * pad)]);
+    const line = pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const area = 'M' + pts[0][0] + ',' + (h - pad) + ' L' + line.replace(/ /g, ' L') + ' L' + pts[n - 1][0] + ',' + (h - pad) + ' Z';
+    const last = pts[n - 1];
+    return '<svg class="spark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" role="img" aria-label="First-timers per week: ' + values.join(', ') + '">' +
+      '<path d="' + area + '" fill="currentColor" fill-opacity=".09"/>' +
+      '<polyline points="' + line + '" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="3.5" fill="currentColor"/></svg>';
+  }
+  function kpi(label, value, delta, extra, testid, whyText) {
+    return '<article class="kpi" data-testid="' + testid + '"><p class="label">' + label + '</p><p class="value">' + value + '</p>' + (delta ? '<p class="delta">' + delta + '</p>' : '') + (extra || '') + '<p class="kpi-why"><b>Why:</b> ' + whyText + '</p></article>';
+  }
+  function funnel(rows) {
+    const top = rows[0][1];
+    return '<div class="funnel">' + rows.map((r) => '<div class="f-row"><span class="f-label">' + r[0] + '</span><div class="bar"><i style="width:' + Math.max(2, (r[1] / top) * 100) + '%"></i></div><span class="f-val">' + num(r[1]) + (r[2] ? '<span class="f-delta">+' + r[2] + '</span>' : '') + '</span></div>').join('') + '</div>';
+  }
+
+  /* ---------- views ---------- */
+  function renderWeek() {
+    const list = upcoming();
+    const shown = list.filter((e) => UI.filter === 'All' || CLUBS[e.club].interest === UI.filter);
+    const interests = ['All', 'Careers', 'Culture', 'Create', 'Build', 'Move'];
+    $('#view-week').innerHTML =
+      '<header class="view-head"><p class="eyebrow">This week at Western</p><h1 class="h1">Walk into something new.</h1>' +
+      '<p class="lede">Every event here is free, open to everyone, and someone will meet you at the door. Each one counts toward your record.</p></header>' +
+      why('Most students stick to a few familiar places on campus. These events are the easiest first step into a new one, and the club gets something for welcoming you.', 'Aspire 2026 case') +
+      '<div class="filters" role="group" aria-label="Filter by interest">' + interests.map((i) => '<button class="chip" type="button" data-act="filter" data-v="' + i + '" aria-pressed="' + (UI.filter === i) + '">' + i + '</button>').join('') + '</div>' +
+      '<p class="count-line" data-testid="feed-count">' + shown.length + ' event' + (shown.length === 1 ? '' : 's') + (UI.filter === 'All' ? ' this week' : ' in ' + UI.filter) + '</p>' +
+      '<div class="feed" data-testid="feed">' + (shown.map(posterHTML).join('') || '<p class="empty">Nothing in ' + esc(UI.filter) + ' this week yet. Try All.</p>') + '</div>';
+  }
+
+  function renderRecord() {
+    const r = record(S);
+    const nx = nextStep(r, S);
+    const RUNGS = [
+      { key: 'show', name: 'Show up', what: 'Check in at a club you haven’t been to.', why: 'Most students stick to a few familiar places. One new room is how belonging starts.', src: 'Aspire 2026 case' },
+      { key: 'pitch', name: 'Pitch in', what: 'Volunteer at an event: greeter, timekeeper or setup.', why: 'Entry-level hiring is the bottleneck right now. Pitching in gives you a real example for an interview.', src: 'CSLS, Sept 2026' },
+      { key: 'lead', name: 'Lead', what: 'Run an event or join a club’s executive team.', why: 'Every club elects a new team each spring, so hundreds of leadership roles open up every year.', src: 'USC Club Executive Manual' },
+      { key: 'rep', name: 'Represent', what: 'Join Policy Fellows or run for Council.', why: '16 of the 51 faculty and affiliate seats on Council were vacant in October 2026.', src: 'Aspire 2026 case' },
+    ];
+    let nextGiven = false;
+    const rungHTML = RUNGS.map((g, i) => {
+      const st = r.rungs[i];
+      let state, label;
+      if (st.done) { state = 'done'; label = 'Done'; }
+      else if (st.pending) { state = 'wait'; label = g.key === 'rep' ? 'Applied' : 'Waiting to confirm'; nextGiven = true; }
+      else if (!nextGiven) { state = 'next'; label = 'Your next step'; nextGiven = true; }
+      else { state = 'later'; label = 'Later'; }
+      let count = '';
+      if (g.key === 'show') count = '<div class="rung-count">' + tallies(st.n, 'clubs') + '<span>' + st.n + (st.n === 1 ? ' club' : ' clubs') + '</span></div>';
+      if (g.key === 'pitch') count = '<div class="rung-count">' + tallies(st.n, 'times') + '<span>' + st.n + (st.n === 1 ? ' time' : ' times') + '</span></div>';
+      return '<article class="rung" data-state="' + state + '" data-testid="rung-' + g.key + '"><p class="step">Rung ' + (i + 1) + '</p><h3>' + g.name + '</h3><p class="state">' + label + '</p>' + count +
+        '<p class="what">' + g.what + '</p><p class="rung-why"><b>Why:</b> ' + g.why + '<cite>' + g.src + '</cite></p></article>';
+    }).join('');
+    const nextBtn = nx.act === 'week' ? '<a class="btn small" href="#week">See this week</a>' : nx.act === 'fellows' ? '<button class="btn small" type="button" data-act="fellows">Apply to Policy Fellows</button>' : nx.act === 'runforit' ? '<button class="btn small" type="button" data-act="runforit">Save my spot</button>' : '';
+    const itemHTML = (it) => '<li><span class="dot' + (it.ok ? ' ok' : '') + '"></span><div><p class="it-text">' + esc(it.text) + (it.club ? ' <span class="muted">· ' + esc(CLUBS[it.club].name) + '</span>' : '') + '</p><p class="it-by">' + esc(it.by) + ' · ' + esc(when(it.at)) + '</p></div></li>';
+    $('#view-record').innerHTML =
+      '<header class="view-head record-head"><div><p class="eyebrow">My record · demo student</p><h1 class="h1">Maya’s record</h1>' +
+      '<p class="lede">Second year, Health Sciences. Everything she does with a club counts, and someone real confirms every step.</p></div>' +
+      '<div class="seal">' + TALLY + '<span>Confirmed by<br>the USC</span></div></header>' +
+      '<div class="next-card" data-testid="next-step"><p class="eyebrow">Your next step</p><p class="next-text">' + esc(nx.text) + '</p>' + nextBtn + '</div>' +
+      '<section aria-labelledby="ladder-h"><h2 class="h2" id="ladder-h">Four rungs, from showing up to Council</h2><div class="ladder">' + rungHTML + '</div></section>' +
+      '<div class="grid2">' +
+        '<section class="panel" aria-labelledby="act-h"><h2 class="h3" id="act-h">What’s on your record</h2><ol class="activity" data-testid="activity">' + r.items.map(itemHTML).join('') + '</ol></section>' +
+        '<section class="panel" aria-labelledby="cv-h"><h2 class="h3" id="cv-h">Your résumé lines</h2><p class="small muted">Only confirmed steps show up here.</p>' +
+          '<pre class="resume" id="resume-text" tabindex="0" data-testid="resume">' + esc(r.resume.map((l) => '• ' + l).join('\n')) + '</pre>' +
+          '<div class="row"><button class="btn small" type="button" data-act="copy-resume">Copy lines</button><span class="small muted" id="copy-msg" role="status"></span></div>' +
+          why('Western’s Co-Curricular Record asks students to write reflections and find a staff validator, and it lists 482 approved activities. Counts records each step at the door, and would feed that record once Western agrees to accept USC-confirmed steps.', 'Western Experiential Learning') +
+        '</section>' +
+      '</div>' +
+      '<div class="grid2">' +
+        '<section class="panel rep" data-testid="fellows-card"><p class="eyebrow">Top rung</p><h2 class="h3">Policy Fellows: youth jobs</h2><p>Work with the USC’s advocacy team for a term: research the issue, write a one-page brief, join one meeting with a city councillor or MPP, and present to Council.</p>' +
+          why('Canadians aged 15 to 24 lost 48,000 jobs in September 2026. Students will give their time to the issue that decides whether they get hired.', 'The Hub, Oct 9, 2026') +
+          (S.fellows ? '<p class="done-line">' + CHECK + 'Applied. The advocacy team will be in touch.</p>' : '<div><button class="btn" type="button" data-act="fellows">Apply</button></div>') + '</section>' +
+        '<section class="panel rep" data-testid="runforit-card"><p class="eyebrow">Top rung</p><h2 class="h3">Run for It</h2><p>Campaign skills taught as professional development before the by-elections and the February election: public speaking, budgeting and persuasion.</p>' +
+          why('Several faculty president races went uncontested in 2026. A workshop that builds real skills lowers the bar to run.', 'Aspire 2026 case') +
+          (S.runForIt ? '<p class="done-line">' + CHECK + 'Spot saved.</p>' : '<div><button class="btn ghost" type="button" data-act="runforit">Save my spot</button></div>') + '</section>' +
+      '</div>';
+  }
+
+  function evRowHTML(e) {
+    const c = CLUBS[e.club];
+    const on = !!S.optedIn[e.id];
+    const open = UI.optin === e.id && !on;
+    return '<li class="ev-row" data-testid="row-' + e.id + '">' +
+      '<div><p class="ev-title">' + esc(e.title) + '</p><p class="small muted">' + esc(when(e.at)) + ' · ' + esc(e.place) + '</p></div>' +
+      '<div class="ev-side">' + (on
+        ? '<span class="on-pill">' + TALLY + 'Counts is on</span><span class="code-chip">Door code <b class="mono">' + e.code + '</b></span><button class="btn ghost small" type="button" data-act="optout" data-id="' + e.id + '">Turn off</button>'
+        : '<button class="btn small" type="button" data-act="optin-start" data-id="' + e.id + '" aria-expanded="' + open + '" data-testid="make-' + e.id + '">Make it count</button>') + '</div>' +
+      (open ? '<form class="promise-form" data-id="' + e.id + '"><p class="small"><b>Promise three things and it counts:</b></p>' +
+        '<label><input type="checkbox" name="p_open" id="p-open-' + e.id + '"> Open to everyone, members or not</label>' +
+        '<label><input type="checkbox" name="p_free" id="p-free-' + e.id + '"> Free to attend</label>' +
+        '<label><input type="checkbox" name="p_door" id="p-door-' + e.id + '"> Someone at the door to welcome first-timers</label>' +
+        '<div class="row"><button class="btn small" type="submit" disabled data-testid="optin-' + e.id + '">Turn on Counts</button><button class="btn ghost small" type="button" data-act="optin-cancel">Cancel</button></div></form>' : '') +
+      (on ? '<div class="door-sign" style="--club:' + c.color + '" data-testid="sign-' + e.id + '"><p class="ds-club">' + esc(c.name) + '</p><p class="ds-title">' + esc(e.title) + '</p><p class="ds-counts">' + TALLY + 'This event counts</p><p class="ds-code">Check in on USC Now: <b class="mono">' + e.code + '</b></p><p class="ds-prom">Open to everyone · Free · Ask for the greeter</p></div>' : '') +
+    '</li>';
+  }
+  function renderClubs() {
+    const c = CLUBS[S.club] || CLUBS.law;
+    const evs = EVENTS.filter((e) => e.club === c.id && !e.past).sort((a, b) => a.at - b.at);
+    const sum = clubSummary(S, c.id);
+    const reqs = S.pitches.filter((p) => evById(p.event).club === c.id);
+    const pitchRow = (p) => { const ev = evById(p.event); return '<li class="pitch-row" data-testid="pitch-' + ev.id + '"><div><p><b>Maya</b> wants to pitch in as ' + esc(p.role.toLowerCase()) + '</p><p class="small muted">' + esc(ev.title) + ' · ' + esc(when(ev.at)) + '</p></div>' + (p.status === 'confirmed' ? '<span class="ok">' + CHECK + 'Confirmed</span>' : '<button class="btn small" type="button" data-act="confirm-pitch" data-id="' + p.id + '">Confirm</button>') + '</li>'; };
+    $('#view-clubs').innerHTML =
+      '<header class="view-head"><p class="eyebrow">For clubs</p><h1 class="h1">Your brand. The USC’s reach.</h1>' +
+      '<p class="lede">You keep your name, your style and your members. Tick one box on the proposal you already file in WesternLink, and the USC promotes your event and pays you for every new face.</p></header>' +
+      '<div class="club-switch" role="group" aria-label="Choose a club">' + Object.values(CLUBS).map((k) => '<button class="club-pill" type="button" data-act="club" data-v="' + k.id + '" aria-pressed="' + (k.id === c.id) + '" style="--club:' + k.color + '"><span class="mono-badge sm">' + k.mono + '</span>' + esc(k.name) + '</button>').join('') + '</div>' +
+      '<section class="club-hero" style="--club:' + c.color + '" data-testid="club-hero"><span class="mono-badge lg">' + c.mono + '</span><div><h2 class="club-hero-name">' + esc(c.name) + '</h2><p>' + c.interest + ' · ' + c.paid + ' paid members · president ' + esc(c.president) + '</p></div></section>' +
+      '<div class="grid2">' +
+        '<section class="panel"><h2 class="h3">Staying ratified</h2>' + meter('Paid members', c.paid, 30) + meter('Events this year', c.held, 4) +
+          why('Clubs need 30 paid members and four events a year to stay ratified. New members start as first-timers.', 'USC Club Executive Manual') + '</section>' +
+        '<section class="panel"><h2 class="h3">This term with Counts</h2><div class="mini-kpis"><div><span class="v" data-testid="club-first">' + num(sum.first) + '</span><span class="l">students new to your club</span></div><div><span class="v" data-testid="club-earned">' + money(sum.earned) + '</span><span class="l">earned, paid to your club account after each event</span></div></div>' +
+          '<p class="small muted">$3 for each student new to your club, up to $150 an event, from employer partners through PD USC.</p></section>' +
+      '</div>' +
+      '<section class="panel"><h2 class="h3">Your upcoming events in WesternLink</h2><ul class="ev-rows">' + evs.map(evRowHTML).join('') + '</ul></section>' +
+      '<section class="panel"><h2 class="h3">Pitch-in requests</h2>' + (reqs.length ? '<ul class="pitch-rows">' + reqs.map(pitchRow).join('') + '</ul>' : '<p class="muted">No requests yet. Students ask from the event card.</p>') +
+        why('When you confirm, the step goes on the student’s record with your name on it. That is the proof employers ask about.', '') + '</section>' +
+      '<div class="grid2">' +
+        '<section class="panel"><h2 class="h3">What you get</h2><ul class="ticks"><li>$3 for every student new to your club, up to $150 an event.</li><li>Your event in the USC Now feed and on the screens at The Spoke and The Wave.</li><li>Your helpers’ and executives’ roles confirmed on their records.</li><li>A PD USC speaker or employer guest, if you ask.</li></ul></section>' +
+        '<section class="panel"><h2 class="h3">What you promise</h2><ul class="ticks"><li>Open to everyone, members or not.</li><li>Free to attend.</li><li>Someone at the door to welcome first-timers.</li><li>The door code posted at the entrance.</li></ul></section>' +
+      '</div>';
+  }
+
+  function renderUSC() {
+    const d = dashboard(S);
+    $('#view-usc').innerHTML =
+      '<header class="view-head"><p class="eyebrow">USC dashboard</p><h1 class="h1">Who’s new, and who’s climbing.</h1><p class="lede">The pilot in one view: students reaching new clubs, steps up the ladder, and the pipeline to Council.</p></header>' +
+      '<p class="sim-banner" data-testid="sim-banner"><b>Simulated pilot, week ' + SIM.week + ' of ' + SIM.weeks + '.</b> Demo data, not results. Clicks anywhere in this prototype add to it live.</p>' +
+      '<div class="kpis">' +
+        kpi('Students new to a club', num(d.firstTimers), d.dFirst ? '+' + d.dFirst + ' just now' : '', spark(d.byWeek), 'kpi-first', 'Only a student’s first visit to a club counts, so this measures new reach, not regulars.') +
+        kpi('Clubs taking part', SIM.clubs + ' of 240+', '', '<p class="small muted">' + SIM.outside + ' of them outside careers</p>', 'kpi-clubs', 'It rides events clubs already run. Each of 240+ clubs must hold at least four a year.') +
+        kpi('Counts events so far', num(d.events), d.dEvents ? '+' + d.dEvents + ' just now' : '', '', 'kpi-events', 'Each is an event the USC didn’t have to plan, staff or book.') +
+        kpi('Paid to clubs', money(d.paid), d.dPaid ? '+' + money(d.dPaid) + ' just now' : '', '<div class="pool"><div class="bar"><i style="width:' + Math.min(100, (d.paid / d.pool) * 100) + '%"></i></div><p class="small muted">of ' + money(d.pool) + ' from employer partners</p></div>', 'kpi-paid', 'If a partner drops out, the rate falls to $2 and the pilot still fits.') +
+      '</div>' +
+      '<div class="grid2">' +
+        '<section class="panel" data-testid="ladder-panel"><h2 class="h3">The ladder</h2>' + funnel(d.ladder) +
+          why('This is the case’s real goal: students who show up once, then help, then lead, then represent. Today the USC can’t see this path at all.', 'Aspire 2026 case') + '</section>' +
+        '<section class="panel" data-testid="pipeline-panel"><h2 class="h3">Pipeline to Council</h2><div class="pipeline"><div><span class="v" data-testid="pipe-fellows">' + d.fellows + '</span><span class="l">Policy Fellows applicants</span></div><div><span class="v">' + d.runForIt + '</span><span class="l">Run for It sign-ups</span></div><div><span class="v">' + SIM.vacant + '</span><span class="l">seats vacant in Oct 2026</span></div></div>' +
+          why('Turnout fell from 34.6% in 2023 to 24.6% in 2026. Students who have climbed three rungs are the likeliest to run.', 'Aspire 2026 case') + '</section>' +
+      '</div>' +
+      '<section class="panel"><h2 class="h3">What students see at The Spoke</h2>' + spokeScreen() +
+        why('Today the club manual leaves promotion to each club. The USC’s businesses are where students already are, every day.', 'USC Club Executive Manual; Aspire 2026 case') + '</section>';
+  }
+
+  /* ---------- live demo ---------- */
+  const STEPS = [
+    { title: 'Pre-Law Society makes Mock trial night count', why: 'One checkbox on the proposal clubs already file in WesternLink. No seven-page grant form and no three-week wait.', src: 'USC Grant Fund application',
+      run() { S.optedIn.mock = true; } },
+    { title: 'The USC puts it where students already are', why: 'Today the club manual leaves promotion to each club. The USC has the app and the screens students pass every day.', src: 'USC Club Executive Manual',
+      run() { S.promoted = true; } },
+    { title: 'Maya checks in for the first time', why: 'Only a student’s first visit earns the club money, so the USC pays for reaching new students.', src: '',
+      run() { checkIn(S, 'mock', 'LAW4', 'me'); } },
+    { title: 'She pitches in, then applies to Policy Fellows', why: 'Someone real confirms every step: the door code, the club president, the USC advocacy team. The top rung is Council.', src: '',
+      run() {
+        if (!S.pitches.some((p) => p.student === 'me' && p.event === 'lsat')) requestPitch(S, 'lsat', 'Greeter', 'me');
+        const p = S.pitches.find((x) => x.student === 'me' && x.event === 'lsat');
+        if (p) confirmPitch(S, p.id);
+        if (!S.fellows) { S.fellows = true; S.fellowsAt = Date.now(); }
+      } },
+    { title: 'The USC sees what changed', why: 'The USC can now see who is new, who is climbing, and who might run for the 16 vacant Council seats.', src: 'Aspire 2026 case',
+      run() {} },
+  ];
+  function runStep(n) {
+    for (let i = 0; i <= n; i++) if (!S.demo.includes(i)) { STEPS[i].run(); S.demo.push(i); }
+    S.demoAt = n;
+    commit();
+  }
+  function phonePane(at) {
+    const mock = evById('mock');
+    const notif = at >= 1 && at <= 2 ? '<div class="notif" data-testid="notif">' + TALLY + '<div><b>USC Now</b><p>' + dayWord(mock.at) + ': Mock trial night with Pre-Law Society. Free, open to everyone.</p></div></div>' : '';
+    let body;
+    if (at <= 1) {
+      const list = upcoming().slice(0, 5);
+      body = '<div class="ph-body"><p class="eyebrow">This week</p>' + list.map((e) => { const c = CLUBS[e.club]; return '<div class="mini-ev"><span class="mono-badge solid" style="--club:' + c.color + '">' + esc(c.mono) + '</span><div><b>' + esc(e.title) + '</b><span class="meta">' + esc(c.name) + ' · ' + esc(when(e.at)) + (e.seededOn ? '' : ' · <span class="fresh">New</span>') + '</span></div></div>'; }).join('') + '</div>';
+    } else if (at === 2) {
+      const ci = S.checkins.find((c) => c.student === 'me' && c.event === 'mock');
+      body = '<div class="ph-body"><div class="success" data-testid="phone-success"><span class="plus-one">+1</span><h3>You’re in.</h3><p>' + (ci && ci.first ? 'First time with Pre-Law Society. It’s on your record, and the club just earned $3.' : 'Welcome back. It’s on your record.') + '</p><p class="small muted">Door code LAW4 · confirmed at the door</p></div></div>';
+    } else {
+      const r = record(S);
+      const tag = (st, i) => st.done ? '<em class="ok">Done</em>' : st.pending ? '<em class="wait">' + (i === 3 ? 'Applied' : 'Waiting') + '</em>' : '<em>Later</em>';
+      body = '<div class="ph-body"><p class="eyebrow">Maya’s record</p><div class="mini-rungs">' + ['Show up', 'Pitch in', 'Lead', 'Represent'].map((n, i) => '<div class="mini-rung"><span>' + (i + 1) + ' · ' + n + (i === 0 ? ' · ' + r.rungs[0].n + ' clubs' : '') + '</span>' + tag(r.rungs[i], i) + '</div>').join('') + '</div><p class="small muted">Applied to Policy Fellows: youth jobs.</p></div>';
+    }
+    return '<div class="phone-screen"><div class="ph-bar">' + TALLY + '<span>USC Now · Counts</span></div>' + notif + body + '</div>';
+  }
+  function deskPane(at) {
+    const law = CLUBS.law, mock = evById('mock');
+    if (at <= 0) {
+      const on = !!S.optedIn.mock;
+      return '<p class="desk-label">Pre-Law Society’s event proposal in WesternLink</p><section class="panel"><div class="row" style="justify-content:space-between"><div><p class="ev-title">' + esc(mock.title) + '</p><p class="small muted">' + esc(when(mock.at)) + ' · ' + esc(mock.place) + '</p></div>' +
+        (on ? '<span class="on-pill">' + TALLY + 'Counts is on</span>' : '<span class="code-chip">Make it count: off</span>') + '</div>' +
+        (on ? '<ul class="ticks"><li>Open to everyone</li><li>Free to attend</li><li>Someone at the door</li></ul><div class="door-sign" style="--club:' + law.color + '"><p class="ds-club">' + esc(law.name) + '</p><p class="ds-title">' + esc(mock.title) + '</p><p class="ds-counts">' + TALLY + 'This event counts</p><p class="ds-code">Check in on USC Now: <b class="mono">' + mock.code + '</b></p></div>' : '<p class="muted">Press step 1 to tick the box.</p>') + '</section>';
+    }
+    if (at === 1) return '<p class="desk-label">The Spoke · screen by the counter</p>' + spokeScreen();
+    if (at === 2) {
+      const sum = clubSummary(S, 'law');
+      return '<p class="desk-label">Pre-Law Society · club account</p><section class="panel"><div class="mini-kpis"><div><span class="v" data-testid="desk-first">' + sum.first + '</span><span class="l">students new to the club this term</span></div><div><span class="v" data-testid="desk-earned">' + money(sum.earned) + '</span><span class="l">earned, paid after the event</span></div></div><p class="small muted">Paid from employer partners through PD USC.</p></section>';
+    }
+    if (at === 3) {
+      const p = S.pitches.find((x) => x.student === 'me' && x.event === 'lsat');
+      return '<p class="desk-label">Pre-Law Society · pitch-in requests</p><section class="panel"><div class="pitch-row"><div><p><b>Maya</b> · greeter at LSAT study circle</p><p class="small muted">Confirmed by ' + law.president + ', club president</p></div><span class="ok">' + CHECK + (p && p.status === 'confirmed' ? 'Confirmed' : 'Pending') + '</span></div></section>' +
+        '<p class="desk-label">USC advocacy team · Policy Fellows</p><section class="panel"><div class="pitch-row"><div><p><b>New application</b> · youth jobs</p><p class="small muted">Maya, second year, Health Sciences</p></div><span class="ok">In review</span></div></section>';
+    }
+    const d = dashboard(S);
+    return '<p class="desk-label">USC dashboard · simulated pilot</p><div class="kpis" data-testid="desk-usc">' +
+      kpi('Students new to a club', num(d.firstTimers), d.dFirst ? '+' + d.dFirst : '', '', 'desk-kpi-first', 'New reach, not regulars.') +
+      kpi('Pitched in', num(d.ladder[1][1]), d.ladder[1][2] ? '+' + d.ladder[1][2] : '', '', 'desk-kpi-pitch', 'Students moving up a rung.') +
+      kpi('Policy Fellows applicants', num(d.fellows), d.dFellows ? '+' + d.dFellows : '', '', 'desk-kpi-fellows', 'The pipeline to 16 vacant seats.') +
+      kpi('Paid to clubs', money(d.paid), d.dPaid ? '+' + money(d.dPaid) : '', '', 'desk-kpi-paid', 'Only for first-timers.') + '</div>';
+  }
+  function renderDemo() {
+    const at = typeof S.demoAt === 'number' ? S.demoAt : -1;
+    $('#view-demo').innerHTML =
+      '<header class="view-head demo-head"><div><p class="eyebrow">Live demo · 90 seconds</p><h1 class="h1">One event, five clicks.</h1></div><button class="btn ghost" type="button" data-act="demo-reset" data-testid="demo-reset">Reset demo</button></header>' +
+      '<ol class="steps">' + STEPS.map((st, i) => '<li><button class="step-btn" type="button" data-act="demo-step" data-v="' + i + '" data-state="' + (S.demo.includes(i) ? 'done' : i === at + 1 ? 'next' : 'todo') + '" data-testid="step-' + (i + 1) + '"><span class="n">' + (i + 1) + '</span><span>' + st.title + '</span></button></li>').join('') + '</ol>' +
+      '<div class="caption" data-testid="demo-caption">' + (at >= 0 ? why(STEPS[at].why, STEPS[at].src) : '<p class="muted">Press 1 to start. Each step shows why it matters.</p>') + '</div>' +
+      '<div class="stage"><div class="phone" role="img" aria-label="Maya’s phone" data-testid="phone">' + phonePane(at) + '</div><div class="desk" data-testid="desk">' + deskPane(at) + '</div></div>';
+  }
+
+  /* ---------- routing ---------- */
+  const VIEWS = { week: renderWeek, record: renderRecord, clubs: renderClubs, usc: renderUSC, why: () => {}, demo: renderDemo };
+  function current() { const h = location.hash.slice(1); return Object.prototype.hasOwnProperty.call(VIEWS, h) ? h : 'week'; }
+  function render() { VIEWS[current()](); }
+  let lastView = null;
+  function route() {
+    const v = current();
+    document.querySelectorAll('[data-view]').forEach((s) => { s.hidden = s.dataset.view !== v; });
+    document.querySelectorAll('.tabs a').forEach((a) => { if (a.getAttribute('href') === '#' + v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    render();
+    if (lastView !== null && lastView !== v) { window.scrollTo(0, 0); const t = $('#toast'); if (t) t.hidden = true; }
+    lastView = v;
+  }
+  window.addEventListener('hashchange', route);
+
+  /* ---------- dialogs ---------- */
+  function openDialog(d) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
+  function closeDialog(d) { if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); }
+  function openCheckin(id) {
+    const ev = evById(id), c = CLUBS[ev.club], d = $('#dlg-checkin');
+    d.dataset.id = id;
+    $('#ci-event').textContent = ev.title + ' · ' + c.name;
+    $('#ci-hint').textContent = ev.code;
+    $('#ci-code').value = '';
+    $('#ci-err').textContent = '';
+    $('#ci-form').hidden = false;
+    $('#ci-done').hidden = true;
+    openDialog(d);
+    $('#ci-code').focus();
+  }
+  $('#ci-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = $('#dlg-checkin');
+    const r = checkIn(S, d.dataset.id, $('#ci-code').value);
+    if (!r.ok) { $('#ci-err').textContent = r.error; $('#ci-code').select(); return; }
+    commit();
+    const done = $('#ci-done');
+    done.innerHTML = '<div class="success" data-testid="checkin-done"><span class="plus-one">+1</span><h3>You’re in.</h3><p>' +
+      (r.first ? 'First time with ' + esc(r.club.name) + '. It’s on your record, and the club just earned $3 from employer partners.' : 'Welcome back to ' + esc(r.club.name) + '. It’s on your record.') + '</p>' +
+      why(r.first ? 'Only a student’s first visit earns the club money, so the USC pays for reaching new students.' : 'Only first visits earn the club money, so regulars aren’t counted twice.', '') +
+      '<div class="row"><a class="btn ghost" href="#record" data-close>See my record</a><button class="btn" type="button" data-close>Done</button></div></div>';
+    $('#ci-form').hidden = true;
+    done.hidden = false;
+    const btn = done.querySelector('button.btn');
+    if (btn) btn.focus();
+  });
+  function openPitch(id) {
+    const ev = evById(id), c = CLUBS[ev.club], d = $('#dlg-pitch');
+    d.dataset.id = id;
+    $('#pi-event').textContent = ev.title + ' · ' + c.name + ' · ' + when(ev.at);
+    $('#pi-roles').innerHTML = ev.roles.map((r, i) => '<label class="radio" for="role-' + r + '"><input type="radio" name="role" value="' + r + '" id="role-' + r + '"' + (i === 0 ? ' checked' : '') + '><span>' + r + '<small>' + ROLE_DESC[r] + '</small></span></label>').join('');
+    $('#pi-err').textContent = '';
+    openDialog(d);
+    const first = d.querySelector('input[name="role"]');
+    if (first) first.focus();
+  }
+  $('#pi-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = $('#dlg-pitch');
+    const role = (d.querySelector('input[name="role"]:checked') || {}).value;
+    const r = requestPitch(S, d.dataset.id, role);
+    if (!r.ok) { $('#pi-err').textContent = r.error; return; }
+    closeDialog(d);
+    commit();
+    toast('Asked. ' + CLUBS[evById(d.dataset.id).club].name + ' confirms it after the event.');
+  });
+
+  /* ---------- toast, copy, reset ---------- */
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
+  }
+  async function copyResume() {
+    const el = $('#resume-text'), msg = $('#copy-msg');
+    const text = el ? el.textContent : '';
+    if (!text.trim()) { msg.textContent = 'Nothing confirmed yet. Check in somewhere first.'; return; }
+    try {
+      await navigator.clipboard.writeText(text);
+      msg.textContent = 'Copied.';
+    } catch (err) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      msg.textContent = 'Selected. Press Ctrl+C or ⌘C to copy.';
+    }
+  }
+  function resetAll() { S = fresh(); UI.filter = 'All'; UI.optin = null; commit(); toast('Demo data reset.'); }
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', (e) => {
+    const closer = e.target.closest('[data-close]');
+    if (closer) { const d = closer.closest('dialog'); if (d) closeDialog(d); if (closer.tagName !== 'A') return; }
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act, id = b.dataset.id, v = b.dataset.v;
+    switch (act) {
+      case 'filter': UI.filter = v; renderWeek(); break;
+      case 'checkin': openCheckin(id); break;
+      case 'pitchin': openPitch(id); break;
+      case 'club': S.club = v; UI.optin = null; commit(); break;
+      case 'optin-start': UI.optin = id; renderClubs(); { const f = document.querySelector('.promise-form input'); if (f) f.focus(); } break;
+      case 'optin-cancel': UI.optin = null; renderClubs(); break;
+      case 'optout': S.optedIn[id] = false; commit(); toast('Counts is off for this event. Check-ins so far stay on students’ records.'); break;
+      case 'confirm-pitch': if (confirmPitch(S, id)) { commit(); toast('Confirmed. It’s on Maya’s record now.'); } break;
+      case 'fellows': if (!S.fellows) { S.fellows = true; S.fellowsAt = Date.now(); commit(); toast('Applied to Policy Fellows.'); } break;
+      case 'runforit': if (!S.runForIt) { S.runForIt = true; S.runForItAt = Date.now(); commit(); toast('Spot saved at Run for It.'); } break;
+      case 'copy-resume': copyResume(); break;
+      case 'demo-step': runStep(Number(v)); break;
+      case 'demo-reset': case 'reset': resetAll(); break;
+      default: break;
+    }
+  });
+  document.addEventListener('change', (e) => {
+    const f = e.target.closest('.promise-form');
+    if (!f) return;
+    const all = ['p_open', 'p_free', 'p_door'].every((n) => f.elements[n].checked);
+    f.querySelector('[type="submit"]').disabled = !all;
+  });
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('.promise-form');
+    if (!f) return;
+    e.preventDefault();
+    const r = optIn(S, f.dataset.id, { open: f.elements.p_open.checked, free: f.elements.p_free.checked, door: f.elements.p_door.checked });
+    if (!r.ok) { toast(r.error); return; }
+    UI.optin = null;
+    commit();
+    toast('Counts is on. It’s in the student feed now.');
+  });
+  $('#ci-code').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4); $('#ci-err').textContent = ''; });
+
+  window.Counts = { fresh, checkIn, payout, record, dashboard, requestPitch, confirmPitch, optIn, clubSummary, state: () => S, EVENTS, CLUBS };
+  route();
+})();
+</script>

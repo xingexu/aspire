@@ -1,7 +1,16 @@
-# PBSN ASPIRE: FoodLink
+# PBSN ASPIRE: Counts
 
 Our answer to the PBSN Aspire 2026 case, *Driving Engagement for Western's University Students' Council*. We chose
-USC Food Support Services and built FoodLink to bring it to where students already are.
+PD USC (Professional Development USC) and built **Counts**: club events that count toward a student's confirmed
+record, with a ladder that ends in USC advocacy and Council. See [`counts/README.md`](counts/README.md).
+
+Open this folder in VS Code and press **F5** ("Run Counts"), or run `cd counts && npm start` and open
+http://localhost:3001. No packages to install.
+
+## Earlier idea: FoodLink
+
+The `app/` and `deck/` folders hold our earlier direction, FoodLink (USC Food Support Services), which we have
+replaced with Counts. They still run as described below.
 
 FoodLink gives Western students walk-up access to free food without a form or a name: two campus shelves
 with live stock counts, sealed surplus from campus partners that students reserve with an anonymous code,
@@ -13,13 +22,13 @@ accountability the USC said walk-ins lacked.
 | [`app/`](app/) | The working app: browser UI, shared business rules, and a Node.js server that stores an append-only event log in PostgreSQL (or a JSON file). Full documentation in [`app/README.md`](app/README.md). |
 | [`deck/`](deck/) | The 7-minute pitch deck, `PBSN_ASPIRE_FoodLink.pptx`, and the script that builds it. |
 
-## Open in VS Code
+### Open in VS Code
 
-Open this folder in VS Code, then press **F5** (Run and Debug, "Run FoodLink"). It installs the packages,
+Open this folder in VS Code, then press **F5** and pick "Run FoodLink (earlier idea)". It installs the packages,
 builds the page, starts the server and opens http://localhost:3000. The tasks "FoodLink: test" and
 "FoodLink: npm install" are under Terminal > Run Task.
 
-## Run the app
+### Run the app
 
 You need Node.js 20 or newer.
 
@@ -46,7 +55,7 @@ npm run test:ui   # browser test of the standalone demo (needs Playwright with C
 The dashboard starts from a simulated six-week pilot, and the app labels it as simulated. It is demo data,
 not results.
 
-## Rebuild the deck
+### Rebuild the deck
 
 ```
 cd deck
