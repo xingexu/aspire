@@ -85,7 +85,7 @@ async function seedFunding(pool) {
   const { rows } = await pool.query("SELECT id FROM users WHERE email = 'wfn.demo@uwo.ca'");
   if (!rows.length) return;
   const items = [{ what: 'Dinner for competitors', cost: 300 }, { what: 'Prizes', cost: 120 }];
-  await pool.query("INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ('wfn', $1, 'Design & Defend', $2, 420, 60, 'Dinner and prizes for a hands-on design competition, open to students with no experience.', '2026-11-03')", [rows[0].id, JSON.stringify(items)]);
+  await pool.query("INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by, details) VALUES ('wfn', $1, 'Design & Defend', $2, 420, 60, 'Dinner and prizes for a hands-on design competition, open to students with no experience.', '2026-11-03', $3)", [rows[0].id, JSON.stringify(items), JSON.stringify({ eventDate: '2026-11-05', location: 'Morrissette Entrepreneurship Building', eventType: 'Competition', openToAll: true, total: 420, other: { club: 0, tickets: 0, sponsors: 0 }, nonMembers: 40, benefit: 'Students with no design background learn Figma and practise pitching their work.', measure: 'Sign-ins at the door and a short survey afterwards', treasurer: 'WFN treasurer', contact: 'wfn.demo@uwo.ca', signature: 'WFN president' })]);
 }
 
 // Supabase signs its database certificates with its own authority, so trust exactly that one and keep checking.

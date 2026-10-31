@@ -204,7 +204,7 @@ dialog.tour::backdrop{background:transparent}
 .pill.approved{background:var(--good-soft);color:var(--good)}
 .pill.declined{background:var(--bad-soft);color:var(--bad)}
 .chat-actions .btn{white-space:normal;text-align:left}
-.top-actions{display:flex;align-items:center;gap:0.5rem;flex:none}
+.top-actions{position:relative;display:flex;align-items:center;gap:0.5rem;flex:none}
 /* past events: a tidy gallery, muted until you point at one */
 .past{display:grid;gap:1rem;margin-top:1.5rem}
 .past-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(13.5rem,46%),1fr));gap:1.5rem 1rem}
@@ -264,7 +264,7 @@ dialog.tour::backdrop{background:transparent}
 .mode-pick{display:grid;grid-template-columns:1fr 1fr;gap:0.25rem;padding:0.25rem;border-radius:999px;background:var(--tint)}
 .mode-pick button{appearance:none;border:0;background:none;color:var(--ink);font-weight:650;min-height:2.5rem;border-radius:999px;cursor:pointer;transition:background .24s var(--ease)}
 .mode-pick button[aria-pressed="true"]{background:#FFF;box-shadow:0 1px 4px rgb(20 20 26 / .16)}
-#lg-up[hidden],#lg-club-wrap[hidden],#lg-invite-wrap[hidden]{display:none}
+#lg-up[hidden],#lg-club-wrap[hidden],#lg-demo[hidden]{display:none}
 .tools{position:relative;z-index:6;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;padding:0.875rem;border-radius:1.5rem;background:var(--card);box-shadow:var(--shadow)}
 .tool{display:grid;gap:0.25rem;font-size:0.8125rem;font-weight:650;min-width:9rem;flex:1 1 9rem}
 .tool.grow{flex:3 1 16rem}
@@ -296,15 +296,37 @@ dialog.tour::backdrop{background:transparent}
 .today-title{font:800 clamp(1.75rem,3.6vw,3rem)/1.05 var(--font-display);letter-spacing:-.025em;margin:0;overflow-wrap:anywhere}
 @media (max-width:760px){.today-card{grid-template-columns:minmax(0,1fr)}.today-card .poster-shot{height:auto}}
 /* funding */
-.fund.sheet{width:min(34rem,calc(100vw - 2rem))}
-.stepper{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0.375rem}
+.fund.sheet{width:min(38rem,calc(100vw - 2rem))}
+.stepper{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.375rem}
 .stepper li{display:flex;align-items:center;gap:0.375rem;padding-top:0.5rem;border-top:3px solid var(--line);font-size:0.8125rem;font-weight:600;color:var(--muted);transition:border-color .3s var(--ease),color .3s var(--ease);min-width:0}
 .step-n{flex:none;display:inline-grid;place-items:center;width:1.375rem;height:1.375rem;border-radius:50%;background:var(--tint);font-size:0.75rem}
 .stepper li.now{border-color:var(--accent);color:var(--ink);font-weight:700}
 .stepper li.now .step-n{background:var(--accent);color:#FFF}
 .stepper li.done{border-color:var(--accent)}
-@media (max-width:420px){.stepper li{flex-direction:column;align-items:flex-start;font-size:0.75rem}}
-.fund-body{display:grid;gap:0.75rem;min-height:12rem;align-content:start}
+.step-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+@media (max-width:560px){.stepper .step-name{display:none}.stepper li.now .step-name{display:inline}.stepper{grid-template-columns:repeat(5,auto)}}
+.fund-body{display:grid;gap:0.75rem;min-height:12rem;max-height:min(58dvh,34rem);overflow-y:auto;padding:0.25rem;align-content:start}
+.fund-sub{font-weight:700;margin-top:0.25rem}
+.fund-three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem}
+@media (max-width:480px){.fund-three,.fund-two{grid-template-columns:minmax(0,1fr)!important}}
+.fund-sum{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;padding:0.75rem;border-radius:0.875rem;background:var(--tint);font-size:0.875rem}
+.fund-sum b{font:800 1.25rem/1 var(--font-display);margin-left:0.25rem}
+.agree-list{display:grid;gap:0.5rem}
+.agree{display:grid;grid-template-columns:1.25rem minmax(0,1fr);gap:0.5rem;align-items:start;font-size:0.9375rem;cursor:pointer}
+.agree input{width:1.125rem;height:1.125rem;margin:0.125rem 0 0;accent-color:var(--accent)}
+.review-checks{display:grid;gap:0.5rem;padding:0.75rem;border-radius:0.875rem;background:var(--tint)}
+.review-checks legend{float:left;margin-bottom:0.375rem;font-weight:700;font-size:0.875rem}
+.amount-field{max-width:14rem}
+.amount-field .money-input{display:block}
+.account-menu{position:absolute;z-index:40;top:calc(100% + 0.5rem);right:0;display:grid;gap:0.25rem;justify-items:start;width:min(17rem,calc(100vw - 2rem));padding:1rem;border-radius:1.25rem;background:rgb(255 255 255 / .97);box-shadow:0 0 0 1px rgb(20 20 26 / .06),0 18px 44px rgb(20 20 26 / .22)}
+.account-menu[hidden]{display:none}
+.account-menu .btn{margin-top:0.5rem;width:100%}
+.menu-name{font-weight:750}
+.menu-mail{overflow-wrap:anywhere}
+.demo-logins{display:grid;gap:0.375rem;padding:0.75rem;border-radius:0.875rem;background:var(--tint)}
+.demo-title{font-weight:700}
+.demo-grid{display:flex;flex-wrap:wrap;gap:0.375rem;margin-top:0.25rem}
+.demo-grid .btn{min-height:2.25rem;padding:0.25rem 0.75rem;font-size:0.8125rem}
 .fund-body .lg-creds[hidden]{display:none}
 .fund-q{font:700 1.25rem/1.25 var(--font-display)}
 textarea.text-input{resize:vertical;font:inherit}
@@ -388,7 +410,8 @@ dialog.sheet[open]::backdrop{opacity:1}
       </span>
     </a>
     <div class="top-actions">
-    <button class="btn small" type="button" data-act="account" data-testid="account" id="account-btn">Sign in</button>
+    <button class="btn small" type="button" data-act="account" data-testid="account" id="account-btn" aria-expanded="false">Sign in</button>
+    <div class="account-menu" id="account-menu" data-testid="account-menu" hidden></div>
     </div>
   </div>
 </header>
@@ -435,7 +458,6 @@ dialog.sheet[open]::backdrop{opacity:1}
         <label class="radio"><input type="radio" name="lg-role" value="admin" id="lg-role-admin"><span>USC staff</span></label>
       </div></fieldset>
       <div id="lg-club-wrap" class="lg-creds"><span class="field">Your club</span><div id="lg-club-slot"></div></div>
-      <div id="lg-invite-wrap" class="lg-creds"><label class="field" for="lg-invite">USC invite code</label><input id="lg-invite" class="text-input" autocomplete="off"></div>
     </div>
     <div class="lg-creds">
       <label class="field" for="lg-email">Western email</label>
@@ -444,10 +466,10 @@ dialog.sheet[open]::backdrop{opacity:1}
       <input id="lg-pass" class="text-input" type="password" autocomplete="current-password">
     </div>
     <p class="small muted" id="lg-hint" hidden></p>
+    <div class="demo-logins" id="lg-demo" data-testid="demo-logins"></div>
     <p class="err" id="lg-err" role="alert"></p>
     <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" data-testid="login-submit">Sign in</button></div>
   </form>
-  <div id="lg-who" class="sheet-body" hidden></div>
 </dialog>
 
 <dialog id="dlg-fund" class="sheet fund" aria-labelledby="fund-title" data-testid="fund">
@@ -530,7 +552,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (!r.ok) throw new Error(j.error || 'Something went wrong. Please try again.');
     return j;
   }
-  let D = { user: null, posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] };
+  let D = { user: null, posts: [], mine: [], requests: [], funding: [], threads: [] };
   const UI = { q: '', club: 'All', cat: 'All', thread: null, draftInbox: null };
   const unreadTotal = () => D.threads.reduce((t, x) => t + x.unread, 0);
   // Reloads everything this person may see. New messages arrive here too, pushed by the stream below.
@@ -683,19 +705,15 @@ dialog.sheet[open]::backdrop{opacity:1}
     const u = me();
     if (!u || u.role !== 'club') { $('#view-clubs').innerHTML = gateHTML('club', 'For clubs'); return; }
     const c = CLUBS[u.club];
-    if (!u.approved) {
-      $('#view-clubs').innerHTML = '<header class="view-head"><h1 class="h1">' + esc(c.name) + '</h1></header><section class="panel gate" data-testid="club-waiting"><h2 class="h3">Waiting for the USC</h2><p>The USC confirms each club president before they can post or read club messages. You’ll be able to use this page as soon as they do.</p></section>';
-      return;
-    }
     const listed = STATIC_EVENTS.filter((e) => e.club === c.id && live(e)).sort((a, b) => a.ends - b.ends);
     $('#view-clubs').innerHTML =
       '<header class="view-head"><h1 class="h1">' + esc(c.name) + '</h1><p class="small">Signed in as ' + esc(u.email) + '</p></header>' +
       '<section class="panel"><div class="row spread"><h2 class="h3">Your posts</h2><button class="btn small" type="button" data-act="chat" data-testid="chat-open">Add a post</button></div>' +
         (D.mine.length ? '<ul class="rows">' + D.mine.map((p) => '<li class="row-item" data-testid="mine-' + p.id + '"><div><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + '</p>' + noteLine(p) + '</div><div class="row">' + pill(p.status, STATUS[p.status]) + '<button class="btn ghost small" type="button" data-act="remove-post" data-id="' + p.id + '" data-testid="remove-' + p.id + '">Remove</button></div></li>').join('') + '</ul>'
           : '<p class="muted">Nothing yet. Add a post, and the USC will review it before it appears on Home.</p>') + '</section>' +
-      '<section class="panel"><div class="row spread"><h2 class="h3">Funding from the USC</h2><button class="btn small" type="button" data-act="fund-start" data-testid="fund-start">Request funding</button></div>' +
-        (D.funding.length ? '<ul class="rows">' + D.funding.map((f) => '<li class="row-item" data-testid="myfund-' + f.id + '"><div class="grow"><p class="ev-title">' + esc(f.event) + ' · ' + money(f.amount) + '</p><p class="small muted">Needed by ' + esc(f.neededBy) + '</p>' + noteLine(f) + '</div>' + pill(f.status, FUND_STATUS[f.status]) + '</li>').join('') + '</ul>'
-          : '<p class="muted">Need money for an event? It takes four short steps, and the USC replies here.</p>') + '</section>' +
+      '<section class="panel"><div class="row spread"><h2 class="h3">Funding from the USC</h2><button class="btn small" type="button" data-act="fund-start" data-testid="fund-start">Apply for funding</button></div>' +
+        (D.funding.length ? '<ul class="rows">' + D.funding.map((f) => '<li class="row-item" data-testid="myfund-' + f.id + '"><div class="grow"><p class="ev-title">' + esc(f.event) + ' · ' + (f.status === 'approved' ? money(f.approvedAmount) + ' of ' + money(f.amount) : money(f.amount)) + '</p><p class="small muted">Needed by ' + esc(f.neededBy) + '</p>' + noteLine(f) + '</div>' + pill(f.status, FUND_STATUS[f.status]) + '</li>').join('') + '</ul>'
+          : '<p class="muted">Need money for an event? Fill in the application, and the USC replies here.</p>') + '</section>' +
       (listed.length ? '<section class="panel"><h2 class="h3">Already on Home</h2><ul class="rows">' + listed.map((e) => '<li class="row-item"><div><p class="ev-title">' + esc(e.title) + '</p><p class="small muted">' + esc(e.date) + ' · ' + esc(e.place) + '</p></div>' + postLink(e) + '</li>').join('') + '</ul></section>' : '');
   }
 
@@ -705,28 +723,37 @@ dialog.sheet[open]::backdrop{opacity:1}
     return '<article class="review-card" data-testid="request-' + p.id + '">' + (p.img ? '<img class="req-shot" src="' + p.img + '" alt="">' : '') + '<div class="grow"><p class="review-kicker">' + esc(CLUBS[p.club].short) + ' · new post</p><h3 class="review-title">' + esc(p.title) + '</h3><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + ' · ' + esc(p.cat) + '</p>' + postLink(p) +
       (p.status === 'pending' ? decideButtons('post', p.id, 'Approve post') : '<div class="row">' + pill(p.status, STATUS[p.status]) + '</div>' + noteLine(p)) + '</div></article>';
   }
+  const CHECKS = ['The budget looks reasonable for this event', 'The event benefits students beyond the club', 'The club can account for the money'];
   function fundCard(f) {
-    const each = f.amount / f.attendance;
-    return '<article class="review-card fund-card" data-testid="funding-' + f.id + '"><div class="grow"><div class="row spread"><div><p class="review-kicker">' + esc(CLUBS[f.club].short) + ' · funding</p><h3 class="review-title">' + esc(f.event) + '</h3></div><p class="review-amount">' + money(f.amount) + '</p></div>' +
-      '<p>' + esc(f.purpose) + '</p>' + budgetHTML(f) + '<p class="small muted">' + f.attendance + ' people expected, about ' + money(Math.round(each * 100) / 100) + ' each · needed by ' + esc(f.neededBy) + '</p>' +
-      (f.status === 'pending' ? decideButtons('funding', f.id, 'Approve ' + money(f.amount)) : '<div class="row">' + pill(f.status, FUND_STATUS[f.status]) + '</div>' + noteLine(f)) + '</div></article>';
+    const x = f.details || {}, o = x.other || {}, each = f.attendance ? f.amount / f.attendance : 0, row = (a, b) => (b ? '<dt>' + a + '</dt><dd>' + esc(b) + '</dd>' : '');
+    const others = (o.club || 0) + (o.tickets || 0) + (o.sponsors || 0);
+    const decision = f.status === 'pending'
+      ? '<fieldset class="review-checks"><legend>USC review checklist</legend>' + CHECKS.map((c, i) => '<label class="agree"><input type="checkbox" id="check-' + f.id + '-' + i + '" data-testid="check-' + f.id + '-' + i + '"><span>' + c + '</span></label>').join('') + '</fieldset>' +
+        '<label class="note-field amount-field"><span>Amount to approve (up to ' + money(f.amount) + ')</span><span class="money-input"><span aria-hidden="true">$</span><input class="text-input" inputmode="decimal" id="amount-' + f.id + '" value="' + f.amount + '" data-testid="amount-' + f.id + '"></span></label>' +
+        '<label class="note-field"><span>Note to the club (needed either way)</span><input class="text-input" id="note-funding-' + f.id + '" maxlength="300" autocomplete="off" data-testid="note-funding-' + f.id + '"></label>' +
+        '<div class="decide"><button class="btn yes" type="button" data-act="decide" data-kind="funding" data-v="approved" data-id="' + f.id + '" data-testid="approve-funding-' + f.id + '">Approve funding</button><button class="btn no" type="button" data-act="decide" data-kind="funding" data-v="declined" data-id="' + f.id + '" data-testid="decline-funding-' + f.id + '">Decline</button></div>'
+      : '<div class="row">' + pill(f.status, f.status === 'approved' ? 'Approved ' + money(f.approvedAmount) : FUND_STATUS[f.status]) + '</div>' + noteLine(f);
+    return '<article class="review-card fund-card" data-testid="funding-' + f.id + '"><div class="grow"><div class="row spread"><div><p class="review-kicker">' + esc(CLUBS[f.club].short) + ' · funding application</p><h3 class="review-title">' + esc(f.event) + '</h3></div><p class="review-amount">' + money(f.amount) + '</p></div>' +
+      '<dl class="review-list">' + row('Event', [x.eventDate, x.location, x.eventType].filter(Boolean).join(', ')) + row('Open to', x.openToAll === undefined ? '' : x.openToAll ? 'All students' : 'Members only') + row('Why', f.purpose) + row('Benefit', x.benefit) + row('People', f.attendance + ' expected' + (x.nonMembers !== undefined ? ', ' + x.nonMembers + ' non-members' : '') + ', about ' + money(Math.round(each * 100) / 100) + ' each') + row('Measure', x.measure) + row('Treasurer', x.treasurer ? x.treasurer + (x.contact ? ', ' + x.contact : '') : '') + row('Signed', x.signature) + row('Needed by', f.neededBy) + '</dl>' +
+      budgetHTML({ items: f.items, amount: x.total || f.amount }) + (others ? '<p class="small muted">Other funding: ' + money(others) + ' (club ' + money(o.club || 0) + ', tickets ' + money(o.tickets || 0) + ', sponsors ' + money(o.sponsors || 0) + ')</p>' : '') + decision + '</div></article>';
   }
   function renderUSC() {
     if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'USC dashboard'); return; }
     const openPosts = D.requests.filter((p) => p.status === 'pending'), openFund = D.funding.filter((f) => f.status === 'pending');
     const donePosts = D.requests.filter((p) => p.status !== 'pending'), doneFund = D.funding.filter((f) => f.status !== 'pending');
-    const sum = (st) => D.funding.reduce((t, f) => t + (f.status === st ? f.amount : 0), 0);
+    const sum = (st) => D.funding.reduce((t, f) => t + (f.status === st ? (st === 'approved' ? f.approvedAmount : f.amount) : 0), 0);
     const tile = (label, value, id) => '<article class="kpi" data-testid="' + id + '"><p class="label">' + label + '</p><p class="value">' + value + '</p></article>';
-    const notes = {};
+    const notes = {}, ticks = {};
     document.querySelectorAll('#view-usc .note-field input').forEach((i) => { notes[i.id] = i.value; });
+    document.querySelectorAll('#view-usc .review-checks input').forEach((i) => { ticks[i.id] = i.checked; });
     $('#view-usc').innerHTML =
       '<header class="view-head"><h1 class="h1">USC dashboard</h1></header>' +
-      '<div class="kpis">' + tile('Waiting for a decision', openPosts.length + openFund.length + D.accounts.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
-      (D.accounts.length ? '<section class="panel"><h2 class="h3">New club presidents</h2><ul class="rows">' + D.accounts.map((a) => '<li class="row-item" data-testid="account-' + a.id + '"><div><p class="ev-title">' + esc(a.name) + '</p><p class="small muted">' + esc(a.email) + ' · says they run ' + esc(CLUBS[a.club] ? CLUBS[a.club].name : a.club) + '</p></div><div class="decide"><button class="btn yes small" type="button" data-act="account-yes" data-id="' + a.id + '" data-testid="account-yes-' + a.id + '">Confirm</button><button class="btn no small" type="button" data-act="account-no" data-id="' + a.id + '">Decline</button></div></li>').join('') + '</ul></section>' : '') +
+      '<div class="kpis">' + tile('Waiting for a decision', openPosts.length + openFund.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
       '<section class="review-sec"><h2 class="h2">Funding requests</h2>' + (openFund.map(fundCard).join('') || '<p class="review-empty">No funding requests waiting.</p>') + '</section>' +
       '<section class="review-sec"><h2 class="h2">Posts to review</h2>' + (openPosts.map(postCard).join('') || '<p class="review-empty">No posts waiting.</p>') + '</section>' +
       (donePosts.length + doneFund.length ? '<details class="panel decided"><summary class="h3">Decided</summary>' + doneFund.map(fundCard).join('') + donePosts.map(postCard).join('') + '</details>' : '');
     Object.entries(notes).forEach(([k, v]) => { const i = document.getElementById(k); if (i) i.value = v; });
+    Object.entries(ticks).forEach(([k, v]) => { const i = document.getElementById(k); if (i) i.checked = v; });
   }
 
   /* ---------- messages: each person talks to an inbox (the USC or a club), and that inbox's staff can answer ---------- */
@@ -864,6 +891,8 @@ dialog.sheet[open]::backdrop{opacity:1}
     const up = mode === 'up';
     document.querySelectorAll('[data-act="login-mode"]').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === mode));
     $('#lg-up').hidden = !up;
+    $('#lg-demo').hidden = up;
+    if (!up) renderDemoLogins();
     $('#lg-pass').autocomplete = up ? 'new-password' : 'current-password';
     $('[data-testid="login-submit"]').textContent = up ? 'Create account' : 'Sign in';
     $('#lg-err').textContent = '';
@@ -872,23 +901,37 @@ dialog.sheet[open]::backdrop{opacity:1}
   function setLoginRole(role) {
     const up = loginMode === 'up';
     $('#lg-club-wrap').hidden = !(up && role === 'club');
-    $('#lg-invite-wrap').hidden = !(up && role === 'admin');
-    $('#lg-hint').textContent = !up ? '' : role === 'club' ? 'Choose a new password just for Purple Hub, not your Western one. The USC confirms club presidents before they can post.' : role === 'admin' ? 'Choose a new password just for Purple Hub, not your Western one. USC staff need an invite code.' : 'Choose a new password just for Purple Hub, not your Western one.';
+    $('#lg-hint').textContent = up ? 'Choose a new password just for Purple Hub, not your Western one.' : '';
     $('#lg-hint').hidden = !up;
   }
   function openLogin(mode) {
-    $('#lg-form').hidden = false; $('#lg-who').hidden = true;
-    $('#lg-pass').value = ''; $('#lg-invite').value = '';
+    $('#lg-pass').value = '';
     $('#lg-role-student').checked = true;
     setLoginMode(mode || 'in');
     openDialog($('#dlg-login'));
     $(mode === 'up' ? '#lg-name' : '#lg-email').focus();
   }
-  function openAccount() {
-    const who = $('#lg-who'), a = me();
-    who.innerHTML = '<h2 class="h3">' + esc(a.name) + '</h2><p class="muted">' + esc(a.email) + '</p><p>' + (a.role === 'admin' ? 'USC staff' : a.role === 'club' ? (a.approved ? 'President of ' : 'Waiting to be confirmed as president of ') + esc(CLUBS[a.club].name) : 'Student') + '</p><div class="row end"><button class="btn ghost" type="button" data-close>Close</button><button class="btn" type="button" data-act="signout" data-testid="signout">Sign out</button></div>';
-    $('#lg-form').hidden = true; who.hidden = false;
-    openDialog($('#dlg-login'));
+  // Shared accounts anyone can use: pressing one signs in, and the password is on show too.
+  const DEMO_LOGINS = [['usc.demo@uwo.ca', 'USC staff'], ...Object.values(CLUBS).map((c) => [c.id + '.demo@uwo.ca', c.short + ' president']), ['zinger.demo@uwo.ca', 'Zinger'], ['nuo.demo@uwo.ca', 'Nuo'], ['zohra.demo@uwo.ca', 'Zohra'], ['ahana.demo@uwo.ca', 'Ahana']];
+  function renderDemoLogins() {
+    $('#lg-demo').innerHTML = '<p class="demo-title">Or use a shared account</p><p class="small">Anyone can use these. Password: <b class="mono" data-testid="demo-password">' + esc(D.demoPassword || '') + '</b></p><div class="demo-grid">' +
+      DEMO_LOGINS.map((x) => '<button class="btn ghost small" type="button" data-act="demo-login" data-v="' + x[0] + '" data-testid="demo-' + x[0].split('.')[0] + '">' + esc(x[1]) + '</button>').join('') + '</div>';
+  }
+  function afterLogin(welcome) {
+    closeDialog($('#dlg-login'));
+    CHAT.reset();
+    const u = me();
+    go(u.role === 'admin' ? 'usc' : u.role === 'club' ? 'clubs' : current());
+    toast(welcome + firstName(u) + '.');
+  }
+  function toggleAccountMenu(show) {
+    const m = $('#account-menu'), a = me();
+    if (!show || !a) { m.hidden = true; $('#account-btn').setAttribute('aria-expanded', 'false'); return; }
+    m.innerHTML = '<p class="menu-name">' + esc(a.name) + '</p><p class="small muted menu-mail">' + esc(a.email) + '</p><p class="small">' + (a.role === 'admin' ? 'USC staff' : a.role === 'club' ? 'President of ' + esc(CLUBS[a.club].name) : 'Student') + '</p><button class="btn small" type="button" data-act="signout" data-testid="signout">Sign out</button>';
+    m.hidden = false;
+    $('#account-btn').setAttribute('aria-expanded', 'true');
+    fade(m, 180);
+    m.querySelector('button').focus();
   }
   $('#lg-club-slot').innerHTML = ddHTML('lg-club', 'Your club', Object.values(CLUBS).map((c) => [c.id, c.name]), 'pbsn');
   $('#lg-form').addEventListener('change', (e) => { if (e.target.name === 'lg-role') setLoginRole(e.target.value); });
@@ -896,17 +939,13 @@ dialog.sheet[open]::backdrop{opacity:1}
     e.preventDefault();
     const up = loginMode === 'up', submit = $('[data-testid="login-submit"]');
     const body = { email: $('#lg-email').value, password: $('#lg-pass').value };
-    if (up) Object.assign(body, { name: $('#lg-name').value, role: $('input[name="lg-role"]:checked').value, club: $('#lg-club').dataset.value, invite: $('#lg-invite').value });
+    if (up) Object.assign(body, { name: $('#lg-name').value, role: $('input[name="lg-role"]:checked').value, club: $('#lg-club').dataset.value });
     submit.disabled = true;
     try {
       await api(up ? '/api/signup' : '/api/login', body);
-      $('#lg-pass').value = ''; $('#lg-invite').value = '';
+      $('#lg-pass').value = '';
       await refresh();
-      closeDialog($('#dlg-login'));
-      CHAT.reset();
-      const u = me();
-      go(u.role === 'admin' ? 'usc' : u.role === 'club' ? 'clubs' : current());
-      toast((up ? 'Welcome, ' : 'Hi, ') + firstName(u) + '.');
+      afterLogin(up ? 'Welcome, ' : 'Hi, ');
     } catch (err) {
       if (!up) $('#lg-pass').value = '';
       $('#lg-err').textContent = err.message;
@@ -915,83 +954,114 @@ dialog.sheet[open]::backdrop{opacity:1}
 
   /* ---------- request funding: four short steps ---------- */
   const FUND = { step: 0, d: null };
-  const FUND_STEPS = ['Event', 'Budget', 'Why', 'Review'];
-  const fundTotal = () => FUND.d.items.reduce((t, x) => t + (Number(x.cost) || 0), 0);
+  const FUND_STEPS = ['Event', 'Budget', 'Impact', 'Accountability', 'Review'];
+  const num = (v) => Number(v) || 0;
+  const fundTotal = () => FUND.d.items.reduce((t, x) => t + num(x.cost), 0);
+  const fundOther = () => num(FUND.d.otherClub) + num(FUND.d.otherTickets) + num(FUND.d.otherSponsors);
+  const fundAsk = () => Math.round((fundTotal() - fundOther()) * 100) / 100;
+  const fundEventName = () => (FUND.d.eventPick === '__other' ? FUND.d.other.trim() : FUND.d.eventPick);
   function fundEvents() {
     const c = me().club, seen = new Set();
-    const names = [...STATIC_EVENTS.filter((e) => e.club === c && live(e)).map((e) => e.title), ...D.mine.filter((p) => p.status !== 'declined').map((p) => p.title)].filter((n) => !seen.has(n) && seen.add(n));
-    return names;
+    return [...STATIC_EVENTS.filter((e) => e.club === c && live(e)).map((e) => e.title), ...D.mine.filter((p) => p.status !== 'declined').map((p) => p.title)].filter((n) => !seen.has(n) && seen.add(n));
   }
+  const field = (label, key, attrs, help) => '<label class="lg-creds"><span class="field">' + label + '</span><input class="text-input" value="' + esc(FUND.d[key]) + '" data-bind="' + key + '" data-testid="fund-' + key + '" ' + (attrs || '') + '>' + (help ? '<span class="small muted">' + help + '</span>' : '') + '</label>';
+  const area = (label, key, help) => '<label class="lg-creds"><span class="field">' + label + '</span><textarea class="text-input" rows="3" maxlength="800" data-bind="' + key + '" data-testid="fund-' + key + '">' + esc(FUND.d[key]) + '</textarea><span class="small muted">' + help + '</span></label>';
+  const agree = (key, text) => '<label class="agree"><input type="checkbox" data-bind="' + key + '" data-testid="fund-' + key + '"' + (FUND.d[key] ? ' checked' : '') + '><span>' + text + '</span></label>';
   function renderFund() {
     const { step, d } = FUND;
-    $('#fund-steps').innerHTML = FUND_STEPS.map((n, i) => '<li class="' + (i < step ? 'done' : i === step ? 'now' : '') + '"' + (i === step ? ' aria-current="step"' : '') + '><span class="step-n">' + (i + 1) + '</span>' + n + '</li>').join('');
+    $('#fund-steps').innerHTML = FUND_STEPS.map((n, i) => '<li class="' + (i < step ? 'done' : i === step ? 'now' : '') + '"' + (i === step ? ' aria-current="step"' : '') + '><span class="step-n">' + (i + 1) + '</span><span class="step-name">' + n + '</span></li>').join('');
     $('#fund-err').textContent = '';
     $('[data-testid="fund-back"]').style.visibility = step ? 'visible' : 'hidden';
-    $('[data-testid="fund-next"]').textContent = step === 3 ? 'Send to the USC' : 'Next';
+    $('[data-testid="fund-next"]').textContent = step === 4 ? 'Submit application' : 'Next';
     const body = $('#fund-body');
     if (step === 0) {
       const names = fundEvents();
-      body.innerHTML = '<p class="fund-q">Which event is this for?</p>' + ddHTML('fund-event', 'Event', [...names.map((n) => [n, n]), ['__other', 'Something else']], d.eventPick || names[0] || '__other') +
-        '<label class="lg-creds" id="fund-other-wrap"><span class="field">Name of the event</span><input id="fund-other" class="text-input" maxlength="100" value="' + esc(d.other) + '" data-bind="other" data-testid="fund-other"></label>';
-      d.eventPick = $('#fund-event').dataset.value;
+      body.innerHTML = '<p class="fund-q">Tell us about the event</p><div class="lg-creds"><span class="field">Which event?</span>' + ddHTML('fund-event', 'Event', [...names.map((n) => [n, n]), ['__other', 'Something else']], d.eventPick || names[0] || '__other') + '</div>' +
+        '<label class="lg-creds" id="fund-other-wrap"><span class="field">Name of the event</span><input id="fund-other" class="text-input" maxlength="100" value="' + esc(d.other) + '" data-bind="other" data-testid="fund-other"></label>' +
+        '<div class="fund-two">' + field('Date of the event', 'eventDate', 'type="date"') + field('Location', 'location', 'maxlength="120" placeholder="Building and room"') + '</div>' +
+        '<div class="fund-two"><div class="lg-creds"><span class="field">Type of event</span>' + ddHTML('fund-type', 'Type of event', ['Competition', 'Workshop', 'Networking', 'Social', 'Speaker', 'Other'].map((x) => [x, x]), d.eventType) + '</div><div class="lg-creds"><span class="field">Open to all students?</span>' + ddHTML('fund-open', 'Open to all students', [['yes', 'Yes, everyone'], ['no', 'Members only']], d.openToAll) + '</div></div>';
+      d.eventPick = $('#fund-event').dataset.value; d.eventType = $('#fund-type').dataset.value; d.openToAll = $('#fund-open').dataset.value;
       $('#fund-other-wrap').hidden = d.eventPick !== '__other';
     } else if (step === 1) {
-      body.innerHTML = '<p class="fund-q">What do you need money for?</p><div class="budget-rows">' + d.items.map((x, i) => '<div class="budget-row"><input class="text-input" placeholder="Item, like Food" maxlength="80" aria-label="Item ' + (i + 1) + '" value="' + esc(x.what) + '" data-item="' + i + '" data-key="what" data-testid="item-what-' + i + '"><label class="money-input"><span aria-hidden="true">$</span><input class="text-input" inputmode="decimal" placeholder="0" aria-label="Cost of item ' + (i + 1) + '" value="' + esc(x.cost) + '" data-item="' + i + '" data-key="cost" data-testid="item-cost-' + i + '"></label>' + (d.items.length > 1 ? '<button class="linkbtn" type="button" data-act="fund-del" data-v="' + i + '">Remove</button>' : '') + '</div>').join('') + '</div>' +
-        '<div class="row spread"><button class="btn ghost small" type="button" data-act="fund-add" data-testid="fund-add">Add another</button><p class="fund-total">Total <b id="fund-total" data-testid="fund-total">' + money(fundTotal()) + '</b></p></div>';
+      body.innerHTML = '<p class="fund-q">Full budget</p><div class="budget-rows">' + d.items.map((x, i) => '<div class="budget-row"><input class="text-input" placeholder="Item, like Food" maxlength="80" aria-label="Item ' + (i + 1) + '" value="' + esc(x.what) + '" data-item="' + i + '" data-key="what" data-testid="item-what-' + i + '"><label class="money-input"><span aria-hidden="true">$</span><input class="text-input" inputmode="decimal" placeholder="0" aria-label="Cost of item ' + (i + 1) + '" value="' + esc(x.cost) + '" data-item="' + i + '" data-key="cost" data-testid="item-cost-' + i + '"></label>' + (d.items.length > 1 ? '<button class="linkbtn" type="button" data-act="fund-del" data-v="' + i + '">Remove</button>' : '') + '</div>').join('') + '</div>' +
+        '<div class="row"><button class="btn ghost small" type="button" data-act="fund-add" data-testid="fund-add">Add another</button></div>' +
+        '<p class="fund-sub">Where else is money coming from?</p><div class="fund-three">' + field('Club funds', 'otherClub', 'inputmode="decimal" placeholder="0"') + field('Ticket income', 'otherTickets', 'inputmode="decimal" placeholder="0"') + field('Sponsors', 'otherSponsors', 'inputmode="decimal" placeholder="0"') + '</div>' +
+        '<div class="fund-sum"><span>Budget <b id="fund-total" data-testid="fund-total">' + money(fundTotal()) + '</b></span><span>Asking the USC for <b id="fund-ask" data-testid="fund-ask">' + money(fundAsk()) + '</b></span></div>';
     } else if (step === 2) {
-      body.innerHTML = '<label class="lg-creds"><span class="field">Why does this event need the money?</span><textarea id="fund-purpose" class="text-input" rows="3" maxlength="500" data-bind="purpose" data-testid="fund-purpose">' + esc(d.purpose) + '</textarea></label>' +
-        '<div class="fund-two"><label class="lg-creds"><span class="field">People you expect</span><input class="text-input" inputmode="numeric" value="' + esc(d.attendance) + '" data-bind="attendance" data-testid="fund-attendance"></label><label class="lg-creds"><span class="field">Needed by</span><input class="text-input" type="date" value="' + esc(d.neededBy) + '" data-bind="neededBy" data-testid="fund-needed"></label></div>';
+      body.innerHTML = '<p class="fund-q">Impact on students</p>' + area('Why does this event need USC money?', 'purpose', 'At least 40 characters.') + area('How will students benefit?', 'benefit', 'At least 30 characters.') +
+        '<div class="fund-two">' + field('People you expect', 'attendance', 'inputmode="numeric"') + field('Of those, non-members', 'nonMembers', 'inputmode="numeric"') + '</div>' + field('How will you measure success?', 'measure', 'maxlength="300" placeholder="For example, a sign-in sheet and a short survey"');
+    } else if (step === 3) {
+      body.innerHTML = '<p class="fund-q">Who’s accountable</p><div class="fund-two">' + field('Club treasurer', 'treasurer', 'maxlength="100"') + field('Contact email', 'contact', 'type="email" placeholder="you@uwo.ca"') + '</div>' + field('Money needed by', 'neededBy', 'type="date"') +
+        '<div class="agree-list">' + agree('agreeReceipts', 'We’ll send the USC receipts for everything within 30 days of the event.') + agree('agreeUnspent', 'We’ll spend this only on the items listed, and return anything unspent.') + agree('agreeTrue', 'This application is accurate, and our executive team supports it.') + '</div>' + field('Sign with your full name', 'signature', 'maxlength="100"');
     } else {
-      const f = { items: d.items.map((x) => ({ what: x.what, cost: Number(x.cost) })), amount: fundTotal() };
-      body.innerHTML = '<p class="fund-q">Does this look right?</p><dl class="review-list"><dt>Event</dt><dd>' + esc(fundEventName()) + '</dd><dt>Why</dt><dd>' + esc(d.purpose) + '</dd><dt>People</dt><dd>' + esc(d.attendance) + '</dd><dt>Needed by</dt><dd>' + esc(d.neededBy) + '</dd></dl>' + budgetHTML(f);
+      body.innerHTML = '<p class="fund-q">Check everything before you submit</p><dl class="review-list"><dt>Event</dt><dd>' + esc(fundEventName()) + ', ' + esc(d.eventDate) + ', ' + esc(d.location) + '</dd><dt>Type</dt><dd>' + esc(d.eventType) + (d.openToAll === 'yes' ? ', open to all students' : ', members only') + '</dd><dt>Why</dt><dd>' + esc(d.purpose) + '</dd><dt>Benefit</dt><dd>' + esc(d.benefit) + '</dd><dt>People</dt><dd>' + esc(d.attendance) + ' expected, ' + esc(d.nonMembers) + ' non-members</dd><dt>Measure</dt><dd>' + esc(d.measure) + '</dd><dt>Treasurer</dt><dd>' + esc(d.treasurer) + ', ' + esc(d.contact) + '</dd><dt>Needed by</dt><dd>' + esc(d.neededBy) + '</dd><dt>Signed</dt><dd>' + esc(d.signature) + '</dd></dl>' +
+        budgetHTML({ items: d.items.map((x) => ({ what: x.what, cost: num(x.cost) })), amount: fundTotal() }) + '<div class="fund-sum"><span>Other funding <b>' + money(fundOther()) + '</b></span><span>Asking the USC for <b data-testid="fund-ask">' + money(fundAsk()) + '</b></span></div>';
     }
     fade(body, 220);
-    const first = body.querySelector('input,textarea,.dd-btn');
-    if (first) first.focus();
+    const first = body.querySelector('input:not([type="checkbox"]),textarea,.dd-btn');
+    if (first) first.focus({ preventScroll: true });
+    body.scrollTop = 0;
   }
-  const fundEventName = () => (FUND.d.eventPick === '__other' ? FUND.d.other.trim() : FUND.d.eventPick);
   function fundCheck() {
-    const { step, d } = FUND;
-    if (step === 0 && !fundEventName()) return 'Please name the event.';
+    const { step, d } = FUND, t = (k) => String(d[k]).trim();
+    if (step === 0) {
+      if (!fundEventName()) return 'Please name the event.';
+      if (!d.eventDate) return 'Please choose the date of the event.';
+      if (!t('location')) return 'Please say where it’s happening.';
+    }
     if (step === 1) {
       const rows = d.items.filter((x) => String(x.what).trim() || String(x.cost).trim());
       if (!rows.length) return 'Please add at least one item.';
       if (rows.some((x) => !String(x.what).trim())) return 'Please name each item.';
       if (rows.some((x) => !(Number(x.cost) > 0))) return 'Please enter a cost for each item, like 120.';
+      if (['otherClub', 'otherTickets', 'otherSponsors'].some((k) => !(Number(d[k] || 0) >= 0))) return 'Please use numbers for your other funding.';
       d.items = rows;
+      if (fundAsk() <= 0) return 'Your other funding already covers this budget, so there’s nothing to request.';
     }
     if (step === 2) {
-      if (!d.purpose.trim()) return 'Please say why the event needs the money.';
-      if (!/^\d+$/.test(String(d.attendance).trim()) || Number(d.attendance) < 1) return 'Please say how many people you expect, like 50.';
-      if (!d.neededBy) return 'Please choose when you need it by.';
+      if (t('purpose').length < 40) return 'Please explain why you need the money in at least 40 characters.';
+      if (t('benefit').length < 30) return 'Please explain how students benefit in at least 30 characters.';
+      if (!/^\d+$/.test(t('attendance')) || Number(d.attendance) < 1) return 'Please say how many people you expect, like 50.';
+      if (!/^\d+$/.test(t('nonMembers')) || Number(d.nonMembers) > Number(d.attendance)) return 'Non-members must be a number, and no more than the people you expect.';
+      if (!t('measure')) return 'Please say how you’ll measure success.';
+    }
+    if (step === 3) {
+      if (!t('treasurer')) return 'Please name your club treasurer.';
+      if (!/^[^\s@]+@uwo\.ca$/i.test(t('contact'))) return 'Please use a Western email, ending in @uwo.ca, for the contact.';
+      if (!d.neededBy) return 'Please choose when you need the money by.';
+      if (!d.agreeReceipts || !d.agreeUnspent || !d.agreeTrue) return 'Please agree to all three conditions.';
+      if (!t('signature')) return 'Please sign with your full name.';
     }
     return '';
   }
   function openFund() {
     if (!isClub()) return;
     FUND.step = 0;
-    FUND.d = { eventPick: '', other: '', items: [{ what: '', cost: '' }], purpose: '', attendance: '', neededBy: '' };
+    FUND.d = { eventPick: '', other: '', eventDate: '', location: '', eventType: 'Competition', openToAll: 'yes', items: [{ what: '', cost: '' }], otherClub: '', otherTickets: '', otherSponsors: '', purpose: '', benefit: '', attendance: '', nonMembers: '', measure: '', treasurer: '', contact: me().email, neededBy: '', agreeReceipts: false, agreeUnspent: false, agreeTrue: false, signature: '' };
     renderFund();
     openDialog($('#dlg-fund'));
   }
   ddChange['fund-event'] = (v) => { FUND.d.eventPick = v; $('#fund-other-wrap').hidden = v !== '__other'; if (v === '__other') $('#fund-other').focus(); };
+  ddChange['fund-type'] = (v) => { FUND.d.eventType = v; };
+  ddChange['fund-open'] = (v) => { FUND.d.openToAll = v; };
   $('#fund-form').addEventListener('input', (e) => {
     const t = e.target;
-    if (t.dataset.bind) FUND.d[t.dataset.bind] = t.value;
-    if (t.dataset.item !== undefined) { FUND.d.items[t.dataset.item][t.dataset.key] = t.dataset.key === 'cost' ? t.value.replace(/[$,\s]/g, '') : t.value; $('#fund-total').textContent = money(fundTotal()); }
+    if (t.dataset.bind) FUND.d[t.dataset.bind] = t.type === 'checkbox' ? t.checked : t.value;
+    if (t.dataset.item !== undefined) FUND.d.items[t.dataset.item][t.dataset.key] = t.dataset.key === 'cost' ? t.value.replace(/[$,\s]/g, '') : t.value;
+    if ($('#fund-total')) { $('#fund-total').textContent = money(fundTotal()); $('#fund-ask').textContent = money(fundAsk()); }
   });
   $('#fund-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const err = fundCheck();
     if (err) { $('#fund-err').textContent = err; return; }
-    if (FUND.step < 3) { FUND.step++; renderFund(); return; }
+    if (FUND.step < 4) { FUND.step++; renderFund(); return; }
     const d = FUND.d, btn = $('[data-testid="fund-next"]');
     btn.disabled = true;
     try {
-      await api('/api/funding', { event: fundEventName(), items: d.items.map((x) => ({ what: x.what, cost: Number(x.cost) })), attendance: Number(d.attendance), purpose: d.purpose, neededBy: d.neededBy });
+      await api('/api/funding', { event: fundEventName(), eventDate: d.eventDate, location: d.location, eventType: d.eventType, openToAll: d.openToAll, items: d.items.map((x) => ({ what: x.what, cost: Number(x.cost) })), other: { club: d.otherClub, tickets: d.otherTickets, sponsors: d.otherSponsors }, purpose: d.purpose, benefit: d.benefit, attendance: Number(d.attendance), nonMembers: Number(d.nonMembers), measure: d.measure, treasurer: d.treasurer, contact: d.contact, neededBy: d.neededBy, agreeReceipts: d.agreeReceipts, agreeUnspent: d.agreeUnspent, agreeTrue: d.agreeTrue, signature: d.signature });
       await refresh();
       closeDialog($('#dlg-fund'));
-      toast('Sent to the USC. You’ll see their answer here.');
+      toast('Application sent. You’ll see the USC’s answer here.');
     } catch (x) { $('#fund-err').textContent = x.message; } finally { btn.disabled = false; }
   });
 
@@ -1295,6 +1365,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   });
   document.addEventListener('click', (e) => {
     if (!(e.target.closest && e.target.closest('.dd'))) ddCloseAll();
+    if (!(e.target.closest && e.target.closest('.top-actions'))) toggleAccountMenu(false);
     const closer = e.target.closest('[data-close]');
     if (closer) { const d = closer.closest('dialog'); if (d) closeDialog(d); return; }
     const b = e.target.closest('[data-act]');
@@ -1315,29 +1386,36 @@ dialog.sheet[open]::backdrop{opacity:1}
       case 'fund-del': FUND.d.items.splice(Number(v), 1); renderFund(); break;
       case 'fund-back': FUND.step--; renderFund(); break;
       case 'decide': {
-        const kind = b.dataset.kind, note = $('#note-' + kind + '-' + id).value.trim();
-        if (v === 'declined' && !note) { toast('Please add a short note saying why.'); $('#note-' + kind + '-' + id).focus(); break; }
+        const kind = b.dataset.kind, note = $('#note-' + kind + '-' + id).value.trim(), body = { status: v, note };
+        if (kind === 'funding') {
+          if (!note) { toast('Please add a note explaining your decision.'); $('#note-funding-' + id).focus(); break; }
+          if (v === 'approved') {
+            body.checked = CHECKS.every((c, i) => $('#check-' + id + '-' + i).checked);
+            body.approvedAmount = Number($('#amount-' + id).value.replace(/[$,\s]/g, ''));
+            if (!body.checked) { toast('Please complete the review checklist first.'); break; }
+          }
+        } else if (v === 'declined' && !note) { toast('Please add a short note saying why.'); $('#note-' + kind + '-' + id).focus(); break; }
         const card = b.closest('.review-card');
-        act(api(kind === 'post' ? '/api/posts/' + id + '/review' : '/api/funding/' + id + '/decide', { status: v, note }).then(async () => {
+        act(api(kind === 'post' ? '/api/posts/' + id + '/review' : '/api/funding/' + id + '/decide', body).then(async () => {
           if (card && card.animate && !still()) await card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(' + (v === 'approved' ? 24 : -24) + 'px)' }], { duration: 260, easing: 'ease', fill: 'forwards' }).finished;
           await refresh();
           toast(v === 'approved' ? (kind === 'post' ? 'Approved. It’s on Home now.' : 'Funding approved.') : 'Declined. The club can see your note.');
         }));
         break;
       }
-      case 'account-yes': act(api('/api/accounts/' + id + '/decide', { approve: true }).then(() => refresh()).then(() => toast('Club president confirmed.'))); break;
-      case 'account-no': act(api('/api/accounts/' + id + '/decide', { approve: false }).then(() => refresh()).then(() => toast('Declined. They keep a student account.'))); break;
-      case 'account': if (me()) openAccount(); else openLogin('in'); break;
+      case 'account': if (me()) toggleAccountMenu($('#account-menu').hidden); else openLogin('in'); break;
+      case 'demo-login': act(api('/api/login', { email: v, password: D.demoPassword }).then(() => refresh()).then(() => afterLogin('Hi, '))); break;
       case 'login': openLogin(v); break;
       case 'login-mode': setLoginMode(v); break;
-      case 'signout': act(api('/api/logout', {}).then(() => { closeDialog($('#dlg-login')); CHAT.reset(); UI.thread = null; UI.draftInbox = null; return refresh(); }).then(() => { render(); fade($('#view-' + current())); toast('Signed out.'); })); break;
+      case 'signout': act(api('/api/logout', {}).then(() => { toggleAccountMenu(false); CHAT.reset(); UI.thread = null; UI.draftInbox = null; return refresh(); }).then(() => { render(); fade($('#view-' + current())); toast('Signed out.'); })); break;
       case 'tour-next': nextTourStep(); break;
       case 'tour-back': showTourStep(tourAt - 1); break;
       case 'tour-skip': endTour(); break;
       default: break;
     }
   });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#ask-panel').hidden && !document.querySelector('dialog[open]')) toggleAsk(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleAccountMenu(false);
+    if (e.key === 'Escape' && !$('#ask-panel').hidden && !document.querySelector('dialog[open]')) toggleAsk(false); });
   ddChange['new-chat'] = (inbox) => {
     if (!inbox) return;
     const have = D.threads.find((t) => t.inbox === inbox && t.title === inboxLabel(inbox));

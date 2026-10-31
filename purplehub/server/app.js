@@ -27,8 +27,8 @@ const IMG = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
 const SESSION_DAYS = 14;
 const AUTH_TRIES = Number(process.env.AUTH_TRIES) || 40;
 const SECURE = process.env.NODE_ENV === 'production';
-// Without this code nobody can register as USC staff. Set it in .env, or use the one printed at startup.
-const INVITE = process.env.ADMIN_INVITE_CODE || crypto.randomBytes(9).toString('base64url');
+// Shared demo accounts, shown on the sign-in screen so anyone can use them.
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'purplehub-demo';
 
 let pool, opening = null;
 // Vercel has no local database: it needs DATABASE_URL. Until that's set, events and the assistant still work.
@@ -84,7 +84,7 @@ async function membersOf(inbox) {
 
 /* ---------- reading ---------- */
 const postJson = (p) => ({ id: String(p.id), custom: true, club: p.club, title: p.title, date: p.date_text, place: p.place, ends: new Date(p.ends_at).getTime(), at: new Date(p.ends_at).getTime(), post: p.post_url, img: p.img, cat: p.cat, status: p.status, note: p.note });
-const fundJson = (f) => ({ id: String(f.id), club: f.club, event: f.event, items: f.items, amount: Number(f.amount), attendance: f.attendance, purpose: f.purpose, neededBy: new Date(f.needed_by).toISOString().slice(0, 10), status: f.status, note: f.note });
+const fundJson = (f) => ({ id: String(f.id), club: f.club, event: f.event, items: f.items, amount: Number(f.amount), attendance: f.attendance, purpose: f.purpose, neededBy: new Date(f.needed_by).toISOString().slice(0, 10), status: f.status, note: f.note, details: f.details, approvedAmount: f.approved_amount === null ? null : Number(f.approved_amount) });
 async function threadsFor(u) {
   const inboxes = inboxesOf(u);
   const { rows } = await pool.query(`SELECT t.id, t.owner_id, t.inbox, t.updated_at, o.name AS owner_name, COALESCE(r.last_read_id, 0) AS last_read,
@@ -99,7 +99,7 @@ async function threadsFor(u) {
   });
 }
 async function bootstrap(u) {
-  const out = { user: publicUser(u), posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] };
+  const out = { demoPassword: DEMO_PASSWORD, user: publicUser(u), posts: [], mine: [], requests: [], funding: [], threads: [] };
   out.posts = (await pool.query("SELECT * FROM posts WHERE status = 'approved'")).rows.map(postJson);
   if (!u) return out;
   out.threads = await threadsFor(u);
@@ -110,7 +110,6 @@ async function bootstrap(u) {
   if (u.role === 'admin' && u.approved) {
     out.requests = (await pool.query('SELECT * FROM posts ORDER BY id DESC')).rows.map(postJson);
     out.funding = (await pool.query('SELECT * FROM funding_requests ORDER BY id DESC')).rows.map(fundJson);
-    out.accounts = (await pool.query("SELECT id, name, email, club FROM users WHERE role = 'club' AND NOT approved ORDER BY id")).rows.map((a) => ({ ...a, id: String(a.id) }));
   }
   return out;
 }
@@ -124,16 +123,10 @@ const api = {
     need(typeof b.password === 'string' && b.password.length >= 8 && b.password.length <= 200, 400, 'Please choose a password of at least 8 characters.');
     need(['student', 'club', 'admin'].includes(b.role), 400, 'Please choose who you are.');
     if (b.role === 'club') need(hasClub(b.club), 400, 'Please choose your club.');
-    if (b.role === 'admin') {
-      const given = Buffer.from(sha(String(b.invite || ''))), want = Buffer.from(sha(INVITE));
-      need(crypto.timingSafeEqual(given, want), 403, 'That invite code isn’t right. USC staff get it from a USC admin.');
-    }
     const hash = await new Promise((resolve) => setImmediate(() => resolve(db.hashPassword(b.password))));
-    // A president can read their club's messages and post for it, so the USC confirms them first.
-    const { rows } = await pool.query('INSERT INTO users (email, name, password_hash, role, club, approved) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (email) DO NOTHING RETURNING id, email, name, role, club, approved', [email, name, hash, b.role, b.role === 'club' ? b.club : null, b.role !== 'club']);
+    const { rows } = await pool.query('INSERT INTO users (email, name, password_hash, role, club, approved) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (email) DO NOTHING RETURNING id, email, name, role, club, approved', [email, name, hash, b.role, b.role === 'club' ? b.club : null, true]);
     need(rows.length, 409, 'That email already has an account. Try signing in.');
     await startSession(res, rows[0].id);
-    if (b.role === 'club') notify(await membersOf('usc'));
     return { ok: true };
   },
   async 'POST /api/login'(b, u, req, res) {
@@ -172,20 +165,35 @@ const api = {
     return { ok: true };
   },
   async 'POST /api/funding'(b, u) {
-    need(u && u.role === 'club' && u.approved, 403, 'Only confirmed club presidents can request funding.');
+    need(u && u.role === 'club' && u.approved, 403, 'Only club presidents can request funding.');
     need(Array.isArray(b.items) && b.items.length && b.items.length <= 20, 400, 'Please add at least one thing to your budget.');
     const items = b.items.map((x) => {
       const cost = Number(x && x.cost);
       need(Number.isFinite(cost) && cost > 0 && cost <= 100000, 400, 'Please check the costs in your budget.');
       return { what: clean(x.what, 80, 'your budget items'), cost: Math.round(cost * 100) / 100 };
     });
-    const amount = Math.round(items.reduce((t, x) => t + x.cost, 0) * 100) / 100; // always added up here, never trusted from the page
-    need(amount <= 100000, 400, 'That total is too large.');
-    const attendance = Number(b.attendance);
+    const round = (n) => Math.round(n * 100) / 100, money = (v) => { const n = Number(v || 0); need(Number.isFinite(n) && n >= 0 && n <= 100000, 400, 'Please check your other funding.'); return round(n); };
+    const total = round(items.reduce((t, x) => t + x.cost, 0)); // always worked out here, never trusted from the page
+    const other = { club: money(b.other && b.other.club), tickets: money(b.other && b.other.tickets), sponsors: money(b.other && b.other.sponsors) };
+    const amount = round(total - other.club - other.tickets - other.sponsors);
+    need(amount > 0 && amount <= 100000, 400, 'Your other funding already covers this budget, so there’s nothing to request.');
+    const attendance = Number(b.attendance), nonMembers = Number(b.nonMembers);
     need(Number.isInteger(attendance) && attendance > 0 && attendance <= 100000, 400, 'Please say how many people you expect.');
-    need(/^\d{4}-\d{2}-\d{2}$/.test(b.neededBy || '') && !Number.isNaN(Date.parse(b.neededBy)), 400, 'Please choose when you need it by.');
-    await pool.query('INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
-      [u.club, u.id, clean(b.event, 100, 'the event'), JSON.stringify(items), amount, attendance, clean(b.purpose, 500, 'what it’s for'), b.neededBy]);
+    need(Number.isInteger(nonMembers) && nonMembers >= 0 && nonMembers <= attendance, 400, 'Non-members can’t be more than the people you expect.');
+    const isDate = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d || '') && !Number.isNaN(Date.parse(d));
+    need(isDate(b.neededBy), 400, 'Please choose when you need it by.');
+    need(isDate(b.eventDate), 400, 'Please choose the date of the event.');
+    const purpose = clean(b.purpose, 800, 'why you need the money');
+    need(purpose.length >= 40, 400, 'Please explain why you need the money in at least 40 characters.');
+    const benefit = clean(b.benefit, 800, 'how students benefit');
+    need(benefit.length >= 30, 400, 'Please explain how students benefit in at least 30 characters.');
+    const contact = clean(b.contact, 200, 'the contact email').toLowerCase();
+    need(WESTERN_EMAIL.test(contact), 400, 'Please use a Western email, ending in @uwo.ca, for the contact.');
+    need(b.agreeReceipts === true && b.agreeUnspent === true && b.agreeTrue === true, 400, 'Please agree to all three conditions.');
+    const signature = clean(b.signature, 100, 'your signature');
+    const details = { eventDate: b.eventDate, location: clean(b.location, 120, 'the location'), eventType: clean(b.eventType, 40, 'the type of event'), openToAll: b.openToAll === 'yes', total, other, nonMembers, benefit, measure: clean(b.measure, 300, 'how you’ll measure success'), treasurer: clean(b.treasurer, 100, 'the treasurer’s name'), contact, signature };
+    await pool.query('INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by, details) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+      [u.club, u.id, clean(b.event, 100, 'the event'), JSON.stringify(items), amount, attendance, purpose, b.neededBy, JSON.stringify(details)]);
     notify([...await membersOf('usc'), ...await membersOf(u.club)]);
     return { ok: true };
   },
@@ -193,10 +201,18 @@ const api = {
     need(u && u.role === 'admin' && u.approved, 403, 'USC admins only.');
     need(['approved', 'declined'].includes(b.status), 400, 'Please choose a decision.');
     const note = typeof b.note === 'string' ? b.note.trim().slice(0, 300) : '';
-    need(b.status === 'approved' || note, 400, 'Please give a short reason, so the club knows what to change.');
-    const { rows } = await pool.query("UPDATE funding_requests SET status = $2, note = $3 WHERE id = $1 RETURNING club", [id, b.status, note]);
-    need(rows.length, 404, 'That request is gone.');
-    notify([...await membersOf('usc'), ...await membersOf(rows[0].club)]);
+    need(note, 400, 'Please add a note explaining your decision.');
+    const cur = (await pool.query('SELECT club, amount, status FROM funding_requests WHERE id = $1', [id])).rows[0];
+    need(cur, 404, 'That request is gone.');
+    need(cur.status === 'pending', 409, 'This request has already been decided.');
+    let approved = null;
+    if (b.status === 'approved') {
+      need(b.checked === true, 400, 'Please complete the review checklist first.');
+      approved = Math.round(Number(b.approvedAmount) * 100) / 100;
+      need(Number.isFinite(approved) && approved > 0 && approved <= Number(cur.amount), 400, 'The approved amount must be more than $0 and no more than what they asked for.');
+    }
+    await pool.query('UPDATE funding_requests SET status = $2, note = $3, approved_amount = $4, reviewer_id = $5, decided_at = now() WHERE id = $1', [id, b.status, note, approved, u.id]);
+    notify([...await membersOf('usc'), ...await membersOf(cur.club)]);
     return { ok: true };
   },
   async 'POST /api/posts/:id/review'(b, u, req, res, id) {
@@ -207,14 +223,6 @@ const api = {
     const { rowCount } = await pool.query('UPDATE posts SET status = $2, note = $3 WHERE id = $1', [id, b.status, note]);
     need(rowCount, 404, 'That post is gone.');
     notifyEveryone();
-    return { ok: true };
-  },
-  async 'POST /api/accounts/:id/decide'(b, u, req, res, id) {
-    need(u && u.role === 'admin' && u.approved, 403, 'USC admins only.');
-    // Declining keeps the person's account, as a student.
-    const { rowCount } = await pool.query(b.approve ? "UPDATE users SET approved = true WHERE id = $1 AND role = 'club'" : "UPDATE users SET role = 'student', club = NULL, approved = true WHERE id = $1 AND role = 'club'", [id]);
-    need(rowCount, 404, 'That account is gone.');
-    notify([id, u.id]);
     return { ok: true };
   },
   async 'POST /api/messages'(b, u) {
@@ -280,7 +288,7 @@ async function handle(req, res) {
   try {
     await connect().catch((e) => { if (!HOSTED) throw e; console.error('Database unavailable:', e.message); });
     if (!pool) {
-      if (req.method === 'GET' && url === '/api/data') return json(res, 200, { user: null, posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] });
+      if (req.method === 'GET' && url === '/api/data') return json(res, 200, { demoPassword: DEMO_PASSWORD, user: null, posts: [], mine: [], requests: [], funding: [], threads: [] });
       if (req.method === 'POST' && url === '/api/chat') {
         need(req.headers['x-purplehub'] === '1', 403, 'Bad request.');
         const b = await readBody(req);
@@ -321,7 +329,6 @@ if (require.main === module) {
   connect().then(() => {
     http.createServer((req, res) => { handle(req, res); }).listen(PORT, () => {
       console.log('Purple Hub listening on http://localhost:' + PORT);
-      if (!process.env.ADMIN_INVITE_CODE) console.log('USC staff invite code for this run: ' + INVITE);
       console.log(process.env.OPENAI_API_KEY ? 'Assistant: GPT (' + (process.env.OPENAI_MODEL || 'gpt-4o-mini') + ')' : 'Assistant: built-in answers. Add OPENAI_API_KEY to purplehub/.env to use GPT.');
     });
   }).catch((e) => {

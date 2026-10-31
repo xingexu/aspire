@@ -24,8 +24,8 @@ computer, and fills it with demo accounts. It leaves any other PostgreSQL alone.
 |---|---|---|---|
 | Home | `#week` | Everyone | Upcoming and past events, with search, sort by club and category |
 | Messages | `#messages` | Signed in | Conversations with the USC and clubs, with unread counts and live delivery |
-| For clubs | `#clubs` | Club presidents | Add a post, request funding in four steps, and see the USC's answers |
-| USC dashboard | `#usc` | USC staff | Funding and posts to approve or decline, new club presidents and totals |
+| For clubs | `#clubs` | Club presidents | Add a post, apply for funding, and see the USC's answers |
+| USC dashboard | `#usc` | USC staff | Funding applications and posts to approve or decline, and totals |
 
 ## How it fits together
 
@@ -43,31 +43,18 @@ and the seal in `assets/usc-logo.png` belongs to the USC.
 Set the project's Root Directory to `purplehub`. `vercel.json` does the rest. Add these environment variables:
 
 - `DATABASE_URL`: a hosted PostgreSQL. Tables are created on the first request. Without it, events and the assistant still work, and sign-in says it isn't connected.
-- `ADMIN_INVITE_CODE`: the code USC staff sign up with.
 - `OPENAI_API_KEY`: optional, for GPT answers.
-- `DEMO_PASSWORD`: optional. Adds the demo accounts below with this password, instead of the public one.
+- `DEMO_PASSWORD`: adds the shared accounts below with this password.
 
 Vercel functions can't hold a connection open, so there the page checks for new messages every 8 seconds.
 
 ## Accounts
 
-Everyone signs up with their own `@uwo.ca` email and a new password, stored as a salted hash. Browsing needs no account.
+Everyone signs up with their own `@uwo.ca` email and a new password, stored as a salted hash, and every role works straight away. Browsing needs no account.
 
-- **Student:** ready straight away.
-- **Club president:** the USC confirms them on its dashboard before they can post or read club messages.
-- **USC staff:** needs an invite code. Set `ADMIN_INVITE_CODE` in `.env`, or use the code printed when the server starts.
+The sign-in screen also lists shared accounts for USC staff, each club president and four students, and shows their password, so anyone can try any role in one press. **This means anyone can act as the USC, read its messages and decide funding.** It suits a demo, not real data. Set `SEED_DEMO=0` on a fresh database, and remove the list, before real use.
 
-Emails aren't verified yet, because that needs a mail service, so someone could type a `@uwo.ca` address that isn't theirs.
-
-Outside production, an empty database gets demo accounts, all with the password `purplehub-demo`:
-
-| Who | Email |
-|---|---|
-| USC staff | `usc.demo@uwo.ca` |
-| Club presidents | `pbsn.demo@uwo.ca`, `wfn.demo@uwo.ca`, `w5.demo@uwo.ca`, `csa.demo@uwo.ca`, `caisa.demo@uwo.ca`, `taw.demo@uwo.ca` |
-| Students, with sample chats | `zinger.demo@uwo.ca`, `nuo.demo@uwo.ca`, `zohra.demo@uwo.ca`, `ahana.demo@uwo.ca` |
-
-Set `NODE_ENV=production` when deploying, which skips these accounts and marks the cookie as HTTPS-only.
+Emails aren't verified yet, because that needs a mail service.
 
 ## The assistant
 
