@@ -5,20 +5,22 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const ROOT = path.join(__dirname, '..');
+
 // Optional private settings, such as OPENAI_API_KEY, in purplehub/.env (never committed).
 try {
-  for (const l of fs.readFileSync(path.join(__dirname, '.env'), 'utf8').split('\n')) {
+  for (const l of fs.readFileSync(path.join(ROOT, '.env'), 'utf8').split('\n')) {
     const m = l.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
     if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
   }
 } catch (e) { /* no .env file */ }
 
-const db = require('./server/db');
-const chat = require('./server/chat');
+const db = require('./db');
+const chat = require('./chat');
 
 const PORT = Number(process.env.PORT) || 3001;
-const PAGE = path.join(__dirname, 'dist', 'index.html');
-const DATA = JSON.parse(fs.readFileSync(path.join(__dirname, 'src', 'data.json'), 'utf8'));
+const PAGE = path.join(ROOT, 'dist', 'index.html');
+const DATA = JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'data.json'), 'utf8'));
 const WESTERN_EMAIL = /^[^\s@]+@uwo\.ca$/;
 const IG_POST = /^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/$/;
 const IMG = /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/;
@@ -35,7 +37,7 @@ function connect() {
   if (pool) return Promise.resolve(pool);
   if (HOSTED && !process.env.DATABASE_URL) return Promise.resolve(null);
   if (!opening) {
-    const url = process.env.DATABASE_URL || require('./scripts/db').start();
+    const url = process.env.DATABASE_URL || require('../scripts/db').start();
     opening = db.open(url, DATA.clubs, HOSTED ? 2 : 10).then((p) => { pool = p; return p; }, (e) => { opening = null; throw e; });
   }
   return opening;

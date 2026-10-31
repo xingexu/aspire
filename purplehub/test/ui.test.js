@@ -20,7 +20,7 @@ const DB_URL = pgdb.start(PG_DIR, 5577);
 function startServer(port, extra) {
   return new Promise((resolve, reject) => {
     const env = { ...process.env, PORT: String(port), DATABASE_URL: DB_URL, ADMIN_INVITE_CODE: 'test-invite', OPENAI_API_KEY: '', AUTH_TRIES: '100000', ...extra };
-    const proc = spawn(process.execPath, ['server.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'inherit'] });
+    const proc = spawn(process.execPath, ['server/app.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'inherit'] });
     process.on('exit', () => proc.kill());
     proc.stdout.on('data', (d) => { if (/listening on/.test(d)) resolve(proc); });
     proc.on('exit', (c) => reject(new Error('server exited ' + c)));

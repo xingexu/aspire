@@ -30,7 +30,7 @@ computer, and fills it with demo accounts. It leaves any other PostgreSQL alone.
 ## How it fits together
 
 - `src/purplehub.html` is the page, `src/data.json` the real event list and `build.js` puts them together.
-- `server.js` serves the page and a JSON API. `server/db.js` and `server/migrations/` hold the database, and `server/chat.js`
+- `server/app.js` serves the page and a JSON API. `server/db.js` and `server/migrations/` hold the database, and `server/chat.js`
   the assistant.
 - `PurpleHub.html` is a single-file copy to send around. With no server behind it, it only shows the events.
 

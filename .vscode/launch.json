@@ -6,7 +6,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/purplehub",
-      "program": "${workspaceFolder}/purplehub/server.js",
+      "program": "${workspaceFolder}/purplehub/server/app.js",
       "preLaunchTask": "Purple Hub: build",
       "skipFiles": ["<node_internals>/**"],
       "serverReadyAction": {

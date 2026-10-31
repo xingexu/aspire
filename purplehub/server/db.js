@@ -88,15 +88,19 @@ async function seedFunding(pool) {
   await pool.query("INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ('wfn', $1, 'Design & Defend', $2, 420, 60, 'Dinner and prizes for a hands-on design competition, open to students with no experience.', '2026-11-03')", [rows[0].id, JSON.stringify(items)]);
 }
 
+// Supabase signs its database certificates with its own authority, so trust exactly that one and keep checking.
+const sslFor = (url) => (/\.supabase\.com/.test(url) ? { ca: fs.readFileSync(path.join(__dirname, 'supabase-ca.pem'), 'utf8'), rejectUnauthorized: true } : undefined);
+
 async function open(url, clubs, max = 10) {
-  let pool = new Pool({ connectionString: url, max });
+  const ssl = sslFor(url);
+  let pool = new Pool({ connectionString: url, max, ssl });
   try {
     await pool.query('SELECT 1');
   } catch (e) {
     await pool.end().catch(() => {});
     if (e.code !== '3D000') throw e;
     await createDatabaseIfMissing(url);
-    pool = new Pool({ connectionString: url, max });
+    pool = new Pool({ connectionString: url, max, ssl });
   }
   // An idle connection dropping (say, PostgreSQL restarting) must not take the whole server down.
   pool.on('error', (e) => console.warn('Database connection lost:', e.message));
