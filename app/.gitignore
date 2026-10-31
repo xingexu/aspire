@@ -1,0 +1,9 @@
+node_modules/
+# local event log used when DATABASE_URL is not set
+server/data/
+# written by build.js (npm start and the tests run it)
+dist/
+server/public/
+# written by the tests
+test/shots/
+test/fonts/*.bin

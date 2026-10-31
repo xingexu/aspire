@@ -1,0 +1,18 @@
+{
+  "name": "foodlink",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FoodLink: live free-food shelves, surplus drops and pilot impact for Western students. Node.js + PostgreSQL.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "start": "node build.js && node server/server.js",
+    "test": "node --test test/domain.test.js test/server.test.js",
+    "test:ui": "node build.js && node test/support/fetch-fonts.js && node test/ui.test.js"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}
