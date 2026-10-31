@@ -1,4 +1,4 @@
-# Counts
+# CoWork
 
 A PD USC program, prototyped for the PBSN Aspire 2026 case. Clubs keep their brand and run the events students
 already like. A club ticks one box on the event proposal it already files in WesternLink and promises three things
@@ -12,11 +12,11 @@ It (campaign skills before the elections).
 You need Node.js 18 or newer. There are no packages to install.
 
 ```
-cd counts
+cd cowork
 npm start
 ```
 
-Open http://localhost:3001. In VS Code, press F5 and pick "Run Counts".
+Open http://localhost:3001. In VS Code, press F5 and pick "Run CoWork".
 
 | Section | Address | What it shows |
 |---|---|---|
@@ -27,7 +27,7 @@ Open http://localhost:3001. In VS Code, press F5 and pick "Run Counts".
 | Why it works | `#why` | The case answer: problem, insight, what is new, cost, targets, timeline and sources |
 | Live demo | `#demo` | Five steps for the pitch. Press Reset demo before presenting |
 
-The page is one file, `src/counts.html`. `npm run build` writes `dist/index.html` for local use and `Counts.html`, a
+The page is one file, `src/cowork.html`. `npm run build` writes `dist/index.html` for local use and `CoWork.html`, a
 complete single file to send as an attachment: logo, styles and scripts are all inside it and it makes no network
 requests. Clubs, students and the dashboard numbers are fictional or simulated and are labelled that way in the app.
 Demo state lives in the browser (localStorage, if allowed) and syncs between open tabs.
@@ -38,18 +38,32 @@ A first-time visitor gets a 10-step walkthrough, written for someone who rarely 
 buttons and ends with a practice check-in. It opens once, except on `#demo`, where it would interrupt a live pitch.
 Help (top right) brings it back. To see it again as a new visitor, clear the site's data or use a private window.
 
+## Sign-in
+
+Students need no account. The club tools (`#clubs`) and USC dashboard (`#usc`) are locked until someone signs in:
+
+| Role | Username | Password | Sees |
+|---|---|---|---|
+| USC admin | `uscadmin` | `usc2026` | The dashboard, and every club |
+| Club president | `jordan`, `priya`, `lina`, `owen`, `sam` or `ade` | `club2026` | Only their own club |
+
+These are demo accounts. The page has no server, so sign-in only decides what the browser shows and the passwords are in
+the page source. It is not real security, and real accounts would need a server.
+
 ## Look and scaling
 
-The whole site is purple, in both system light and dark mode. The tab bar and tour card use
-[liquid-glass-react](https://github.com/rdev/liquid-glass-react), mounted by `src/glass.jsx`; the cards use a CSS glass
-that matches it, because they re-render constantly. Refraction only shows in Chrome and Edge. Safari and every iPhone
-browser run WebKit, which drops the blur if the displacement filter is on, so they get the library's frost and rim
-without the bending. If the library fails, or the viewer asks for less transparency, the same pieces fall back to CSS.
+Boxes are plain translucent panels over a faded photo of Western (`assets/western.jpg`). The look is neutral, and purple
+appears only as an accent: hover, focus and the walkthrough spotlight. The USC logo keeps its own colours. Pages cross-fade
+when you move between them. The tab bar and tour card use
+[liquid-glass-react](https://github.com/rdev/liquid-glass-react), mounted by `src/glass.jsx`. Refraction only shows in
+Chrome and Edge. Safari and every iPhone browser run WebKit, which drops the blur if the displacement filter is on, so they
+get the library's frost and rim without the bending. If the library fails, or the viewer asks for less transparency, the
+same pieces fall back to CSS.
 
 The bundle is committed, so `npm start` needs no packages. After editing `src/glass.jsx`, run `npm install` and
 `npm run build:glass`.
 
-Sizes are in rem. Tabs float at the top from 1080px wide and become a bottom bar below that, inside the iPhone safe
+Sizes are in rem. Tabs float at the top from 1200px wide and become a bottom bar below that, inside the iPhone safe
 areas. Type grows on displays wider than about 1440px, and the page respects browser zoom and text-size settings.
 
 The USC seal in `assets/usc-logo.png` is cropped from the logo on westernusc.ca and belongs to the USC. It's used here

@@ -1,26 +1,31 @@
-<title>Counts</title>
+<title>CoWork</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Counts: club events that count, by PD USC. A prototype for the PBSN Aspire 2026 case.">
+<meta name="description" content="CoWork: club events that go on your record, by PD USC. A prototype for the PBSN Aspire 2026 case.">
 <style>
 :root{
-  /* One look: always purple. Surfaces are liquid glass over the fixed .aurora backdrop, and club posters stay in the
-     purple family. The tab bar and tour card use liquid-glass-react (see glass.jsx); everything else is the CSS glass below. */
-  color-scheme:dark;
-  --bg:#2A0F5E; --paper:#2A0F5E; --ink:#FFFFFF; --ink-2:#F3EEFD; --muted:#E2D9F6;
-  --card:linear-gradient(155deg,rgb(255 255 255 / .17),rgb(255 255 255 / .07) 65%);
-  --line:rgb(255 255 255 / .22); --tint:rgb(255 255 255 / .13);
-  --usc:#E6DBFF; --usc-soft:rgb(255 255 255 / .16);
-  --mark:#E6DBFF; --on-mark:#2A0F5E; --on-club:#FFFFFF;
-  --good:#FFFFFF; --good-soft:rgb(255 255 255 / .22); --warn:#F7D4FF; --warn-soft:rgb(214 120 255 / .22); --bad:#FFC8DC; --bad-soft:rgb(255 120 170 / .2);
-  --screen:rgb(20 7 52 / .62); --screen-2:rgb(255 255 255 / .09); --screen-ink:#FFFFFF; --screen-muted:#D9CEF2; --bezel:#170838;
-  --rim:inset 0 1px 0 rgb(255 255 255 / .42), inset 0 0 0 1px rgb(255 255 255 / .14);
-  --shadow:var(--rim), 0 14px 36px rgb(14 4 40 / .3);
-  --glass:blur(18px) saturate(160%);
+  /* Neutral and see-through: plain translucent boxes over a faded photo of Western. Purple is only an accent, for hover,
+     focus and the walkthrough spotlight. The tab bar and tour card use liquid-glass-react (see glass.jsx). */
+  color-scheme:light;
+  --bg:#F5F5F7; --paper:#FFFFFF; --ink:#16161A; --ink-2:#2A2A30; --muted:#3F3F46;
+  --accent:#4F2683; --accent-soft:rgb(79 38 131 / .08); --accent-card:rgb(245 240 253 / .74);
+  --card:rgb(255 255 255 / .55);
+  --line:rgb(0 0 0 / .12); --tint:rgb(0 0 0 / .06);
+  --usc:#16161A; --usc-soft:rgb(255 255 255 / .55);
+  --mark:#ECECEF; --on-mark:#16161A; --on-club:#16161A;
+  --good:#0F5533; --good-soft:rgb(23 100 63 / .12); --warn:#633800; --warn-soft:rgb(170 110 0 / .14); --bad:#A61B12; --bad-soft:rgb(180 35 24 / .1);
+  --screen:rgb(44 44 54 / .84); --screen-2:rgb(255 255 255 / .1); --screen-ink:#FFFFFF; --screen-muted:#F0F0F3; --bezel:#3A3A44;
+  --rim:inset 0 0 0 1px rgb(255 255 255 / .55);
+  --shadow:var(--rim), 0 8px 24px rgb(20 20 26 / .08);
+  --glass:none;
   --usc-logo:url("{{USC_LOGO}}");
+  --western:url("{{WESTERN_BG}}");
   --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
   --r-card:1.5rem; --r-ctl:999px; --tab-h:3.75rem; --tab-gap:0.5rem;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --btn:rgb(255 255 255 / .86); --btn-shadow:inset 0 0 0 1px rgb(255 255 255 / .9),0 0 0 1px rgb(20 20 26 / .07),0 2px 4px rgb(20 20 26 / .06),0 6px 16px rgb(20 20 26 / .1);
+  --fill:#5B5B66;
   --toast-lift:1.25rem;
   --tab-y:calc(env(safe-area-inset-top,0px) + 2.625rem);
 }
@@ -28,46 +33,47 @@
 /* Scales with the window on a Mac and honours browser text-size settings; every size below is in rem. */
 html{font-size:clamp(100%,75% + .28vw,118.75%);-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:6rem}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 var(--font-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100dvh}
-.aurora{position:fixed;inset:0 0 auto;height:100lvh;z-index:-1;pointer-events:none;background:
-  radial-gradient(60% 50% at 12% 8%,#5E35A8 0%,transparent 70%),
-  radial-gradient(50% 45% at 90% 18%,#55279A 0%,transparent 72%),
-  radial-gradient(70% 55% at 75% 95%,#5A2A9E 0%,transparent 70%),
-  radial-gradient(55% 45% at 10% 85%,#3D1C86 0%,transparent 72%),
-  linear-gradient(160deg,#341272,#2A0F5E 55%,#260C57)}
+.aurora{position:fixed;inset:0 0 auto;height:100lvh;z-index:-1;pointer-events:none;background:var(--western) 62% center/cover no-repeat;opacity:.3}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 p{margin:0}
-:focus-visible{outline:3px solid var(--usc);outline-offset:2px;border-radius:0.375rem}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:0.375rem}
 .wrap{max-width:75rem;margin:0 auto;padding-left:max(1rem,env(safe-area-inset-left,0px));padding-right:max(1rem,env(safe-area-inset-right,0px))}
 
 /* top bar: brand and help sit on the page. The tab bar floats: top centre on a Mac, a bottom bar on a phone or tablet. */
 .top{position:relative;z-index:13;padding-top:env(safe-area-inset-top,0px)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;min-height:5.25rem;padding-block:0.75rem}
-.usc-logo{display:inline-block;flex:none;width:3rem;height:3rem;border-radius:50%;background:var(--usc-logo) center/contain no-repeat;box-shadow:0 4px 14px rgb(14 4 40 / .35)}
+.usc-logo{display:inline-block;flex:none;width:3rem;height:3rem;border-radius:50%;background:var(--usc-logo) center/contain no-repeat;box-shadow:0 4px 14px rgb(20 20 26 / .35)}
 .brand{display:inline-flex;align-items:center;gap:0.75rem;text-decoration:none;min-width:0}
 .brand-text{display:grid;gap:3px;min-width:0}
 .brand-name{display:inline-flex;align-items:center;gap:0.4375rem;font:800 1.625rem/1 var(--font-display);letter-spacing:-.03em}
 .brand .tally{width:1.6875rem;height:1.25rem}
 .brand-by{font:500 0.7812rem/1.2 var(--font-body);color:var(--muted);white-space:nowrap}
+.top-actions{display:flex;align-items:center;gap:0.5rem;flex:none}
 .help-btn{flex:none}
+@media (max-width:420px){.help-btn > span,.brand .tally{display:none}}
 .help-btn svg{width:1.125rem;height:1.125rem}
 .tab-anchor{position:fixed;z-index:14;left:50%;top:var(--tab-y);width:0;height:0}
 .tabs{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;gap:2px;width:max-content;padding:0.3125rem;border-radius:999px;background:var(--card);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%)}
-.tabs a{display:flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;padding:0.5625rem 1rem;min-height:2.5rem;border-radius:999px;color:var(--ink);font-weight:600;font-size:0.9375rem;line-height:1.1;transition:background .15s ease}
-.tabs a:hover{background:var(--tint)}
-.tabs a[aria-current="page"]{background:rgb(255 255 255 / .94);color:var(--on-mark)}
+.tabs a{display:flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;padding:0.5625rem 1rem;min-height:2.5rem;border-radius:999px;color:var(--ink);font-weight:600;font-size:0.9375rem;line-height:1.1;transition:background .28s var(--ease),color .28s var(--ease)}
+.tabs a:hover{background:var(--accent-soft);color:var(--accent)}
+.tabs a{position:relative;z-index:1}
+.tabs a[aria-current="page"],.tabs a[aria-current="page"]:hover{background:none;color:var(--ink);font-weight:700}
+.tab-glider{position:absolute;left:0;top:0;border-radius:999px;background:#FFF;box-shadow:0 0 0 1px rgb(20 20 26 / .06),0 2px 8px rgb(20 20 26 / .16);pointer-events:none}
+.tab-glider.ready{transition:transform .42s var(--ease),width .42s var(--ease),height .42s var(--ease)}
 .tab-ico,.lab-short{display:none}
 /* Once the library has adopted the tabs, it draws the glass and the position. Its layers blend with the page, so the anchor
    must not be a stacking context (that would isolate them and leave the blur nothing to blur); each layer gets the z-index instead. */
 .lg-on .tab-anchor{position:static;width:auto;height:auto}
 .lg-on .tab-anchor > *{z-index:14!important}
-.lg-on .tabs{position:static;transform:none;background:rgb(42 15 94 / .28);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:999px}
+.tabs,.tour-card{text-shadow:none}
+.lg-on .tabs{position:relative;transform:none;background:rgb(255 255 255 / .4);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:999px}
 .lg-on .tab-anchor .glass{display:flex!important;vertical-align:top}
 .tab-anchor .pointer-events-none,.tour-anchor .pointer-events-none{pointer-events:none}
 .lg-slot{display:block}
 .lg-frost-only .glass__warp{filter:none!important;-webkit-backdrop-filter:blur(20px) saturate(170%)}
-.lg-frost-only .tabs{background:rgb(42 15 94 / .74)}
-@media (max-width:1079px){
+.lg-frost-only .tabs{background:rgb(255 255 255 / .82)}
+@media (max-width:1199px){
   :root{--toast-lift:calc(var(--tab-h) + var(--tab-gap) + 0.875rem);--tab-y:calc(100dvh - env(safe-area-inset-bottom,0px) - var(--tab-gap) - var(--tab-h) / 2)}
   html{scroll-padding-top:1rem;scroll-padding-bottom:calc(var(--tab-h) + 1.5rem)}
   .tabs{width:min(100vw - 1rem - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px),40rem);height:var(--tab-h)}
@@ -78,7 +84,7 @@ p{margin:0}
   main.wrap{padding-bottom:2.5rem}
   footer.foot{padding-bottom:calc(var(--tab-h) + var(--tab-gap) + 0.75rem + env(safe-area-inset-bottom,0px))}
 }
-@media (max-width:420px){.brand-by{display:none}.usc-logo{width:2.625rem;height:2.625rem}.help-btn .help-long{display:none}}
+@media (max-width:420px){.brand-by{display:none}.usc-logo{width:2.625rem;height:2.625rem}}
 
 main{padding-block:1.75rem 4.5rem}
 .view{display:grid;gap:1.75rem}
@@ -95,8 +101,8 @@ main{padding-block:1.75rem 4.5rem}
 .row.end{justify-content:flex-end}
 .panel{background:var(--card);border-radius:var(--r-card);padding:1.25rem;box-shadow:var(--shadow);display:grid;gap:0.875rem;align-content:start;min-width:0}
 :is(.panel,.poster,.rung,.kpi,.fact,.how li,.ladder-line div,.targets li,.step-btn,.chip,.club-pill,.btn.ghost,.next-card,.screen){-webkit-backdrop-filter:var(--glass);backdrop-filter:var(--glass)}
-/* Blur over a soft gradient looks nearly the same as none, and dozens of blurred cards cost a phone real frame rate. */
-@media (hover:none){:is(.panel,.poster,.rung,.kpi,.fact,.how li,.ladder-line div,.targets li,.step-btn,.chip,.club-pill,.next-card,.screen){-webkit-backdrop-filter:none;backdrop-filter:none}}
+:is(.panel,.poster,.rung,.kpi,.fact,.how li,.ladder-line div,.targets li:not(.rule-tile),.step-btn,.chip,.club-pill,.club-hero){transition:box-shadow .32s var(--ease),background .32s var(--ease),transform .32s var(--ease)}
+@media (hover:hover){:is(.panel,.poster,.rung,.kpi,.fact,.how li,.ladder-line div,.targets li:not(.rule-tile),.step-btn,.chip:not([aria-pressed="true"]),.club-pill,.club-hero):hover{background:var(--accent-card);box-shadow:inset 0 0 0 1.5px var(--accent),0 12px 30px rgb(79 38 131 / .16);transform:translateY(-2px)}}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.125rem;align-items:start}
 @media (max-width:820px){.grid2{grid-template-columns:1fr}}
 
@@ -107,15 +113,14 @@ main{padding-block:1.75rem 4.5rem}
 .why cite{font-style:normal;font-size:0.8125rem;color:var(--muted)}
 
 /* buttons, chips */
-.btn{appearance:none;border:0;background:linear-gradient(180deg,#FFF,#EDE5FD);color:var(--paper);box-shadow:inset 0 1px 0 #FFF,0 6px 18px rgb(14 4 40 / .3);font-weight:650;font-size:0.9688rem;padding:0.625rem 1rem;border-radius:var(--r-ctl);cursor:pointer;min-height:2.75rem;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;text-decoration:none;transition:transform .12s ease, opacity .12s ease}
-.btn:hover{opacity:.88}
-.btn:active{transform:translateY(1px)}
-.btn.ghost{background:var(--card);color:var(--ink);box-shadow:var(--rim)}
-.btn.ghost:hover{background:var(--tint);opacity:1}
+.btn{appearance:none;border:0;background:var(--btn);color:var(--ink);box-shadow:var(--btn-shadow);font-weight:650;font-size:0.9688rem;padding:0.625rem 1rem;border-radius:var(--r-ctl);cursor:pointer;min-height:2.75rem;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;text-decoration:none;transition:transform .28s var(--ease),background .28s var(--ease),color .28s var(--ease),box-shadow .28s var(--ease)}
+.btn:active{transform:scale(.97);transition-duration:.1s}
+@media (hover:hover){.btn:not([disabled]):hover{color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent),0 8px 20px rgb(79 38 131 / .16);transform:translateY(-1px)}}
+.btn.ghost{background:rgb(255 255 255 / .34);color:var(--ink);box-shadow:var(--rim)}
 .btn.small{min-height:2.375rem;padding:0.4375rem 0.8125rem;font-size:0.9062rem}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
 .chip{appearance:none;border:0;background:var(--card);box-shadow:var(--rim);border-radius:999px;padding:0.5rem 0.875rem;font-weight:600;font-size:0.9062rem;cursor:pointer;min-height:2.5rem}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none}
+.chip[aria-pressed="true"]{background:var(--btn);color:var(--ink);box-shadow:var(--btn-shadow);font-weight:700}
 .filters{display:flex;flex-wrap:wrap;gap:0.5rem}
 .count-line{font-size:0.875rem;color:var(--muted);margin-top:-0.75rem}
 .done-line{display:inline-flex;align-items:center;gap:0.375rem;font-weight:650;color:var(--good);font-size:0.9062rem}
@@ -129,19 +134,18 @@ main{padding-block:1.75rem 4.5rem}
 
 /* posters (club event cards) */
 .feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(18.75rem,100%),1fr));gap:1.125rem}
-.poster{background:var(--card);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0;transition:transform .18s ease}
-.poster:hover{transform:translateY(-2px)}
-.poster-top{background:var(--club);background:linear-gradient(150deg,var(--club),color-mix(in srgb,var(--club) 70%,#12062E));color:var(--on-club);box-shadow:inset 0 1px 0 rgb(255 255 255 / .3);padding:1rem 1.125rem 1.25rem;position:relative;min-height:9.75rem;display:flex;flex-direction:column;gap:0.625rem}
+.poster{background:var(--card);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.poster-top{color:var(--on-club);box-shadow:inset 0 1px 0 rgb(255 255 255 / .3);padding:1rem 1.125rem 1.25rem;position:relative;min-height:9.75rem;display:flex;flex-direction:column;gap:0.625rem}
 .club-line{display:flex;align-items:center;gap:0.625rem;font-weight:650;font-size:0.875rem;padding-right:6rem;min-width:0}
 .club-line span:last-child{overflow-wrap:anywhere}
-.mono-badge{display:inline-grid;place-items:center;flex:none;width:2.125rem;height:2.125rem;border-radius:0.5625rem;background:rgb(255 255 255 / .16);box-shadow:inset 0 0 0 1.5px rgb(255 255 255 / .6);font:800 0.8125rem/1 var(--font-display);letter-spacing:.02em;color:var(--on-club)}
-.mono-badge.solid{background:var(--club);box-shadow:none}
+.mono-badge{display:inline-grid;place-items:center;flex:none;width:2.125rem;height:2.125rem;border-radius:0.5625rem;background:var(--tint);font:800 0.8125rem/1 var(--font-display);letter-spacing:.02em;color:var(--on-club)}
+.mono-badge.solid{background:#EFEFF2;box-shadow:none}
 .mono-badge.sm{width:1.625rem;height:1.625rem;border-radius:0.4375rem;font-size:0.6875rem}
 .mono-badge.lg{width:4rem;height:4rem;border-radius:1rem;font-size:1.5rem}
 .poster-title{font:800 1.6875rem/1.04 var(--font-display);letter-spacing:-.025em;margin:auto 0 0;text-wrap:balance;max-width:17ch}
-.sticker{position:absolute;top:0.875rem;right:0.875rem;display:inline-flex;align-items:center;gap:0.375rem;background:var(--mark);color:var(--on-mark);font:800 0.875rem/1 var(--font-display);padding:0.4375rem 0.6875rem 0.4375rem 0.5625rem;border-radius:999px;box-shadow:0 4px 12px rgb(14 4 40 / .3)}
+.sticker{position:absolute;top:0.875rem;right:0.875rem;display:inline-flex;align-items:center;gap:0.375rem;background:var(--mark);color:var(--on-mark);font:800 0.875rem/1 var(--font-display);padding:0.4375rem 0.6875rem 0.4375rem 0.5625rem;border-radius:999px;box-shadow:0 4px 12px rgb(20 20 26 / .3)}
 .sticker .tally{width:1.25rem;height:0.9375rem}
-.new-flag{align-self:flex-start;font:700 0.7188rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:rgb(255 255 255 / .92);color:var(--club);padding:0.3125rem 0.5rem;border-radius:0.25rem}
+.new-flag{align-self:flex-start;font:700 0.7188rem/1 var(--font-body);letter-spacing:.08em;text-transform:uppercase;background:var(--mark);color:var(--on-mark);padding:0.3125rem 0.5rem;border-radius:0.25rem}
 .poster-body{padding:1rem 1.125rem 1.125rem;display:grid;gap:0.5rem;flex:1;align-content:start}
 .when{font-weight:650}
 .place{color:var(--muted);font-size:0.9062rem}
@@ -187,15 +191,15 @@ main{padding-block:1.75rem 4.5rem}
 /* clubs */
 .club-switch{display:flex;gap:0.5rem;overflow-x:auto;padding:2px 2px 0.375rem;scrollbar-width:thin;min-width:0}
 .club-pill{appearance:none;border:0;display:inline-flex;align-items:center;gap:0.5rem;white-space:nowrap;background:var(--card);box-shadow:var(--rim);border-radius:999px;padding:0.3125rem 0.875rem 0.3125rem 0.375rem;font-weight:650;font-size:0.9062rem;cursor:pointer;min-height:2.5rem}
-.club-pill .mono-badge{background:var(--club);box-shadow:none}
+.club-pill .mono-badge{box-shadow:none}
 .club-pill[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
-.club-hero{display:flex;align-items:center;gap:1rem;background:var(--club);color:var(--on-club);border-radius:var(--r-card);padding:1.25rem;min-width:0}
+.club-hero{display:flex;align-items:center;gap:1rem;background:var(--card);color:var(--on-club);border-radius:var(--r-card);padding:1.25rem;min-width:0}
 .club-hero-name{font:800 clamp(1.625rem,3.4vw,2.25rem)/1.05 var(--font-display);letter-spacing:-.025em;margin:0}
 .club-hero p{opacity:.9}
 .meter{display:grid;gap:0.375rem}
 .meter-top{display:flex;justify-content:space-between;gap:0.75rem;font-weight:600;font-size:0.9062rem}
 .bar{height:0.625rem;border-radius:999px;background:var(--tint);overflow:hidden}
-.bar i{display:block;height:100%;border-radius:999px;background:var(--ink)}
+.bar i{display:block;height:100%;border-radius:999px;background:var(--fill)}
 .bar.short i{background:var(--warn)}
 .meter-note{font-size:0.8125rem;color:var(--warn);font-weight:600}
 .mini-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.875rem}
@@ -213,11 +217,11 @@ main{padding-block:1.75rem 4.5rem}
 .promise-form{grid-column:1/-1;display:grid;gap:0.5rem;background:var(--tint);border-radius:0.75rem;padding:0.875rem}
 .promise-form label{display:flex;gap:0.625rem;align-items:center;font-size:0.9375rem;cursor:pointer;min-height:2rem}
 .promise-form input{width:1.125rem;height:1.125rem;accent-color:var(--ink);flex:none}
-.door-sign{grid-column:1/-1;justify-self:start;width:min(100%,21.25rem);background:var(--club);color:var(--on-club);border-radius:1rem;padding:1rem;display:grid;gap:0.375rem;box-shadow:inset 0 1px 0 rgb(255 255 255 / .3)}
+.door-sign{grid-column:1/-1;justify-self:start;width:min(100%,21.25rem);background:var(--card);color:var(--on-club);border-radius:1rem;padding:1rem;display:grid;gap:0.375rem;box-shadow:var(--rim)}
 .ds-club{font-weight:650;font-size:0.8125rem;opacity:.9}
 .ds-title{font:800 1.375rem/1.05 var(--font-display);letter-spacing:-.02em}
-.ds-counts{justify-self:start;display:inline-flex;align-items:center;gap:0.375rem;background:var(--mark);color:var(--on-mark);font:800 0.8438rem/1 var(--font-display);padding:0.375rem 0.5625rem;border-radius:0.375rem;margin-top:0.25rem}
-.ds-counts .tally{width:1.125rem;height:0.875rem}
+.ds-badge{justify-self:start;display:inline-flex;align-items:center;gap:0.375rem;background:var(--mark);color:var(--on-mark);font:800 0.8438rem/1 var(--font-display);padding:0.375rem 0.5625rem;border-radius:0.375rem;margin-top:0.25rem}
+.ds-badge .tally{width:1.125rem;height:0.875rem}
 .ds-code{font-size:0.875rem}
 .ds-code b{font-size:1.125rem}
 .ds-prom{font-size:0.7812rem;opacity:.9}
@@ -226,7 +230,7 @@ main{padding-block:1.75rem 4.5rem}
 .ok{color:var(--good);font-weight:700;display:inline-flex;gap:0.375rem;align-items:center}
 .ticks{list-style:none;margin:0;padding:0;display:grid;gap:0.625rem}
 .ticks li{display:grid;grid-template-columns:1.375rem minmax(0,1fr);gap:0.5rem;align-items:start}
-.ticks li::before{content:"";width:1.125rem;height:1.125rem;margin-top:3px;border-radius:0.3125rem;background:var(--mark) center/0.75rem no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.4 4.6 9 10 3.2' fill='none' stroke='%232A0F5E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.ticks li::before{content:"";width:1.125rem;height:1.125rem;margin-top:3px;border-radius:0.3125rem;background:var(--mark) center/0.75rem no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.4 4.6 9 10 3.2' fill='none' stroke='%2316161A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .table-wrap{overflow-x:auto;min-width:0}
 table.cmp{border-collapse:collapse;width:100%;min-width:32.5rem;font-size:0.9375rem}
 table.cmp th,table.cmp td{text-align:left;padding:0.6875rem 0.75rem;border-top:1px solid var(--line);vertical-align:top}
@@ -236,7 +240,7 @@ table.cmp td.us{font-weight:650}
 table.cmp td.us mark{background:var(--mark);color:var(--on-mark);padding:0 3px;border-radius:3px}
 
 /* USC dashboard */
-.sim-banner{background:var(--warn-soft);color:var(--warn);border-radius:0.75rem;padding:0.75rem 0.875rem;font-size:0.9062rem}
+.sim-banner{background:var(--card);box-shadow:var(--rim);color:var(--ink);border-radius:0.75rem;padding:0.75rem 0.875rem;font-size:0.9062rem}
 .sim-banner b{font-weight:750}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(14.375rem,100%),1fr));gap:1rem}
 .kpi{background:var(--card);border-radius:var(--r-card);padding:1.125rem;box-shadow:var(--shadow);display:grid;gap:0.375rem;align-content:start;min-width:0}
@@ -324,7 +328,7 @@ table.cmp td.us mark{background:var(--mark);color:var(--on-mark);padding:0 3px;b
 .stage{display:grid;grid-template-columns:minmax(0,23.125rem) minmax(0,1fr);gap:1.5rem;align-items:start}
 @media (max-width:900px){.stage{grid-template-columns:1fr}}
 .phone{width:min(100%,23.125rem);border-radius:2.375rem;padding:0.6875rem;background:var(--bezel);box-shadow:var(--shadow);justify-self:center}
-.phone-screen{background:var(--paper);border-radius:1.75rem;min-height:37.5rem;overflow:hidden;display:flex;flex-direction:column}
+.phone-screen{background:rgb(245 245 247 / .88);border-radius:1.75rem;min-height:37.5rem;overflow:hidden;display:flex;flex-direction:column}
 .ph-bar{display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.875rem 1rem 0.625rem;font-weight:700;font-size:0.8125rem;color:var(--ink-2);border-bottom:1px solid var(--line)}
 .ph-bar .tally{width:1.25rem;height:0.9375rem;color:var(--ink)}
 .ph-body{padding:0.875rem;display:grid;gap:0.625rem;align-content:start}
@@ -351,12 +355,12 @@ table.cmp td.us mark{background:var(--mark);color:var(--on-mark);padding:0 3px;b
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* dialogs, toast, footer */
-dialog.sheet{border:0;border-radius:1.75rem;padding:0;width:min(27.5rem,calc(100vw - 2rem));background:rgb(52 22 112 / .82);color:var(--ink);box-shadow:var(--rim),0 30px 80px rgb(10 2 30 / .55);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
-dialog.sheet::backdrop{background:rgb(14 4 38 / .55)}
+dialog.sheet{border:0;border-radius:1.75rem;padding:0;width:min(27.5rem,calc(100vw - 2rem));background:rgb(255 255 255 / .88);color:var(--ink);box-shadow:var(--rim),0 30px 80px rgb(20 20 26 / .55);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
+dialog.sheet::backdrop{background:rgb(18 18 22 / .4)}
 .sheet-body{padding:1.375rem;display:grid;gap:0.75rem}
 .sheet-body label.field{font-weight:650;font-size:0.9062rem}
-.code-input{width:100%;font:600 1.75rem/1 var(--font-mono);letter-spacing:.3em;text-transform:uppercase;padding:0.75rem 0.875rem;border-radius:0.75rem;border:1.5px solid var(--line);background:rgb(20 7 52 / .55);color:var(--ink)}
-.code-input:focus{outline:3px solid var(--usc);outline-offset:1px}
+.code-input{width:100%;font:600 1.75rem/1 var(--font-mono);letter-spacing:.3em;text-transform:uppercase;padding:0.75rem 0.875rem;border-radius:0.75rem;border:1.5px solid var(--line);background:rgb(255 255 255 / .7);color:var(--ink)}
+.code-input:focus{outline:3px solid var(--accent);outline-offset:1px}
 .hint{font-size:0.8438rem;color:var(--muted)}
 .hint b{color:var(--ink)}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:0.5rem}
@@ -365,7 +369,7 @@ legend{font-weight:650;font-size:0.9062rem;margin-bottom:0.375rem}
 .radio:has(input:checked){box-shadow:inset 0 0 0 2px var(--ink)}
 .radio input{margin:3px 0 0;width:1.125rem;height:1.125rem;accent-color:var(--ink)}
 .radio small{display:block;color:var(--muted);font-size:0.8125rem}
-.toast{position:fixed;left:50%;bottom:calc(var(--toast-lift) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:0.75rem 1rem;border-radius:0.75rem;font-weight:650;box-shadow:var(--shadow);width:max-content;max-width:calc(100vw - 2rem);z-index:30}
+.toast{position:fixed;left:50%;bottom:calc(var(--toast-lift) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgb(48 48 58 / .94);color:#FFF;padding:0.75rem 1rem;border-radius:0.75rem;font-weight:650;box-shadow:var(--shadow);width:max-content;max-width:calc(100vw - 2rem);z-index:30}
 footer.foot{border-top:1px solid var(--line)}
 footer.foot .wrap{padding-block:1.375rem;display:flex;flex-wrap:wrap;gap:0.625rem 1.25rem;align-items:center;justify-content:space-between;font-size:0.8438rem;color:var(--muted)}
 .foot-note{display:flex;align-items:center;gap:0.75rem;flex:1 1 17.5rem;min-width:0}
@@ -377,15 +381,30 @@ footer.foot .wrap{padding-block:1.375rem;display:flex;flex-wrap:wrap;gap:0.625re
 /* walkthrough: a spotlight on the real interface and a card that explains it */
 dialog.tour{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ink);overflow:hidden}
 dialog.tour::backdrop{background:transparent}
-.tour-spot{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:1.25rem;box-shadow:0 0 0 2px rgb(255 255 255 / .9),0 0 26px 4px rgb(214 190 255 / .55),0 0 0 200vmax rgb(14 4 38 / .68);pointer-events:none;transition:left .25s ease,top .25s ease,width .25s ease,height .25s ease}
-.tour-spot.off{box-shadow:0 0 0 200vmax rgb(14 4 38 / .68)}
-.tour-anchor{position:fixed;left:50%;top:50%;width:0;height:0;transition:left .25s ease,top .25s ease}
-.tour-card{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:min(27rem,100vw - 1.5rem);max-height:calc(100dvh - 1.5rem);overflow-y:auto;display:grid;gap:0.625rem;padding:1.375rem;border-radius:1.75rem;background:rgb(52 22 112 / .86);box-shadow:var(--rim),0 24px 70px rgb(10 2 30 / .5);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
-.lg-on .tour-card{position:static;transform:none;background:rgb(52 22 112 / .62);box-shadow:var(--rim);-webkit-backdrop-filter:none;backdrop-filter:none}
+.tour-spot{position:fixed;left:50%;top:50%;width:0;height:0;border-radius:1.25rem;box-shadow:0 0 0 3px var(--accent),0 0 22px 4px rgb(79 38 131 / .45),0 0 0 200vmax rgb(18 18 22 / .55);pointer-events:none;transition:left .46s var(--ease),top .46s var(--ease),width .46s var(--ease),height .46s var(--ease),opacity .3s ease}
+.tour-spot.off{box-shadow:0 0 0 200vmax rgb(18 18 22 / .55)}
+.tour-anchor{position:fixed;left:50%;top:50%;width:0;height:0;transition:left .46s var(--ease),top .46s var(--ease)}
+.tour-card{position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:min(27rem,100vw - 1.5rem);max-height:calc(100dvh - 1.5rem);overflow-y:auto;display:grid;gap:0.625rem;padding:1.375rem;border-radius:1.75rem;background:rgb(255 255 255 / .9);box-shadow:var(--rim),0 24px 70px rgb(20 20 26 / .5);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
+.lg-on .tour-card{position:static;transform:none;background:rgb(255 255 255 / .74);box-shadow:var(--rim);-webkit-backdrop-filter:none;backdrop-filter:none}
 .lg-on .tour-anchor .glass{display:flex!important;vertical-align:top}
-.lg-frost-only .tour-card{background:rgb(52 22 112 / .92)}
+.lg-frost-only .tour-card{background:rgb(255 255 255 / .94)}
 /* A dialog is always its own stacking context, so blending here would isolate the card and stop its blur. */
 .tour-anchor > span{mix-blend-mode:normal!important}
+.view-ghost{position:fixed;z-index:12;margin:0;pointer-events:none}
+.text-input{width:100%;font-size:1rem;padding:0.75rem 0.875rem;border-radius:0.75rem;border:1.5px solid var(--line);background:rgb(255 255 255 / .7);color:var(--ink)}
+.text-input:focus{outline:3px solid var(--accent);outline-offset:1px}
+.role-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.5rem}
+.demo-note{background:var(--tint);border-radius:0.75rem;padding:0.75rem;font-size:0.875rem;display:grid;gap:0.375rem;justify-items:start}
+.gate{max-width:36rem}
+dialog.sheet,dialog.tour{opacity:0;transition:opacity .3s ease,transform .36s var(--ease),overlay .3s allow-discrete,display .3s allow-discrete}
+dialog.sheet{transform:translateY(10px) scale(.98)}
+dialog.sheet[open],dialog.tour[open]{opacity:1;transform:none}
+@starting-style{dialog.sheet[open],dialog.tour[open]{opacity:0}dialog.sheet[open]{transform:translateY(10px) scale(.98)}}
+dialog.sheet::backdrop{opacity:0;transition:opacity .3s ease,overlay .3s allow-discrete,display .3s allow-discrete}
+dialog.sheet[open]::backdrop{opacity:1}
+@starting-style{dialog.sheet[open]::backdrop{opacity:0}}
+.toast:not([hidden]){animation:fadein .3s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
 .tour-media:empty{display:none}
 .tour-media .usc-logo{width:5.25rem;height:5.25rem}
 .tour-media .door-sign{width:100%}
@@ -393,7 +412,7 @@ dialog.tour::backdrop{background:transparent}
 .tour-title{font:750 1.5rem/1.15 var(--font-display);letter-spacing:-.015em;margin:0;text-wrap:balance}
 .tour-text{font-size:1.0312rem;line-height:1.45;color:var(--ink-2)}
 .tour-bar{height:0.3125rem;border-radius:999px;background:var(--tint);overflow:hidden;margin-top:0.25rem}
-.tour-bar i{display:block;height:100%;border-radius:999px;background:var(--ink);transition:width .25s ease}
+.tour-bar i{display:block;height:100%;border-radius:999px;background:var(--fill);transition:width .46s var(--ease)}
 .tour-actions{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin-top:0.375rem}
 .tour-actions .grow{flex:1 1 auto}
 @media (hover:none){.tour-actions .btn:focus-visible{outline:none}}
@@ -407,28 +426,32 @@ dialog.tour::backdrop{background:transparent}
 }
 .tour-actions .linkbtn{color:var(--ink);min-height:2.75rem;font-size:0.9375rem}
 @media (prefers-reduced-transparency: reduce){
-  :root{--card:#3F1E85;--screen:#170838;--glass:none}
-  .tabs,.tour-card,dialog.sheet{background:#3F1E85;-webkit-backdrop-filter:none;backdrop-filter:none}
+  :root{--card:#FFFFFF;--screen:#1C1C1E;--glass:none}
+  .tabs,.tour-card,dialog.sheet{background:#FFFFFF;-webkit-backdrop-filter:none;backdrop-filter:none}
 }
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 
-<noscript><p class="noscript">Counts needs JavaScript. If this opened in a preview, open the file in Safari or Chrome instead.</p></noscript>
+<noscript><p class="noscript">CoWork needs JavaScript. If this opened in a preview, open the file in Safari or Chrome instead.</p></noscript>
 <div class="aurora" aria-hidden="true"></div>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#week" aria-label="Counts, a PD USC program from the University Students’ Council at Western. Home.">
+    <a class="brand" href="#week" aria-label="CoWork, a PD USC program from the University Students’ Council at Western. Home.">
       <span class="usc-logo" data-testid="usc-logo"></span>
       <span class="brand-text">
-        <span class="brand-name"><svg class="tally" viewBox="0 0 30 22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 3v16M10.5 3v16M16 3v16M21.5 3v16"/><path d="M2 16.5 26 5.5"/></g></svg>counts</span>
+        <span class="brand-name"><svg class="tally" viewBox="0 0 30 22" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 3v16M10.5 3v16M16 3v16M21.5 3v16"/><path d="M2 16.5 26 5.5"/></g></svg>CoWork</span>
         <span class="brand-by">a PD USC program</span>
       </span>
     </a>
-    <button class="btn ghost small help-btn" type="button" data-act="tour" data-testid="help" aria-label="How to use Counts"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.300a2.6 2.6 0 0 1 5 .900c0 1.8-2.5 2.2-2.5 3.900M12 17.200v.1"/></g></svg><span>Help<span class="help-long"> and how to use</span></span></button>
+    <div class="top-actions">
+    <button class="btn ghost small help-btn" type="button" data-act="tour" data-testid="help" aria-label="How to use CoWork"><svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.300a2.6 2.6 0 0 1 5 .900c0 1.8-2.5 2.2-2.5 3.900M12 17.200v.1"/></g></svg><span>Help</span></button>
+    <button class="btn small" type="button" data-act="account" data-testid="account" id="account-btn">Sign in</button>
+    </div>
   </div>
 </header>
 <div class="tab-anchor" id="tab-anchor">
     <nav class="tabs" aria-label="Sections">
+      <span class="tab-glider" id="tab-glider" aria-hidden="true"></span>
       <a href="#week" aria-label="This week"><svg class="tab-ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g></svg><span class="lab-long">This week</span><span class="lab-short">Events</span></a>
       <a href="#record" aria-label="My record"><svg class="tab-ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21V3M17 21V3M7 7.5h10M7 12h10M7 16.5h10"/></g></svg><span class="lab-long">My record</span><span class="lab-short">Record</span></a>
       <a href="#clubs" aria-label="For clubs"><svg class="tab-ico" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.6-3.8 3.2-6 6.5-6s5.9 2.2 6.5 6M16 5.300a3.5 3.5 0 0 1 0 6.400M18.5 14.600c1.7.9 2.7 2.8 3 5.4"/></g></svg><span class="lab-long">For clubs</span><span class="lab-short">Clubs</span></a>
@@ -449,7 +472,7 @@ dialog.tour::backdrop{background:transparent}
     <header class="why-hero">
       <p class="eyebrow">Our answer to the Aspire 2026 case · Initiative: PD USC</p>
       <h1 class="h1">Everything you do at Western should count.</h1>
-      <p class="lede">Counts is a PD USC program. Clubs keep their brand and run the events students already like. The USC adds reach, a small payment for every new face, and proof students can take into an interview. The path ends at Council.</p>
+      <p class="lede">CoWork is a PD USC program. Clubs keep their brand and run the events students already like. The USC adds reach, a small payment for every new face, and proof students can take into an interview. The path ends at Council.</p>
     </header>
 
     <section class="why-block" aria-labelledby="w-problem">
@@ -477,7 +500,7 @@ dialog.tour::backdrop{background:transparent}
         <div class="panel"><h3 class="h3">Clubs</h3><ul class="ticks"><li>240+ clubs reach 17,000+ students a year.</li><li>Students’ sense of belonging sits in smaller communities like these.</li><li>Promotion is each club’s own job, and a club needs 30 paid members and four events a year to stay ratified.</li></ul></div>
         <div class="panel"><h3 class="h3">The USC</h3><ul class="ticks"><li>The Spoke, The Wave and the USC Now app reach students every day.</li><li>It approves every club event in WesternLink, 3 to 10 business days ahead, so it already sees what’s coming.</li><li>It can confirm what a student actually did. A club poster can’t.</li></ul></div>
       </div>
-      <aside class="why"><span class="tag">Why it matters</span><p>Today the two don’t trade. The USC funds clubs through a Grant Fund that takes about three weeks to decide and won’t pay for regular events. Counts makes the trade one checkbox.</p><cite>Sources: USC Club Executive Manual; USC Clubs Event Proposal How-To; USC Grant Fund application</cite></aside>
+      <aside class="why"><span class="tag">Why it matters</span><p>Today the two don’t trade. The USC funds clubs through a Grant Fund that takes about three weeks to decide and won’t pay for regular events. CoWork makes the trade one checkbox.</p><cite>Sources: USC Club Executive Manual; USC Clubs Event Proposal How-To; USC Grant Fund application</cite></aside>
     </section>
 
     <section class="why-block" aria-labelledby="w-how">
@@ -509,7 +532,7 @@ dialog.tour::backdrop{background:transparent}
       <div class="panel">
         <div class="table-wrap">
           <table class="cmp">
-            <thead><tr><th scope="col"></th><th scope="col">USC Grant Fund today</th><th scope="col">Counts</th></tr></thead>
+            <thead><tr><th scope="col"></th><th scope="col">USC Grant Fund today</th><th scope="col">CoWork</th></tr></thead>
             <tbody>
               <tr><th scope="row">Club effort</th><td>A seven-page application</td><td class="us">One checkbox on the event proposal</td></tr>
               <tr><th scope="row">Timing</th><td>About three weeks to review, before the event</td><td class="us">Paid after the event</td></tr>
@@ -521,7 +544,7 @@ dialog.tour::backdrop{background:transparent}
           </table>
         </div>
       </div>
-      <aside class="why"><span class="tag">Why it matters</span><p>Western’s Co-Curricular Record already exists, but students have to write reflections and find a staff validator, and it lists 482 approved activities. Counts records each step at the door and would feed that record, not replace it.</p><cite>Sources: USC Grant Fund application; Western Co-Curricular Record; Western Experiential Learning</cite></aside>
+      <aside class="why"><span class="tag">Why it matters</span><p>Western’s Co-Curricular Record already exists, but students have to write reflections and find a staff validator, and it lists 482 approved activities. CoWork records each step at the door and would feed that record, not replace it.</p><cite>Sources: USC Grant Fund application; Western Co-Curricular Record; Western Experiential Learning</cite></aside>
     </section>
 
     <section class="why-block" aria-labelledby="w-cost">
@@ -535,7 +558,7 @@ dialog.tour::backdrop{background:transparent}
               <tr><th scope="row">Promotion at The Spoke and The Wave</th><td class="amt">$700</td><td>Screen slides, table tents and door signs</td></tr>
               <tr><th scope="row">Run for It workshops</th><td class="amt">$500</td><td>Two sessions, catered by The Wave</td></tr>
               <tr><th scope="row">Policy Fellows</th><td class="amt">$200</td><td>Printing and materials for 10 to 15 fellows</td></tr>
-              <tr><th scope="row">Counts tab in USC Now</th><td class="amt">$0 extra</td><td>Part of the app overhaul the USC already plans</td></tr>
+              <tr><th scope="row">CoWork tab in USC Now</th><td class="amt">$0 extra</td><td>Part of the app overhaul the USC already plans</td></tr>
               <tr><th scope="row">Contingency</th><td class="amt">$600</td><td>About 10%</td></tr>
             </tbody>
             <tfoot><tr><td>Total</td><td class="amt">$6,500</td><td>Our estimates</td></tr></tfoot>
@@ -555,7 +578,7 @@ dialog.tour::backdrop{background:transparent}
         <li><b>+15 points</b><span>awareness of PD USC, USC Now poll, January to April</span></li>
         <li><b>Under $6</b><span>per first-timer, all costs in</span></li>
         <li><b>No drop</b><span>in attendance at the same clubs’ other events</span></li>
-        <li class="rule-tile"><b>Decision rule</b><span>In April, open Counts to every club if five of the seven targets are met.</span></li>
+        <li class="rule-tile"><b>Decision rule</b><span>In April, open CoWork to every club if five of the seven targets are met.</span></li>
       </ul>
     </section>
 
@@ -606,7 +629,7 @@ dialog.tour::backdrop{background:transparent}
   <div class="wrap">
     <div class="foot-note"><span class="usc-logo"></span><span>Prototype for the PBSN Aspire 2026 case, not an official USC site. Clubs, students and pilot numbers here are fictional or simulated.</span></div>
     <div class="foot-links">
-      <button class="linkbtn" type="button" data-act="tour">How to use Counts</button>
+      <button class="linkbtn" type="button" data-act="tour">How to use CoWork</button>
       <button class="linkbtn" type="button" data-act="reset" data-testid="reset-all">Reset demo data</button>
     </div>
   </div>
@@ -634,6 +657,24 @@ dialog.tour::backdrop{background:transparent}
     <p class="small muted">The club president confirms it after the event. Then it goes on your record as a real example for interviews.</p>
     <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit">Ask to pitch in</button></div>
   </form>
+</dialog>
+
+<dialog id="dlg-login" class="sheet" aria-labelledby="lg-title">
+  <form id="lg-form" class="sheet-body" novalidate>
+    <h2 id="lg-title" class="h3">Sign in</h2>
+    <fieldset><legend>I am a</legend><div class="role-pick">
+      <label class="radio"><input type="radio" name="lg-role" value="club" id="lg-role-club"><span>Club president</span></label>
+      <label class="radio"><input type="radio" name="lg-role" value="admin" id="lg-role-admin"><span>USC admin</span></label>
+    </div></fieldset>
+    <label class="field" for="lg-user">Username</label>
+    <input id="lg-user" class="text-input" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label class="field" for="lg-pass">Password</label>
+    <input id="lg-pass" class="text-input" type="password" autocomplete="current-password">
+    <p class="err" id="lg-err" role="alert"></p>
+    <div class="demo-note"><span id="lg-hint"></span><button class="linkbtn" type="button" data-act="login-demo" data-testid="login-demo">Fill in a demo account</button></div>
+    <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" data-testid="login-submit">Sign in</button></div>
+  </form>
+  <div id="lg-who" class="sheet-body" hidden></div>
 </dialog>
 
 <dialog id="tour" class="tour" aria-labelledby="tour-title" aria-describedby="tour-text" data-testid="tour">
@@ -708,12 +749,12 @@ dialog.tour::backdrop{background:transparent}
 
   /* ---------- demo world (fictional clubs and people) ---------- */
   const CLUBS = {
-    law:      { id: 'law', name: 'Pre-Law Society', mono: 'PL', color: '#3F2BA6', interest: 'Careers', paid: 27, held: 2, firstTimers: 0, earned: 0, president: 'Jordan' },
-    film:     { id: 'film', name: 'Night Owls Film Club', mono: 'NO', color: '#8E2AAE', interest: 'Create', paid: 41, held: 3, firstTimers: 38, earned: 114, president: 'Priya' },
-    kitchen:  { id: 'kitchen', name: 'Heritage Kitchen', mono: 'HK', color: '#A0257F', interest: 'Culture', paid: 58, held: 5, firstTimers: 61, earned: 183, president: 'Lina' },
-    robotics: { id: 'robotics', name: 'Circuit Breakers', mono: 'CB', color: '#5B37D6', interest: 'Build', paid: 33, held: 2, firstTimers: 22, earned: 66, president: 'Owen' },
-    climb:    { id: 'climb', name: 'Climb Club', mono: 'CC', color: '#6D28D9', interest: 'Move', paid: 64, held: 6, firstTimers: 47, earned: 141, president: 'Sam' },
-    founders: { id: 'founders', name: 'Founders Garage', mono: 'FG', color: '#4A1D96', interest: 'Careers', paid: 29, held: 1, firstTimers: 15, earned: 45, president: 'Ade' },
+    law:      { id: 'law', name: 'Pre-Law Society', mono: 'PL', interest: 'Careers', paid: 27, held: 2, firstTimers: 0, earned: 0, president: 'Jordan' },
+    film:     { id: 'film', name: 'Night Owls Film Club', mono: 'NO', interest: 'Create', paid: 41, held: 3, firstTimers: 38, earned: 114, president: 'Priya' },
+    kitchen:  { id: 'kitchen', name: 'Heritage Kitchen', mono: 'HK', interest: 'Culture', paid: 58, held: 5, firstTimers: 61, earned: 183, president: 'Lina' },
+    robotics: { id: 'robotics', name: 'Circuit Breakers', mono: 'CB', interest: 'Build', paid: 33, held: 2, firstTimers: 22, earned: 66, president: 'Owen' },
+    climb:    { id: 'climb', name: 'Climb Club', mono: 'CC', interest: 'Move', paid: 64, held: 6, firstTimers: 47, earned: 141, president: 'Sam' },
+    founders: { id: 'founders', name: 'Founders Garage', mono: 'FG', interest: 'Careers', paid: 29, held: 1, firstTimers: 15, earned: 45, president: 'Ade' },
   };
   const EVENTS = [
     { id: 'mock', club: 'law', title: 'Mock trial night', at: T(0, 18, 30), place: 'UCC, room 315', code: 'LAW4', blurb: 'Argue a real case in ten minutes. No law background needed.', roles: ['Greeter', 'Timekeeper'], seededOn: false },
@@ -745,7 +786,7 @@ dialog.tour::backdrop{background:transparent}
       pitches: [], fellows: false, fellowsAt: 0, runForIt: false, runForItAt: 0, promoted: false, demo: [], demoAt: -1, club: 'law',
     };
   }
-  const KEY = 'counts-demo-v1';
+  const KEY = 'cowork-demo-v1';
   function storeGet() { try { return window.localStorage.getItem(KEY); } catch (e) { return null; } }
   function storeSet(v) { try { window.localStorage.setItem(KEY, v); } catch (e) { /* storage blocked: the demo still works in memory */ } }
   function load() {
@@ -756,11 +797,35 @@ dialog.tour::backdrop{background:transparent}
   let S = load();
   const UI = { filter: 'All', optin: null };
   let chan = null;
-  try { chan = new BroadcastChannel('counts-demo'); chan.onmessage = (m) => { if (m.data && m.data.v === 1) { S = m.data; render(); } }; } catch (e) { chan = null; }
+  try { chan = new BroadcastChannel('cowork-demo'); chan.onmessage = (m) => { if (m.data && m.data.v === 1) { S = m.data; render(); } }; } catch (e) { chan = null; }
   function commit() {
     storeSet(JSON.stringify(S));
     try { if (chan) chan.postMessage(S); } catch (e) { /* ignore */ }
     render();
+  }
+
+  /* ---------- sign-in ----------
+     A prototype with no server, so this only decides what the page shows. It is not real security. */
+  const ACCOUNTS = { uscadmin: { role: 'admin', name: 'USC admin', short: 'Admin', password: 'usc2026' } };
+  Object.values(CLUBS).forEach((c) => { ACCOUNTS[c.president.toLowerCase()] = { role: 'club', club: c.id, name: c.president, short: c.president, password: 'club2026' }; });
+  const SESSION_KEY = 'cowork-session-v1';
+  let sessionUser = null;
+  try { const u = window.localStorage.getItem(SESSION_KEY); if (u && ACCOUNTS[u]) sessionUser = u; } catch (e) { /* storage blocked: signed out on reload */ }
+  const me = () => (sessionUser ? ACCOUNTS[sessionUser] : null);
+  const isAdmin = () => !!me() && me().role === 'admin';
+  const isClub = () => !!me() && me().role === 'club';
+  function saveSession() { try { if (sessionUser) window.localStorage.setItem(SESSION_KEY, sessionUser); else window.localStorage.removeItem(SESSION_KEY); } catch (e) { /* storage blocked */ } }
+  function signIn(role, user, pass) {
+    const name = String(user || '').trim().toLowerCase(), acct = Object.prototype.hasOwnProperty.call(ACCOUNTS, name) ? ACCOUNTS[name] : null;
+    if (!acct || acct.password !== pass) return { ok: false, error: 'That username or password isn’t right.' };
+    if (acct.role !== role) return { ok: false, error: role === 'admin' ? 'That’s a club president account. Choose Club president above.' : 'That’s a USC admin account. Choose USC admin above.' };
+    sessionUser = name; saveSession();
+    return { ok: true, acct };
+  }
+  function gateHTML(role, eyebrow, title, lede) {
+    return '<header class="view-head"><p class="eyebrow">' + eyebrow + '</p><h1 class="h1">' + title + '</h1><p class="lede">' + lede + '</p></header>' +
+      '<section class="panel gate" data-testid="gate-' + role + '"><h2 class="h3">' + (role === 'admin' ? 'USC admins only' : 'Club presidents only') + '</h2><p>' + (role === 'admin' ? 'Sign in with your USC admin account to see this page.' : 'Sign in with your club president account to manage your club’s events.') + '</p>' +
+      '<div><button class="btn" type="button" data-act="login" data-v="' + role + '">Sign in</button></div></section>';
   }
 
   /* ---------- rules ---------- */
@@ -794,7 +859,7 @@ dialog.tour::backdrop{background:transparent}
     return true;
   }
   function optIn(s, eventId, promises) {
-    if (!promises || !promises.open || !promises.free || !promises.door) return { ok: false, error: 'Tick all three promises to turn Counts on.' };
+    if (!promises || !promises.open || !promises.free || !promises.door) return { ok: false, error: 'Tick all three promises to turn CoWork on.' };
     s.optedIn[eventId] = true;
     return { ok: true };
   }
@@ -858,12 +923,12 @@ dialog.tour::backdrop{background:transparent}
     const c = CLUBS[e.club];
     const mine = S.checkins.find((x) => x.student === 'me' && x.event === e.id);
     const pitch = S.pitches.find((p) => p.student === 'me' && p.event === e.id);
-    return '<article class="poster" style="--club:' + c.color + '" data-testid="event-' + e.id + '">' +
+    return '<article class="poster" data-testid="event-' + e.id + '">' +
       '<div class="poster-top">' +
         '<div class="club-line"><span class="mono-badge">' + esc(c.mono) + '</span><span>' + esc(c.name) + '</span></div>' +
         (e.seededOn ? '' : '<span class="new-flag">New this week</span>') +
         '<h3 class="poster-title">' + esc(e.title) + '</h3>' +
-        '<span class="sticker">' + TALLY + 'Counts</span>' +
+        '<span class="sticker">' + TALLY + 'CoWork</span>' +
       '</div>' +
       '<div class="poster-body">' +
         '<p class="when">' + esc(when(e.at)) + '</p>' +
@@ -884,7 +949,7 @@ dialog.tour::backdrop{background:transparent}
     const list = upcoming().slice(0, 4);
     return '<div class="screen" data-testid="spoke-screen">' +
       '<div class="screen-head"><b>These count this week</b><span>Open to everyone · free · check in on USC Now</span></div>' +
-      '<ul class="screen-list">' + list.map((e) => { const c = CLUBS[e.club]; return '<li><span class="mono-badge solid" style="--club:' + c.color + '">' + esc(c.mono) + '</span><div><p class="t">' + esc(e.title) + '</p><p class="s">' + esc(c.name) + ' · ' + esc(when(e.at)) + '</p></div><span class="c">Counts</span></li>'; }).join('') + '</ul>' +
+      '<ul class="screen-list">' + list.map((e) => { const c = CLUBS[e.club]; return '<li><span class="mono-badge solid">' + esc(c.mono) + '</span><div><p class="t">' + esc(e.title) + '</p><p class="s">' + esc(c.name) + ' · ' + esc(when(e.at)) + '</p></div><span class="c">CoWork</span></li>'; }).join('') + '</ul>' +
       '<p class="screen-foot">Showing on the screens at The Spoke and The Wave</p>' +
     '</div>';
   }
@@ -918,7 +983,7 @@ dialog.tour::backdrop{background:transparent}
     const interests = ['All', 'Careers', 'Culture', 'Create', 'Build', 'Move'];
     $('#view-week').innerHTML =
       '<header class="view-head"><p class="eyebrow">This week at Western</p><h1 class="h1">Walk into something new.</h1>' +
-      '<p class="lede">Every event here is free, open to everyone, and someone will meet you at the door. Each one counts toward your record.</p></header>' +
+      '<p class="lede">Every event here is free, open to everyone, and someone will meet you at the door. Each one goes on your record.</p></header>' +
       why('Most students stick to a few familiar places on campus. These events are the easiest first step into a new one, and the club gets something for welcoming you.', 'Aspire 2026 case') +
       '<div class="filters" role="group" aria-label="Filter by interest">' + interests.map((i) => '<button class="chip" type="button" data-act="filter" data-v="' + i + '" aria-pressed="' + (UI.filter === i) + '">' + i + '</button>').join('') + '</div>' +
       '<p class="count-line" data-testid="feed-count">' + shown.length + ' event' + (shown.length === 1 ? '' : 's') + (UI.filter === 'All' ? ' this week' : ' in ' + UI.filter) + '</p>' +
@@ -952,7 +1017,7 @@ dialog.tour::backdrop{background:transparent}
     const itemHTML = (it) => '<li><span class="dot' + (it.ok ? ' ok' : '') + '"></span><div><p class="it-text">' + esc(it.text) + (it.club ? ' <span class="muted">· ' + esc(CLUBS[it.club].name) + '</span>' : '') + '</p><p class="it-by">' + esc(it.by) + ' · ' + esc(when(it.at)) + '</p></div></li>';
     $('#view-record').innerHTML =
       '<header class="view-head record-head"><div><p class="eyebrow">My record · demo student</p><h1 class="h1">Maya’s record</h1>' +
-      '<p class="lede">Second year, Health Sciences. Everything she does with a club counts, and someone real confirms every step.</p></div>' +
+      '<p class="lede">Second year, Health Sciences. Everything she does with a club goes on her record, and someone real confirms every step.</p></div>' +
       '<div class="seal"><span class="usc-logo"></span><span>Confirmed by<br>the USC</span></div></header>' +
       '<div class="next-card" data-testid="next-step"><p class="eyebrow">Your next step</p><p class="next-text">' + esc(nx.text) + '</p>' + nextBtn + '</div>' +
       '<section aria-labelledby="ladder-h"><h2 class="h2" id="ladder-h">Four rungs, from showing up to Council</h2><div class="ladder">' + rungHTML + '</div></section>' +
@@ -961,7 +1026,7 @@ dialog.tour::backdrop{background:transparent}
         '<section class="panel" aria-labelledby="cv-h"><h2 class="h3" id="cv-h">Your résumé lines</h2><p class="small muted">Only confirmed steps show up here.</p>' +
           '<pre class="resume" id="resume-text" tabindex="0" data-testid="resume">' + esc(r.resume.map((l) => '• ' + l).join('\n')) + '</pre>' +
           '<div class="row"><button class="btn small" type="button" data-act="copy-resume">Copy lines</button><span class="small muted" id="copy-msg" role="status"></span></div>' +
-          why('Western’s Co-Curricular Record asks students to write reflections and find a staff validator, and it lists 482 approved activities. Counts records each step at the door, and would feed that record once Western agrees to accept USC-confirmed steps.', 'Western Experiential Learning') +
+          why('Western’s Co-Curricular Record asks students to write reflections and find a staff validator, and it lists 482 approved activities. CoWork records each step at the door, and would feed that record once Western agrees to accept USC-confirmed steps.', 'Western Experiential Learning') +
         '</section>' +
       '</div>' +
       '<div class="grid2">' +
@@ -981,18 +1046,26 @@ dialog.tour::backdrop{background:transparent}
     return '<li class="ev-row" data-testid="row-' + e.id + '">' +
       '<div><p class="ev-title">' + esc(e.title) + '</p><p class="small muted">' + esc(when(e.at)) + ' · ' + esc(e.place) + '</p></div>' +
       '<div class="ev-side">' + (on
-        ? '<span class="on-pill">' + TALLY + 'Counts is on</span><span class="code-chip">Door code <b class="mono">' + e.code + '</b></span><button class="btn ghost small" type="button" data-act="optout" data-id="' + e.id + '">Turn off</button>'
+        ? '<span class="on-pill">' + TALLY + 'CoWork is on</span><span class="code-chip">Door code <b class="mono">' + e.code + '</b></span><button class="btn ghost small" type="button" data-act="optout" data-id="' + e.id + '">Turn off</button>'
         : '<button class="btn small" type="button" data-act="optin-start" data-id="' + e.id + '" aria-expanded="' + open + '" data-testid="make-' + e.id + '">Make it count</button>') + '</div>' +
-      (open ? '<form class="promise-form" data-id="' + e.id + '"><p class="small"><b>Promise three things and it counts:</b></p>' +
+      (open ? '<form class="promise-form" data-id="' + e.id + '"><p class="small"><b>Promise three things and it’s on CoWork:</b></p>' +
         '<label><input type="checkbox" name="p_open" id="p-open-' + e.id + '"> Open to everyone, members or not</label>' +
         '<label><input type="checkbox" name="p_free" id="p-free-' + e.id + '"> Free to attend</label>' +
         '<label><input type="checkbox" name="p_door" id="p-door-' + e.id + '"> Someone at the door to welcome first-timers</label>' +
-        '<div class="row"><button class="btn small" type="submit" disabled data-testid="optin-' + e.id + '">Turn on Counts</button><button class="btn ghost small" type="button" data-act="optin-cancel">Cancel</button></div></form>' : '') +
-      (on ? '<div class="door-sign" style="--club:' + c.color + '" data-testid="sign-' + e.id + '"><p class="ds-club">' + esc(c.name) + '</p><p class="ds-title">' + esc(e.title) + '</p><p class="ds-counts">' + TALLY + 'This event counts</p><p class="ds-code">Check in on USC Now: <b class="mono">' + e.code + '</b></p><p class="ds-prom">Open to everyone · Free · Ask for the greeter</p></div>' : '') +
+        '<div class="row"><button class="btn small" type="submit" disabled data-testid="optin-' + e.id + '">Turn on CoWork</button><button class="btn ghost small" type="button" data-act="optin-cancel">Cancel</button></div></form>' : '') +
+      (on ? '<div class="door-sign" data-testid="sign-' + e.id + '"><p class="ds-club">' + esc(c.name) + '</p><p class="ds-title">' + esc(e.title) + '</p><p class="ds-badge">' + TALLY + 'This event is on CoWork</p><p class="ds-code">Check in on USC Now: <b class="mono">' + e.code + '</b></p><p class="ds-prom">Open to everyone · Free · Ask for the greeter</p></div>' : '') +
     '</li>';
   }
+  const CLUB_PERKS = '<div class="grid2">' +
+        '<section class="panel"><h2 class="h3">What you get</h2><ul class="ticks"><li>$3 for every student new to your club, up to $150 an event.</li><li>Your event in the USC Now feed and on the screens at The Spoke and The Wave.</li><li>Your helpers’ and executives’ roles confirmed on their records.</li><li>A PD USC speaker or employer guest, if you ask.</li></ul></section>' +
+        '<section class="panel"><h2 class="h3">What you promise</h2><ul class="ticks"><li>Open to everyone, members or not.</li><li>Free to attend.</li><li>Someone at the door to welcome first-timers.</li><li>The door code posted at the entrance.</li></ul></section>' +
+      '</div>';
   function renderClubs() {
-    const c = CLUBS[S.club] || CLUBS.law;
+    if (!isClub() && !isAdmin()) {
+      $('#view-clubs').innerHTML = gateHTML('club', 'For clubs', 'Your brand. The USC’s reach.', 'You keep your name, your style and your members. Tick one box on the proposal you already file in WesternLink, and the USC promotes your event and pays you for every new face.') + CLUB_PERKS;
+      return;
+    }
+    const c = isClub() ? CLUBS[me().club] : (CLUBS[S.club] || CLUBS.law);
     const evs = EVENTS.filter((e) => e.club === c.id && !e.past).sort((a, b) => a.at - b.at);
     const sum = clubSummary(S, c.id);
     const reqs = S.pitches.filter((p) => evById(p.event).club === c.id);
@@ -1000,32 +1073,30 @@ dialog.tour::backdrop{background:transparent}
     $('#view-clubs').innerHTML =
       '<header class="view-head"><p class="eyebrow">For clubs</p><h1 class="h1">Your brand. The USC’s reach.</h1>' +
       '<p class="lede">You keep your name, your style and your members. Tick one box on the proposal you already file in WesternLink, and the USC promotes your event and pays you for every new face.</p></header>' +
-      '<div class="club-switch" role="group" aria-label="Choose a club">' + Object.values(CLUBS).map((k) => '<button class="club-pill" type="button" data-act="club" data-v="' + k.id + '" aria-pressed="' + (k.id === c.id) + '" style="--club:' + k.color + '"><span class="mono-badge sm">' + k.mono + '</span>' + esc(k.name) + '</button>').join('') + '</div>' +
-      '<section class="club-hero" style="--club:' + c.color + '" data-testid="club-hero"><span class="mono-badge lg">' + c.mono + '</span><div><h2 class="club-hero-name">' + esc(c.name) + '</h2><p>' + c.interest + ' · ' + c.paid + ' paid members · president ' + esc(c.president) + '</p></div></section>' +
+      (isAdmin() ? '<div class="club-switch" role="group" aria-label="Choose a club">' + Object.values(CLUBS).map((k) => '<button class="club-pill" type="button" data-act="club" data-v="' + k.id + '" aria-pressed="' + (k.id === c.id) + '"><span class="mono-badge sm">' + k.mono + '</span>' + esc(k.name) + '</button>').join('') + '</div>' : '') +
+      '<section class="club-hero" data-testid="club-hero"><span class="mono-badge lg">' + c.mono + '</span><div><h2 class="club-hero-name">' + esc(c.name) + '</h2><p>' + c.interest + ' · ' + c.paid + ' paid members · president ' + esc(c.president) + '</p></div></section>' +
       '<div class="grid2">' +
         '<section class="panel"><h2 class="h3">Staying ratified</h2>' + meter('Paid members', c.paid, 30) + meter('Events this year', c.held, 4) +
           why('Clubs need 30 paid members and four events a year to stay ratified. New members start as first-timers.', 'USC Club Executive Manual') + '</section>' +
-        '<section class="panel"><h2 class="h3">This term with Counts</h2><div class="mini-kpis"><div><span class="v" data-testid="club-first">' + num(sum.first) + '</span><span class="l">students new to your club</span></div><div><span class="v" data-testid="club-earned">' + money(sum.earned) + '</span><span class="l">earned, paid to your club account after each event</span></div></div>' +
+        '<section class="panel"><h2 class="h3">This term with CoWork</h2><div class="mini-kpis"><div><span class="v" data-testid="club-first">' + num(sum.first) + '</span><span class="l">students new to your club</span></div><div><span class="v" data-testid="club-earned">' + money(sum.earned) + '</span><span class="l">earned, paid to your club account after each event</span></div></div>' +
           '<p class="small muted">$3 for each student new to your club, up to $150 an event, from employer partners through PD USC.</p></section>' +
       '</div>' +
       '<section class="panel"><h2 class="h3">Your upcoming events in WesternLink</h2><ul class="ev-rows">' + evs.map(evRowHTML).join('') + '</ul></section>' +
       '<section class="panel"><h2 class="h3">Pitch-in requests</h2>' + (reqs.length ? '<ul class="pitch-rows">' + reqs.map(pitchRow).join('') + '</ul>' : '<p class="muted">No requests yet. Students ask from the event card.</p>') +
         why('When you confirm, the step goes on the student’s record with your name on it. That is the proof employers ask about.', '') + '</section>' +
-      '<div class="grid2">' +
-        '<section class="panel"><h2 class="h3">What you get</h2><ul class="ticks"><li>$3 for every student new to your club, up to $150 an event.</li><li>Your event in the USC Now feed and on the screens at The Spoke and The Wave.</li><li>Your helpers’ and executives’ roles confirmed on their records.</li><li>A PD USC speaker or employer guest, if you ask.</li></ul></section>' +
-        '<section class="panel"><h2 class="h3">What you promise</h2><ul class="ticks"><li>Open to everyone, members or not.</li><li>Free to attend.</li><li>Someone at the door to welcome first-timers.</li><li>The door code posted at the entrance.</li></ul></section>' +
-      '</div>';
+      CLUB_PERKS;
   }
 
   function renderUSC() {
+    if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'USC dashboard', 'Who’s new, and who’s climbing.', 'The pilot in one view, for USC staff.'); return; }
     const d = dashboard(S);
     $('#view-usc').innerHTML =
       '<header class="view-head"><p class="eyebrow">USC dashboard</p><h1 class="h1">Who’s new, and who’s climbing.</h1><p class="lede">The pilot in one view: students reaching new clubs, steps up the ladder, and the pipeline to Council.</p></header>' +
       '<p class="sim-banner" data-testid="sim-banner"><b>Simulated pilot, week ' + SIM.week + ' of ' + SIM.weeks + '.</b> Demo data, not results. Clicks anywhere in this prototype add to it live.</p>' +
       '<div class="kpis">' +
-        kpi('Students new to a club', num(d.firstTimers), d.dFirst ? '+' + d.dFirst + ' just now' : '', spark(d.byWeek), 'kpi-first', 'Only a student’s first visit to a club counts, so this measures new reach, not regulars.') +
+        kpi('Students new to a club', num(d.firstTimers), d.dFirst ? '+' + d.dFirst + ' just now' : '', spark(d.byWeek), 'kpi-first', 'Only a student’s first visit to a club is included, so this measures new reach, not regulars.') +
         kpi('Clubs taking part', SIM.clubs + ' of 240+', '', '<p class="small muted">' + SIM.outside + ' of them outside careers</p>', 'kpi-clubs', 'It rides events clubs already run. Each of 240+ clubs must hold at least four a year.') +
-        kpi('Counts events so far', num(d.events), d.dEvents ? '+' + d.dEvents + ' just now' : '', '', 'kpi-events', 'Each is an event the USC didn’t have to plan, staff or book.') +
+        kpi('CoWork events so far', num(d.events), d.dEvents ? '+' + d.dEvents + ' just now' : '', '', 'kpi-events', 'Each is an event the USC didn’t have to plan, staff or book.') +
         kpi('Paid to clubs', money(d.paid), d.dPaid ? '+' + money(d.dPaid) + ' just now' : '', '<div class="pool"><div class="bar"><i style="width:' + Math.min(100, (d.paid / d.pool) * 100) + '%"></i></div><p class="small muted">of ' + money(d.pool) + ' from employer partners</p></div>', 'kpi-paid', 'If a partner drops out, the rate falls to $2 and the pilot still fits.') +
       '</div>' +
       '<div class="grid2">' +
@@ -1067,7 +1138,7 @@ dialog.tour::backdrop{background:transparent}
     let body;
     if (at <= 1) {
       const list = upcoming().slice(0, 5);
-      body = '<div class="ph-body"><p class="eyebrow">This week</p>' + list.map((e) => { const c = CLUBS[e.club]; return '<div class="mini-ev"><span class="mono-badge solid" style="--club:' + c.color + '">' + esc(c.mono) + '</span><div><b>' + esc(e.title) + '</b><span class="meta">' + esc(c.name) + ' · ' + esc(when(e.at)) + (e.seededOn ? '' : ' · <span class="fresh">New</span>') + '</span></div></div>'; }).join('') + '</div>';
+      body = '<div class="ph-body"><p class="eyebrow">This week</p>' + list.map((e) => { const c = CLUBS[e.club]; return '<div class="mini-ev"><span class="mono-badge solid">' + esc(c.mono) + '</span><div><b>' + esc(e.title) + '</b><span class="meta">' + esc(c.name) + ' · ' + esc(when(e.at)) + (e.seededOn ? '' : ' · <span class="fresh">New</span>') + '</span></div></div>'; }).join('') + '</div>';
     } else if (at === 2) {
       const ci = S.checkins.find((c) => c.student === 'me' && c.event === 'mock');
       body = '<div class="ph-body"><div class="success" data-testid="phone-success"><span class="plus-one">+1</span><h3>You’re in.</h3><p>' + (ci && ci.first ? 'First time with Pre-Law Society. It’s on your record, and the club just earned $3.' : 'Welcome back. It’s on your record.') + '</p><p class="small muted">Door code LAW4 · confirmed at the door</p></div></div>';
@@ -1076,15 +1147,15 @@ dialog.tour::backdrop{background:transparent}
       const tag = (st, i) => st.done ? '<em class="ok">Done</em>' : st.pending ? '<em class="wait">' + (i === 3 ? 'Applied' : 'Waiting') + '</em>' : '<em>Later</em>';
       body = '<div class="ph-body"><p class="eyebrow">Maya’s record</p><div class="mini-rungs">' + ['Show up', 'Pitch in', 'Lead', 'Represent'].map((n, i) => '<div class="mini-rung"><span>' + (i + 1) + ' · ' + n + (i === 0 ? ' · ' + r.rungs[0].n + ' clubs' : '') + '</span>' + tag(r.rungs[i], i) + '</div>').join('') + '</div><p class="small muted">Applied to Policy Fellows: youth jobs.</p></div>';
     }
-    return '<div class="phone-screen"><div class="ph-bar">' + TALLY + '<span>USC Now · Counts</span></div>' + notif + body + '</div>';
+    return '<div class="phone-screen"><div class="ph-bar">' + TALLY + '<span>USC Now · CoWork</span></div>' + notif + body + '</div>';
   }
   function deskPane(at) {
     const law = CLUBS.law, mock = evById('mock');
     if (at <= 0) {
       const on = !!S.optedIn.mock;
       return '<p class="desk-label">Pre-Law Society’s event proposal in WesternLink</p><section class="panel"><div class="row" style="justify-content:space-between"><div><p class="ev-title">' + esc(mock.title) + '</p><p class="small muted">' + esc(when(mock.at)) + ' · ' + esc(mock.place) + '</p></div>' +
-        (on ? '<span class="on-pill">' + TALLY + 'Counts is on</span>' : '<span class="code-chip">Make it count: off</span>') + '</div>' +
-        (on ? '<ul class="ticks"><li>Open to everyone</li><li>Free to attend</li><li>Someone at the door</li></ul><div class="door-sign" style="--club:' + law.color + '"><p class="ds-club">' + esc(law.name) + '</p><p class="ds-title">' + esc(mock.title) + '</p><p class="ds-counts">' + TALLY + 'This event counts</p><p class="ds-code">Check in on USC Now: <b class="mono">' + mock.code + '</b></p></div>' : '<p class="muted">Press step 1 to tick the box.</p>') + '</section>';
+        (on ? '<span class="on-pill">' + TALLY + 'CoWork is on</span>' : '<span class="code-chip">Make it count: off</span>') + '</div>' +
+        (on ? '<ul class="ticks"><li>Open to everyone</li><li>Free to attend</li><li>Someone at the door</li></ul><div class="door-sign"><p class="ds-club">' + esc(law.name) + '</p><p class="ds-title">' + esc(mock.title) + '</p><p class="ds-badge">' + TALLY + 'This event is on CoWork</p><p class="ds-code">Check in on USC Now: <b class="mono">' + mock.code + '</b></p></div>' : '<p class="muted">Press step 1 to tick the box.</p>') + '</section>';
     }
     if (at === 1) return '<p class="desk-label">The Spoke · screen by the counter</p>' + spokeScreen();
     if (at === 2) {
@@ -1115,17 +1186,49 @@ dialog.tour::backdrop{background:transparent}
   /* ---------- routing ---------- */
   const VIEWS = { week: renderWeek, record: renderRecord, clubs: renderClubs, usc: renderUSC, why: () => {}, demo: renderDemo };
   function current() { const h = location.hash.slice(1); return Object.prototype.hasOwnProperty.call(VIEWS, h) ? h : 'week'; }
-  function render() { VIEWS[current()](); }
+  function renderAccount() { const b = $('#account-btn'); if (b) { b.textContent = me() ? me().short : 'Sign in'; b.setAttribute('aria-label', me() ? 'Account: ' + me().name : 'Sign in'); } }
+  function render() { VIEWS[current()](); renderAccount(); }
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fade(el, ms) { if (el && el.animate && !still()) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: ms || 300, easing: 'ease' }); }
+  // Cards rise into place one after another. Only transform moves, so the page's own fade is untouched.
+  function rise(els) { if (still()) return; [...els].slice(0, 14).forEach((el, i) => { if (el.animate) el.animate([{ transform: 'translateY(12px)' }, { transform: 'none' }], { duration: 480, delay: i * 28, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'backwards' }); }); }
+  const CARDS = ':is(.poster,.panel,.rung,.kpi,.fact,.how li,.ladder-line div,.targets li,.step-btn)';
+  function moveGlider() {
+    const a = $('.tabs a[aria-current="page"]'), g = $('#tab-glider');
+    if (!a || !g) return;
+    g.style.width = a.offsetWidth + 'px'; g.style.height = a.offsetHeight + 'px';
+    g.style.transform = 'translate(' + a.offsetLeft + 'px,' + a.offsetTop + 'px)';
+    requestAnimationFrame(() => g.classList.add('ready'));
+  }
+  // Cross-fade: the old page is a throwaway copy fading out above the new one, so the swap itself stays instant.
+  function ghostOf(section) {
+    if (!section || !section.animate || still()) return;
+    const r = section.getBoundingClientRect();
+    if (!r.height) return;
+    const g = section.cloneNode(true);
+    [g, ...g.querySelectorAll('*')].forEach((el) => [...el.attributes].forEach((a) => { if (a.name === 'id' || a.name === 'name' || a.name === 'for' || a.name.startsWith('data-') || a.name.startsWith('aria-')) el.removeAttribute(a.name); }));
+    g.classList.add('view-ghost');
+    g.setAttribute('aria-hidden', 'true');
+    g.inert = true;
+    Object.assign(g.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
+    document.body.appendChild(g);
+    g.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, easing: 'ease' }).onfinish = () => g.remove();
+  }
   let lastView = null;
   function route() {
     const v = current();
+    if (lastView !== null && lastView !== v) ghostOf($('#view-' + lastView));
     document.querySelectorAll('[data-view]').forEach((s) => { s.hidden = s.dataset.view !== v; });
     document.querySelectorAll('.tabs a').forEach((a) => { if (a.getAttribute('href') === '#' + v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     render();
     if (lastView !== null && lastView !== v) { window.scrollTo(0, 0); const t = $('#toast'); if (t) t.hidden = true; }
+    if (lastView !== null && lastView !== v) { fade($('#view-' + v), 360); rise($('#view-' + v).querySelectorAll(CARDS)); }
+    moveGlider();
     lastView = v;
   }
   window.addEventListener('hashchange', route);
+  // The liquid glass library re-parents the tab bar and sizes change with the window, so re-measure whenever it resizes.
+  if (window.ResizeObserver) new ResizeObserver(moveGlider).observe($('.tabs'));
 
   /* ---------- dialogs ---------- */
   function openDialog(d) { if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', ''); }
@@ -1179,24 +1282,57 @@ dialog.tour::backdrop{background:transparent}
     toast('Asked. ' + CLUBS[evById(d.dataset.id).club].name + ' confirms it after the event.');
   });
 
+  /* ---------- sign-in dialog ---------- */
+  function setLoginRole(role) {
+    $('#lg-role-' + role).checked = true;
+    $('#lg-err').textContent = '';
+    $('#lg-hint').textContent = role === 'admin' ? 'Demo sign-in, not real security. USC admin: uscadmin, password usc2026.'
+      : 'Demo sign-in, not real security. Presidents: ' + Object.values(CLUBS).map((c) => c.president.toLowerCase() + ' (' + c.name + ')').join(', ') + '. Password club2026.';
+  }
+  function openLogin(role) {
+    const d = $('#dlg-login');
+    $('#lg-form').hidden = false; $('#lg-who').hidden = true;
+    $('#lg-user').value = ''; $('#lg-pass').value = '';
+    setLoginRole(role || 'club');
+    openDialog(d);
+    $('#lg-user').focus();
+  }
+  function openAccount() {
+    const who = $('#lg-who'), a = me();
+    who.innerHTML = '<h2 class="h3">Signed in</h2><p><b>' + esc(a.name) + '</b>' + (a.club ? ', president of ' + esc(CLUBS[a.club].name) : '') + '</p><div class="row end"><button class="btn ghost" type="button" data-close>Close</button><button class="btn" type="button" data-act="signout" data-testid="signout">Sign out</button></div>';
+    $('#lg-form').hidden = true; who.hidden = false;
+    openDialog($('#dlg-login'));
+  }
+  $('#lg-form').addEventListener('change', (e) => { if (e.target.name === 'lg-role') setLoginRole(e.target.value); });
+  $('#lg-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const role = $('#lg-role-admin').checked ? 'admin' : 'club';
+    const r = signIn(role, $('#lg-user').value, $('#lg-pass').value);
+    if (!r.ok) { $('#lg-err').textContent = r.error; return; }
+    closeDialog($('#dlg-login'));
+    const dest = role === 'admin' ? 'usc' : 'clubs';
+    if (current() !== dest) { location.hash = '#' + dest; route(); } else { render(); fade($('#view-' + dest)); }
+    toast('Signed in as ' + r.acct.name + '.');
+  });
+
   /* ---------- walkthrough ---------- */
-  const TOUR_KEY = 'counts-tour-seen-v1';
+  const TOUR_KEY = 'cowork-tour-seen-v1';
   let tourSeenMem = false, tourAt = -1;
   function tourSeen() { try { return tourSeenMem || window.localStorage.getItem(TOUR_KEY) === '1'; } catch (e) { return tourSeenMem; } }
   function markTourSeen() { tourSeenMem = true; try { window.localStorage.setItem(TOUR_KEY, '1'); } catch (e) { /* storage blocked: remembered until the page reloads */ } }
-  const onPhoneBar = () => matchMedia('(max-width:1079px)').matches;
+  const onPhoneBar = () => matchMedia('(max-width:1199px)').matches;
   const tap = () => (matchMedia('(pointer:coarse)').matches ? 'Tap' : 'Click');
   const feedAct = (act) => $('[data-testid="feed"] [data-act="' + act + '"]') || $('[data-testid="feed"] .poster');
   // Written for someone who rarely uses apps: one idea per step, no product words until they have been explained.
   const TOUR = [
-    { media: 'logo', title: 'Welcome to Counts', next: 'Show me how',
+    { media: 'logo', title: 'Welcome to CoWork', next: 'Show me how',
       text: () => 'Go to free club events at Western, and each visit is saved on a record you can show employers. This short tour shows you how. Nothing here is real, so you can’t break anything.' },
     { view: 'week', fixed: true, target: () => $('.tabs'), title: 'These buttons change the page',
       text: () => tap() + ' a button to open that page. They stay at the ' + (onPhoneBar() ? 'bottom' : 'top') + ' of your screen, so you can always get back.' },
     { view: 'week', target: () => $('[data-testid="feed"] .poster'), title: 'Each card is an event',
       text: () => 'It shows what’s on, when and where. Every event here is free and open to everyone. You don’t need to be a member or know anyone.' },
     { view: 'week', target: () => feedAct('checkin'), title: 'When you arrive, press “I’m here”',
-      text: () => tap() + ' “I’m here” once you get to the event. That’s how you tell Counts you came.' },
+      text: () => tap() + ' “I’m here” once you get to the event. That’s how you tell CoWork you came.' },
     { view: 'week', media: 'code', title: 'Then type the code from the door',
       text: () => 'There’s a sign at the door with a short code, like this one. Type it in and press “Check in”. The code proves you were really there.' },
     { view: 'week', target: () => feedAct('pitchin'), title: 'Want to help out? Press “Pitch in”',
@@ -1205,12 +1341,13 @@ dialog.tour::backdrop{background:transparent}
       text: () => 'There are four steps: show up, pitch in, lead and represent. Each one is marked “Done” once someone real confirms it.' },
     { view: 'record', target: () => $('[data-testid="next-step"]'), title: 'Not sure what to do next?',
       text: () => 'This box always tells you your next step. Further down the page, you can copy your confirmed activities straight into your résumé.' },
-    { view: 'week', fixed: true, target: () => $('.tabs a[href="#clubs"]'), title: 'Run a club? Start here',
-      text: () => 'This page lets you make your event count with one tick. The buttons to its right are for USC staff and judges, so students can ignore them.' },
+    { view: 'week', fixed: true, target: () => $('.tabs a[href="#clubs"]'), title: 'Run a club? Sign in here',
+      text: () => 'Club presidents sign in on this page to make an event count with one tick. The buttons to its right are for USC staff and judges, so students can ignore them.' },
     { view: 'week', top: true, target: () => $('[data-testid="help"]'), title: 'That’s everything', next: 'Finish', last: true,
       text: () => 'Press Help here any time to see this again. Want to try it? Practise a check-in now and we’ll give you the code.' },
   ];
-  function placeTour() {
+  let tourGliding = false, tourGlideTimer = 0;
+  function placeTour(dy = 0) {
     if (tourAt < 0) return;
     const spot = $('#tour-spot'), card = $('#tour-card'), anchor = $('#tour-anchor');
     const vw = innerWidth, vh = innerHeight, gap = 16, edge = 12;
@@ -1220,7 +1357,8 @@ dialog.tour::backdrop{background:transparent}
     let cx = vw / 2, cy = vh / 2;
     const t = TOUR[tourAt].target ? TOUR[tourAt].target() : null;
     if (t && t.getClientRects().length) {
-      const r = t.getBoundingClientRect(), pad = 6;
+      const b = t.getBoundingClientRect(), pad = 6;
+      const r = { left: b.left, right: b.right, width: b.width, height: b.height, top: b.top - dy, bottom: b.bottom - dy };
       spot.classList.remove('off');
       let spotH = r.height + pad * 2;
       cx = r.left + r.width / 2;
@@ -1242,22 +1380,35 @@ dialog.tour::backdrop{background:transparent}
     const st = TOUR[i];
     if (st.view && current() !== st.view) { location.hash = '#' + st.view; route(); }
     $('#tour-media').innerHTML = st.media === 'logo' ? '<span class="usc-logo"></span>'
-      : st.media === 'code' ? '<div class="door-sign" style="--club:#6D28D9"><p class="ds-club">Example door sign</p><p class="ds-counts">' + TALLY + 'This event counts</p><p class="ds-code">Check in with this code: <b class="mono">OWL7</b></p></div>' : '';
+      : st.media === 'code' ? '<div class="door-sign"><p class="ds-club">Example door sign</p><p class="ds-badge">' + TALLY + 'This event is on CoWork</p><p class="ds-code">Check in with this code: <b class="mono">OWL7</b></p></div>' : '';
     $('#tour-count').textContent = 'Step ' + (i + 1) + ' of ' + TOUR.length;
     $('#tour-title').textContent = st.title;
     $('#tour-text').textContent = st.text();
+    fade($('#tour-card .tour-title')); fade($('#tour-text')); fade($('#tour-media'));
     $('#tour-progress').style.width = ((i + 1) / TOUR.length) * 100 + '%';
     $('[data-act="tour-back"]').hidden = i === 0;
     $('[data-act="tour-skip"]').textContent = st.last ? 'Finish' : 'Skip';
     $('#tour-next').textContent = st.last ? 'Practise a check-in' : (st.next || 'Next');
     const t = st.target ? st.target() : null;
-    if (st.top) window.scrollTo(0, 0);
+    let dy = 0;
+    if (st.top) dy = -window.scrollY;
     else if (t && !st.fixed) {
       // Centre the target and the card together, so the card has room beside what it points at.
-      const stack = t.getBoundingClientRect().height + 16 + $('#tour-card').offsetHeight;
-      window.scrollBy(0, t.getBoundingClientRect().top - (stack <= innerHeight - 24 ? (innerHeight - stack) / 2 : 12));
+      const box = t.getBoundingClientRect(), stack = box.height + 16 + $('#tour-card').offsetHeight;
+      dy = box.top - (stack <= innerHeight - 24 ? (innerHeight - stack) / 2 : 12);
     }
-    placeTour();
+    dy = Math.max(-window.scrollY, Math.min(dy, document.documentElement.scrollHeight - innerHeight - window.scrollY));
+    clearTimeout(tourGlideTimer);
+    if (dy && !still()) {
+      tourGliding = true;
+      window.scrollBy({ top: dy, behavior: 'smooth' });
+      placeTour(dy);
+      tourGlideTimer = setTimeout(() => { tourGliding = false; placeTour(); }, 650);
+    } else {
+      tourGliding = false;
+      if (dy) window.scrollBy(0, dy);
+      placeTour();
+    }
     $('#tour-next').focus({ preventScroll: true });
   }
   function startTour() {
@@ -1280,7 +1431,7 @@ dialog.tour::backdrop{background:transparent}
   }
   $('#tour').addEventListener('cancel', (e) => { e.preventDefault(); endTour(); });
   let tourFrame = 0;
-  const queuePlaceTour = () => { if (tourAt >= 0 && !tourFrame) tourFrame = requestAnimationFrame(() => { tourFrame = 0; placeTour(); }); };
+  const queuePlaceTour = () => { if (tourAt >= 0 && !tourGliding && !tourFrame) tourFrame = requestAnimationFrame(() => { tourFrame = 0; placeTour(); }); };
   window.addEventListener('resize', queuePlaceTour);
   window.addEventListener('scroll', queuePlaceTour, { passive: true });
   if (window.ResizeObserver) new ResizeObserver(queuePlaceTour).observe($('#tour-card'));
@@ -1289,10 +1440,15 @@ dialog.tour::backdrop{background:transparent}
   let toastTimer = null;
   function toast(msg) {
     const t = $('#toast');
+    t.getAnimations().forEach((a) => a.cancel());
     t.textContent = msg;
     t.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
+    toastTimer = setTimeout(() => {
+      if (!t.animate || still()) { t.hidden = true; return; }
+      const out = t.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease', fill: 'forwards' });
+      out.onfinish = () => { t.hidden = true; out.cancel(); };
+    }, 2800);
   }
   async function copyResume() {
     const el = $('#resume-text'), msg = $('#copy-msg');
@@ -1320,20 +1476,24 @@ dialog.tour::backdrop{background:transparent}
     if (!b) return;
     const act = b.dataset.act, id = b.dataset.id, v = b.dataset.v;
     switch (act) {
-      case 'filter': UI.filter = v; renderWeek(); break;
+      case 'filter': UI.filter = v; renderWeek(); fade($('[data-testid="feed"]')); rise(document.querySelectorAll('[data-testid="feed"] .poster')); break;
       case 'checkin': openCheckin(id); break;
       case 'pitchin': openPitch(id); break;
-      case 'club': S.club = v; UI.optin = null; commit(); break;
+      case 'club': if (isAdmin()) { S.club = v; UI.optin = null; commit(); document.querySelectorAll('#view-clubs > :not(.view-head):not(.club-switch)').forEach((el) => fade(el)); } break;
       case 'optin-start': UI.optin = id; renderClubs(); { const f = document.querySelector('.promise-form input'); if (f) f.focus(); } break;
       case 'optin-cancel': UI.optin = null; renderClubs(); break;
-      case 'optout': S.optedIn[id] = false; commit(); toast('Counts is off for this event. Check-ins so far stay on students’ records.'); break;
+      case 'optout': S.optedIn[id] = false; commit(); toast('CoWork is off for this event. Check-ins so far stay on students’ records.'); break;
       case 'confirm-pitch': if (confirmPitch(S, id)) { commit(); toast('Confirmed. It’s on Maya’s record now.'); } break;
       case 'fellows': if (!S.fellows) { S.fellows = true; S.fellowsAt = Date.now(); commit(); toast('Applied to Policy Fellows.'); } break;
       case 'runforit': if (!S.runForIt) { S.runForIt = true; S.runForItAt = Date.now(); commit(); toast('Spot saved at Run for It.'); } break;
       case 'copy-resume': copyResume(); break;
-      case 'demo-step': runStep(Number(v)); break;
+      case 'demo-step': runStep(Number(v)); fade($('[data-testid="demo-caption"]')); fade($('.stage')); break;
       case 'demo-reset': case 'reset': resetAll(); break;
       case 'tour': startTour(); break;
+      case 'account': if (me()) openAccount(); else openLogin('club'); break;
+      case 'login': openLogin(v); break;
+      case 'login-demo': { const adm = $('#lg-role-admin').checked; $('#lg-user').value = adm ? 'uscadmin' : 'jordan'; $('#lg-pass').value = adm ? 'usc2026' : 'club2026'; break; }
+      case 'signout': sessionUser = null; saveSession(); closeDialog($('#dlg-login')); render(); fade($('#view-' + current())); toast('Signed out.'); break;
       case 'tour-next': nextTourStep(); break;
       case 'tour-back': showTourStep(tourAt - 1); break;
       case 'tour-skip': endTour(); break;
@@ -1354,11 +1514,11 @@ dialog.tour::backdrop{background:transparent}
     if (!r.ok) { toast(r.error); return; }
     UI.optin = null;
     commit();
-    toast('Counts is on. It’s in the student feed now.');
+    toast('CoWork is on. It’s in the student feed now.');
   });
   $('#ci-code').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4); $('#ci-err').textContent = ''; });
 
-  window.Counts = { fresh, checkIn, payout, record, dashboard, requestPitch, confirmPitch, optIn, clubSummary, state: () => S, EVENTS, CLUBS };
+  window.CoWork = { fresh, checkIn, payout, record, dashboard, requestPitch, confirmPitch, optIn, clubSummary, state: () => S, EVENTS, CLUBS };
   route();
   // First visit: open the walkthrough, except on the presenter's demo page, where it would interrupt a live pitch.
   if (!tourSeen() && current() !== 'demo') startTour();

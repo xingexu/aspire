@@ -1,5 +1,5 @@
 'use strict';
-// Serves the built Counts page. Run: npm start (builds first), then open the printed address.
+// Serves the built CoWork page. Run: npm start (builds first), then open the printed address.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -15,4 +15,4 @@ http.createServer((req, res) => {
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
     res.end(body);
   });
-}).listen(PORT, () => console.log('Counts listening on http://localhost:' + PORT));
+}).listen(PORT, () => console.log('CoWork listening on http://localhost:' + PORT));

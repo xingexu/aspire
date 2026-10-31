@@ -2,12 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run Counts",
+      "name": "Run CoWork",
       "type": "node",
       "request": "launch",
-      "cwd": "${workspaceFolder}/counts",
-      "program": "${workspaceFolder}/counts/server.js",
-      "preLaunchTask": "Counts: build",
+      "cwd": "${workspaceFolder}/cowork",
+      "program": "${workspaceFolder}/cowork/server.js",
+      "preLaunchTask": "CoWork: build",
       "skipFiles": ["<node_internals>/**"],
       "serverReadyAction": {
         "pattern": "listening on (https?://\\S+)",

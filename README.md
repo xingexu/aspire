@@ -1,17 +1,17 @@
-# PBSN ASPIRE: Counts
+# PBSN ASPIRE: CoWork
 
 Our answer to the PBSN Aspire 2026 case, *Driving Engagement for Western's University Students' Council*. We chose
-PD USC (Professional Development USC) and built **Counts**: club events that count toward a student's confirmed
-record, with a ladder that ends in USC advocacy and Council. See [`counts/README.md`](counts/README.md).
+PD USC (Professional Development USC) and built **CoWork**: club events that count toward a student's confirmed
+record, with a ladder that ends in USC advocacy and Council. See [`cowork/README.md`](cowork/README.md).
 
-Open this folder in VS Code and press **F5** ("Run Counts"), or run `cd counts && npm start` and open
-http://localhost:3001. No packages to install. To share it, send [`counts/Counts.html`](counts/Counts.html): it's one
+Open this folder in VS Code and press **F5** ("Run CoWork"), or run `cd cowork && npm start` and open
+http://localhost:3001. No packages to install. To share it, send [`cowork/CoWork.html`](cowork/CoWork.html): it's one
 complete file.
 
 ## Earlier idea: FoodLink
 
 The `app/` and `deck/` folders hold our earlier direction, FoodLink (USC Food Support Services), which we have
-replaced with Counts. They still run as described below.
+replaced with CoWork. They still run as described below.
 
 FoodLink gives Western students walk-up access to free food without a form or a name: two campus shelves
 with live stock counts, sealed surplus from campus partners that students reserve with an anonymous code,

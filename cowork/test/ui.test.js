@@ -1,4 +1,4 @@
-// End-to-end checks for the Counts page. Run: node test/ui.test.js [--shots]
+// End-to-end checks for the CoWork page. Run: node test/ui.test.js [--shots]
 'use strict';
 const { chromium, webkit, devices } = require('playwright');
 const http = require('http');
@@ -31,9 +31,11 @@ async function noOverflow(page, label) {
 }
 // Every context counts as a returning visitor unless firstVisit is set, so the walkthrough only opens where a test wants it.
 async function newPage(browser, opts) {
-  const { firstVisit, ...ctxOpts } = opts || {};
+  const { firstVisit, signedOut, ...ctxOpts } = opts || {};
   const ctx = await browser.newContext(Object.assign({ viewport: { width: 1440, height: 900 } }, ctxOpts));
-  if (!firstVisit) await ctx.addInitScript(() => { try { localStorage.setItem('counts-tour-seen-v1', '1'); } catch (e) { /* blocked */ } });
+  if (!firstVisit) await ctx.addInitScript(() => { try { localStorage.setItem('cowork-tour-seen-v1', '1'); } catch (e) { /* blocked */ } });
+  // Signed in as the USC admin by default, since most checks need the gated pages.
+  if (!signedOut) await ctx.addInitScript(() => { try { localStorage.setItem('cowork-session-v1', 'uscadmin'); } catch (e) { /* blocked */ } });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
@@ -44,9 +46,9 @@ async function shot(page, name) { if (SHOTS) await page.screenshot({ path: path.
 const VIEWS = ['week', 'record', 'clubs', 'usc', 'why', 'demo'];
 const ENGINES = [['chromium', chromium], ['webkit', webkit]];
 // Phones in both orientations, tablets, then Mac windows from a small MacBook to a Studio Display.
-const SIZES = [[320, 568], [375, 667], [390, 844], [430, 932], [844, 390], [768, 1024], [1024, 768], [1080, 800], [1280, 800], [1512, 982], [1920, 1080], [2560, 1440]];
+const SIZES = [[320, 568], [375, 667], [390, 844], [430, 932], [844, 390], [768, 1024], [1024, 768], [1199, 800], [1200, 800], [1280, 800], [1512, 982], [1920, 1080], [2560, 1440]];
 const TOUR_STEPS = 10;
-const PHONE_BAR_MAX = 1079;
+const PHONE_BAR_MAX = 1199;
 
 (async () => {
   const srv = await serve();
@@ -59,7 +61,7 @@ const PHONE_BAR_MAX = 1079;
     await page.goto(base + '#week');
     await page.waitForSelector('[data-testid="feed"]');
     check('fonts: uses the system font, nothing to download', /-apple-system/.test(await page.evaluate(() => getComputedStyle(document.body).fontFamily)));
-    check('title is Counts', (await page.title()) === 'Counts');
+    check('title is CoWork', (await page.title()) === 'CoWork');
     check('week: 6 events count this week', (await page.locator('[data-testid="feed"] .poster').count()) === 6);
     check('week: mock trial not in feed until the club opts in', (await page.locator('[data-testid="event-mock"]').count()) === 0);
     check('week: every poster says why it matters nearby', await page.locator('#view-week .why').isVisible());
@@ -133,7 +135,7 @@ const PHONE_BAR_MAX = 1079;
 
     // rules
     const rules = await page.evaluate(() => {
-      const C = window.Counts, s = C.fresh();
+      const C = window.CoWork, s = C.fresh();
       for (let i = 0; i < 60; i++) C.checkIn(s, 'films', 'OWL7', 's' + i);
       const capped = C.payout(s, 'films');
       const again = C.checkIn(s, 'films', 'OWL7', 's1');
@@ -196,15 +198,16 @@ const PHONE_BAR_MAX = 1079;
     }
   }
 
-  /* ---------- the whole site is purple, whatever the system theme ---------- */
+  /* ---------- neutral at rest, purple only as a hover highlight; translucent boxes over the photo ---------- */
   for (const scheme of ['light', 'dark']) {
     const { ctx, page } = await newPage(browser, { colorScheme: scheme });
-    const off = [];
+    const off = [], opaque = [], named = [];
     for (const v of VIEWS) {
       await page.goto(base + '#' + v);
       await page.waitForSelector('#view-' + v + ':not([hidden])');
-      off.push(...await page.evaluate((view) => {
-        // Any colour with real saturation must have a purple-family hue. White and near-white text are fine.
+      await page.waitForTimeout(260);
+      await page.mouse.move(0, 0);
+      const r = await page.evaluate((view) => {
         const hue = (str) => {
           const m = str.match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?/);
           if (!m) return null;
@@ -214,21 +217,89 @@ const PHONE_BAR_MAX = 1079;
           const h = max === r ? 60 * (((g - b) / d) % 6) : max === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4);
           return (h + 360) % 360;
         };
-        const bad = [];
+        const off = [], opaque = [];
         document.querySelectorAll('body, body *').forEach((el) => {
           if (el.closest('svg, script, style, [hidden]') || el.tagName === 'BR') return;
           const cs = getComputedStyle(el);
-          [cs.backgroundColor, cs.color, cs.getPropertyValue('--club')].forEach((c) => {
-            const h = c ? (c.trim().startsWith('#') ? hue('rgb(' + [1, 3, 5].map((i) => parseInt(c.trim().slice(i, i + 2), 16)).join(',') + ')') : hue(c)) : null;
-            if (h !== null && (h < 235 || h > 345)) bad.push(view + ' ' + el.tagName + '.' + el.className + ' ' + c);
-          });
+          [cs.backgroundColor, cs.color].forEach((c) => { const h = hue(c); if (h !== null && h >= 235 && h <= 345) off.push(view + ' ' + el.tagName + '.' + el.className + ' ' + c); });
         });
-        return bad;
-      }, v));
+        document.querySelectorAll('#view-' + view + ' :is(.panel,.poster,.poster-top,.kpi,.rung,.fact)').forEach((el) => {
+          const c = getComputedStyle(el).backgroundColor, a = c.match(/,\s*([\d.]+)\)|\/\s*([\d.]+)\)/);
+          if (!a && c !== 'rgba(0, 0, 0, 0)') opaque.push(view + ' ' + el.className + ' ' + c);
+        });
+        return { off, opaque, text: document.body.innerText };
+      }, v);
+      off.push(...r.off); opaque.push(...r.opaque);
+      if (/\bcounts\b/i.test(r.text)) named.push(v + ': ' + r.text.match(/.{0,30}\bcounts\b.{0,20}/i)[0]);
     }
-    check('purple: every colour on every page is in the purple family, system ' + scheme, off.length === 0, off.slice(0, 6));
-    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    check('purple: page background, system ' + scheme, bg === 'rgb(42, 15, 94)', bg);
+    check('colour: no purple at rest on any page, system ' + scheme, off.length === 0, off.slice(0, 6));
+    check('boxes: every text box is translucent, system ' + scheme, opaque.length === 0, opaque.slice(0, 6));
+    check('name: the word counts appears on no page', named.length === 0, named);
+    const bg = await page.evaluate(() => { const a = getComputedStyle(document.querySelector('.aurora')); return { img: a.backgroundImage.startsWith('url("data:image/jpeg'), op: Number(a.opacity), body: getComputedStyle(document.body).backgroundColor }; });
+    check('background: the Western photo, faded, system ' + scheme, bg.img && bg.op > 0 && bg.op < 1 && bg.body === 'rgb(245, 245, 247)', bg);
+    await ctx.close();
+  }
+  {
+    const { ctx, page } = await newPage(browser);
+    await page.goto(base + '#week');
+    const poster = page.locator('[data-testid="event-films"]');
+    await poster.hover();
+    await page.waitForTimeout(450);
+    check('colour: containers highlight purple on hover', /rgb\(79, 38, 131\)/.test(await poster.evaluate((e) => getComputedStyle(e).boxShadow)));
+    const dark = await page.evaluate(() => [...document.querySelectorAll('.btn:not(.ghost), .chip[aria-pressed="true"]')].filter((b) => { const m = getComputedStyle(b).backgroundColor.match(/[\d.]+/g).map(Number); return m[0] < 60 && m[1] < 60 && m[2] < 60; }).length);
+    check('buttons: none are solid black', dark === 0, dark);
+    await page.mouse.move(0, 0);
+    // fades
+    await page.click('.tabs a[href="#record"]');
+    await page.waitForSelector('[data-testid="rung-show"]');
+    const moving = await page.evaluate(() => document.querySelector('#tab-glider').getAnimations().length > 0);
+    check('fade: the tab highlight glides to the new tab', moving);
+    const f = await page.evaluate(() => ({ ghost: !!document.querySelector('.view-ghost'), ghostIds: document.querySelectorAll('.view-ghost [id], .view-ghost [data-testid], .view-ghost [data-act]').length, anims: document.querySelector('#view-record').getAnimations().length }));
+    check('fade: pages cross-fade between clicks', f.ghost && f.anims > 0, f);
+    check('fade: the outgoing copy has no live controls', f.ghostIds === 0, f);
+    await page.waitForTimeout(520);
+    const glide = await page.evaluate(() => { const g = document.querySelector('#tab-glider').getBoundingClientRect(), a = document.querySelector('.tabs a[aria-current="page"]').getBoundingClientRect(); return Math.abs(g.left - a.left) + Math.abs(g.width - a.width); });
+    check('fade: the tab highlight lands exactly on the current tab', glide < 2, glide);
+    check('fade: the outgoing copy is cleaned up', (await page.locator('.view-ghost').count()) === 0);
+    await ctx.close();
+  }
+
+  /* ---------- logins ---------- */
+  {
+    const { ctx, page, errors } = await newPage(browser, { signedOut: true });
+    await page.goto(base + '#usc');
+    check('login: dashboard is locked when signed out', await page.locator('[data-testid="gate-admin"]').isVisible() && (await page.locator('[data-testid="kpi-first"]').count()) === 0);
+    await page.goto(base + '#clubs');
+    check('login: club tools are locked when signed out', await page.locator('[data-testid="gate-club"]').isVisible() && (await page.locator('[data-testid="club-hero"]').count()) === 0);
+    check('login: student pages need no sign-in', await (async () => { await page.goto(base + '#week'); return page.locator('[data-testid="feed"]').isVisible(); })());
+    await page.click('[data-testid="account"]');
+    await page.fill('#lg-user', 'jordan');
+    await page.fill('#lg-pass', 'wrong');
+    await page.click('[data-testid="login-submit"]');
+    check('login: wrong password is refused', /isn’t right/.test(await page.locator('#lg-err').innerText()));
+    await page.fill('#lg-pass', 'club2026');
+    await page.check('#lg-role-admin');
+    await page.click('[data-testid="login-submit"]');
+    check('login: a president cannot use the admin door', /club president account/.test(await page.locator('#lg-err').innerText()));
+    await page.check('#lg-role-club');
+    await page.click('[data-testid="login-submit"]');
+    await page.waitForSelector('[data-testid="club-hero"]');
+    check('login: president lands on their own club', /Pre-Law Society/.test(await page.locator('[data-testid="club-hero"]').innerText()) && (await page.locator('.club-switch').count()) === 0);
+    await page.goto(base + '#usc');
+    check('login: president cannot see the USC dashboard', await page.locator('[data-testid="gate-admin"]').isVisible());
+    await page.reload();
+    check('login: stays signed in after a refresh', (await page.locator('[data-testid="account"]').innerText()) === 'Jordan');
+    await page.click('[data-testid="account"]');
+    await page.click('[data-testid="signout"]');
+    check('login: sign out locks it again', (await page.locator('[data-testid="account"]').innerText()) === 'Sign in');
+    await page.click('[data-testid="gate-admin"] button');
+    await page.click('[data-testid="login-demo"]');
+    await page.click('[data-testid="login-submit"]');
+    await page.waitForSelector('[data-testid="kpi-first"]');
+    check('login: USC admin sees the dashboard', await page.locator('[data-testid="kpi-first"]').isVisible());
+    await page.goto(base + '#clubs');
+    check('login: USC admin can switch between clubs', await page.locator('.club-switch').isVisible());
+    check('login: no errors', errors.length === 0, errors);
     await ctx.close();
   }
 
@@ -410,6 +481,8 @@ const PHONE_BAR_MAX = 1079;
         if (it.h < (onBar ? 44 : 38) || it.w < 44) problems.push('tab ' + i + ' too small ' + Math.round(it.w) + 'x' + Math.round(it.h));
       });
       const barTop = Math.min(...nav.items.map((it) => it.t));
+      const clash = await page.evaluate(() => { const box = (s) => document.querySelector(s).getBoundingClientRect(), hit = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top, bar = box('.tabs'); return [['brand', box('.brand')], ['actions', box('.top-actions')]].filter(([, r]) => hit(r, bar)).map(([n]) => n); });
+      if (clash.length) problems.push('tab bar overlaps ' + clash.join(' and '));
       if (onBar && barTop < height / 2) problems.push('tab bar should be at the bottom');
       if (!onBar && barTop > 100) problems.push('tab bar should be at the top');
       // Nothing is trapped under the bar: the last control on the page can be reached.
@@ -442,13 +515,13 @@ const PHONE_BAR_MAX = 1079;
     }
   }
 
-  /* ---------- Counts.html is a complete file to send as an attachment ---------- */
+  /* ---------- CoWork.html is a complete file to send as an attachment ---------- */
   for (const [name, engine] of ENGINES) {
     const b = await engine.launch();
     const { ctx, page, errors } = await newPage(b, { firstVisit: true });
     const outside = [];
     page.on('request', (r) => { if (!/^(file|data):/.test(r.url())) outside.push(r.url()); });
-    await page.goto('file://' + path.join(ROOT, 'Counts.html'));
+    await page.goto('file://' + path.join(ROOT, 'CoWork.html'));
     await page.waitForSelector('[data-testid="tour"][open]');
     await page.click('[data-testid="tour-skip"]');
     check('attachment ' + name + ': opens from a file with no network requests', outside.length === 0, outside);

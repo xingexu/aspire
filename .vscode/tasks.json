@@ -2,17 +2,17 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Counts: build",
+      "label": "CoWork: build",
       "type": "shell",
       "command": "node build.js",
-      "options": { "cwd": "${workspaceFolder}/counts" },
+      "options": { "cwd": "${workspaceFolder}/cowork" },
       "problemMatcher": []
     },
     {
-      "label": "Counts: test",
+      "label": "CoWork: test",
       "type": "shell",
       "command": "npm install --no-audit --no-fund && npx playwright install chromium webkit && npm run test:ui",
-      "options": { "cwd": "${workspaceFolder}/counts" },
+      "options": { "cwd": "${workspaceFolder}/cowork" },
       "group": "test",
       "problemMatcher": []
     },
