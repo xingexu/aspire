@@ -24,8 +24,8 @@ computer, and fills it with demo accounts. It leaves any other PostgreSQL alone.
 |---|---|---|---|
 | Home | `#week` | Everyone | Upcoming and past events, with search, sort by club and category |
 | Messages | `#messages` | Signed in | Conversations with the USC and clubs, with unread counts and live delivery |
-| For clubs | `#clubs` | Club presidents | Their posts, approval status and funding requests |
-| USC dashboard | `#usc` | USC staff | Requests to approve, new club presidents and funding totals |
+| For clubs | `#clubs` | Club presidents | Add a post, request funding in four steps, and see the USC's answers |
+| USC dashboard | `#usc` | USC staff | Funding and posts to approve or decline, new club presidents and totals |
 
 ## How it fits together
 
@@ -65,7 +65,7 @@ model (`OPENAI_MODEL`, by default `gpt-4o-mini`), grounded in the real event lis
 account. The key stays on the server, and only the conversation text is sent, never who is asking. Without a key, or if the call
 fails, it answers from the same event list and how-to notes using built-in rules.
 
-"Add a post" for club presidents is a step-by-step form written as a chat, and it includes the funding request. Importing a club's
+"Add a post" for club presidents is a step-by-step form written as a chat. Importing a club's
 posts from Instagram automatically would need its Instagram business login.
 
 ## How to use it

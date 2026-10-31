@@ -77,6 +77,15 @@ async function seed(pool, clubs) {
   return true;
 }
 
+// A sample request, so the USC dashboard has something to review in a demo.
+async function seedFunding(pool) {
+  if ((await pool.query('SELECT 1 FROM funding_requests LIMIT 1')).rows.length) return;
+  const { rows } = await pool.query("SELECT id FROM users WHERE email = 'wfn.demo@uwo.ca'");
+  if (!rows.length) return;
+  const items = [{ what: 'Dinner for competitors', cost: 300 }, { what: 'Prizes', cost: 120 }];
+  await pool.query("INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ('wfn', $1, 'Design & Defend', $2, 420, 60, 'Dinner and prizes for a hands-on design competition, open to students with no experience.', '2026-11-03')", [rows[0].id, JSON.stringify(items)]);
+}
+
 async function open(url, clubs) {
   let pool = new Pool({ connectionString: url, max: 10 });
   try {
@@ -93,6 +102,7 @@ async function open(url, clubs) {
   if (process.env.NODE_ENV !== 'production' && process.env.SEED_DEMO !== '0' && await seed(pool, clubs)) {
     console.log('Added demo accounts (password: ' + DEMO_PASSWORD + '). See README.md.');
   }
+  if (process.env.NODE_ENV !== 'production' && process.env.SEED_DEMO !== '0') await seedFunding(pool);
   return pool;
 }
 

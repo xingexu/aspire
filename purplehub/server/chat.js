@@ -4,7 +4,7 @@
 const STOP = new Set('a an and are at can do does event events for from how i in is it me my of on or show tell the to what when where which who will with you your about any there get'.split(' '));
 const HOWTO = [
   [/sign.?up|register|regist|ticket|attend|rsvp/i, 'Each club handles its own registration. Open the event and press “View on Instagram”, and the club’s post tells you how.'],
-  [/fund|money|budget|grant/i, 'Club presidents ask for funding while adding a post. In For clubs, press “Add a post” and answer the questions. The USC approves the post and the money separately.'],
+  [/fund|money|budget|grant/i, 'Club presidents open For clubs and press “Request funding”. It’s four short steps: the event, a budget, why you need it, then a review. The USC approves or declines it, and you’ll see the answer on the same page.'],
   [/add.*post|post.*event|create.*(post|event)|approval|approve/i, 'Club presidents press “Add a post” in For clubs. The post goes to the USC, and it appears on Home once it’s approved.'],
   [/message|contact|talk to|reach|dm\b/i, 'Open Messages and sign in, then choose the USC or a club under “Start a new chat”. Replies appear right away, with a number on the Messages tab when something is new.'],
   [/account|sign.?in|log.?in|password|create/i, 'Press Sign in, then “Create account”, and use your @uwo.ca email. Pick a new password just for Purple Hub, not your Western one. You don’t need an account to browse events.'],
@@ -12,10 +12,13 @@ const HOWTO = [
 ];
 const line = (e, clubs) => e.title + ' (' + clubs[e.club].short + '): ' + e.date + ', ' + e.place + '.';
 const isLive = (e, now) => !e.past && new Date(e.ends).getTime() >= now;
+const isToday = (e, now) => { const end = new Date(now); end.setHours(23, 59, 59, 999); return isLive(e, now) && !e.weekly && !!e.at && new Date(e.at).getTime() <= end.getTime(); };
 
 function builtin(question, data, now = Date.now()) {
   const q = question.toLowerCase().trim(), { clubs, events } = data;
   const upcoming = events.filter((e) => isLive(e, now)).sort((a, b) => new Date(a.ends) - new Date(b.ends));
+  const today = upcoming.filter((e) => isToday(e, now));
+  if (/\b(today|tonight|right now|happening now)\b/.test(q)) return today.length ? 'Happening today:\n' + today.map((e) => line(e, clubs)).join('\n') : 'Nothing is listed for today. Coming up next:\n' + upcoming.slice(0, 3).map((e) => line(e, clubs)).join('\n');
   const next = upcoming.slice(0, 3).map((e) => line(e, clubs)).join('\n');
   if (/^(hi+|hey+|hello+|yo|sup|hiya|good (morning|afternoon|evening))\b[!. ]*$/.test(q)) return 'Hi! Ask me about events, clubs, funding or messaging. For example: “What’s on this week?” or “When is the CSA AGM?”';
   if (/^(thanks|thank you|thx|ty|ok|okay|cool|great)\b/.test(q)) return 'Anytime! Anything else you’d like to know?';
@@ -52,8 +55,9 @@ function systemPrompt(data, now) {
     '- Home lists events, with a search bar, “Sort by club” and “Category”. Browsing needs no account.\n- Each club handles its own registration: “View on Instagram” opens the post that explains how.\n' +
     '- Accounts: Sign in, then Create account, with an @uwo.ca email and a new password just for Purple Hub. Roles are student, club president (the USC approves them first) and USC staff (invite code).\n' +
     '- Messages: signed-in users start a chat with the USC or a club. A number on the tab shows new messages.\n' +
-    '- Club presidents press “Add a post” in For clubs and can request funding there. The USC approves the post and the funding, and approved posts appear on Home.\n\n' +
-    'Upcoming events:\n' + (up.map(fmt).join('\n') || 'None') + '\n\nPast events:\n' + past.map(fmt).join('\n');
+    '- Club presidents press “Add a post” in For clubs; the USC approves or declines it, and approved posts appear on Home.\n' +
+    '- Funding: club presidents press “Request funding” in For clubs and go through four steps (event, budget, why, review). The USC approves or declines with a note.\n\n' +
+    'Happening today:\n' + (up.filter((e) => isToday(e, now)).map(fmt).join('\n') || 'None') + '\n\nUpcoming events:\n' + (up.filter((e) => !isToday(e, now)).map(fmt).join('\n') || 'None') + '\n\nPast events:\n' + past.map(fmt).join('\n');
 }
 
 async function askGpt(history, data, now) {

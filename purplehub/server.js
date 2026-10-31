@@ -70,8 +70,8 @@ async function membersOf(inbox) {
 }
 
 /* ---------- reading ---------- */
-const postJson = (p) => ({ id: String(p.id), custom: true, club: p.club, title: p.title, date: p.date_text, place: p.place, ends: new Date(p.ends_at).getTime(), at: new Date(p.ends_at).getTime(), post: p.post_url, img: p.img, cat: p.cat, status: p.status,
-  funding: p.funding_status ? { amount: Number(p.funding_amount), purpose: p.funding_purpose, status: p.funding_status } : null });
+const postJson = (p) => ({ id: String(p.id), custom: true, club: p.club, title: p.title, date: p.date_text, place: p.place, ends: new Date(p.ends_at).getTime(), at: new Date(p.ends_at).getTime(), post: p.post_url, img: p.img, cat: p.cat, status: p.status, note: p.note });
+const fundJson = (f) => ({ id: String(f.id), club: f.club, event: f.event, items: f.items, amount: Number(f.amount), attendance: f.attendance, purpose: f.purpose, neededBy: new Date(f.needed_by).toISOString().slice(0, 10), status: f.status, note: f.note });
 async function threadsFor(u) {
   const inboxes = inboxesOf(u);
   const { rows } = await pool.query(`SELECT t.id, t.owner_id, t.inbox, t.updated_at, o.name AS owner_name, COALESCE(r.last_read_id, 0) AS last_read,
@@ -86,13 +86,17 @@ async function threadsFor(u) {
   });
 }
 async function bootstrap(u) {
-  const out = { user: publicUser(u), posts: [], mine: [], requests: [], accounts: [], threads: [] };
+  const out = { user: publicUser(u), posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] };
   out.posts = (await pool.query("SELECT * FROM posts WHERE status = 'approved'")).rows.map(postJson);
   if (!u) return out;
   out.threads = await threadsFor(u);
-  if (u.role === 'club') out.mine = (await pool.query('SELECT * FROM posts WHERE club = $1 ORDER BY id DESC', [u.club])).rows.map(postJson);
+  if (u.role === 'club' && u.approved) {
+    out.mine = (await pool.query('SELECT * FROM posts WHERE club = $1 ORDER BY id DESC', [u.club])).rows.map(postJson);
+    out.funding = (await pool.query('SELECT * FROM funding_requests WHERE club = $1 ORDER BY id DESC', [u.club])).rows.map(fundJson);
+  }
   if (u.role === 'admin' && u.approved) {
     out.requests = (await pool.query('SELECT * FROM posts ORDER BY id DESC')).rows.map(postJson);
+    out.funding = (await pool.query('SELECT * FROM funding_requests ORDER BY id DESC')).rows.map(fundJson);
     out.accounts = (await pool.query("SELECT id, name, email, club FROM users WHERE role = 'club' AND NOT approved ORDER BY id")).rows.map((a) => ({ ...a, id: String(a.id) }));
   }
   return out;
@@ -142,14 +146,8 @@ const api = {
     need(!url || IG_POST.test(url), 400, 'Please check the Instagram link.');
     need(!img || (IMG.test(img) && img.length < 1500000), 400, 'That picture is too large.');
     need(url || img, 400, 'Please add an Instagram link or a picture.');
-    let amount = null, purpose = null, fund = null;
-    if (b.funding) {
-      amount = Number(b.funding.amount);
-      need(Number.isFinite(amount) && amount > 0 && amount <= 100000, 400, 'Please check the funding amount.');
-      purpose = clean(b.funding.purpose, 200, 'what the funding is for'); fund = 'pending';
-    }
-    await pool.query('INSERT INTO posts (club, author_id, title, date_text, place, ends_at, post_url, img, cat, funding_amount, funding_purpose, funding_status) VALUES ($1,$2,$3,$4,$5,to_timestamp($6),$7,$8,$9,$10,$11,$12)',
-      [u.club, u.id, clean(b.title, 80, 'the name'), clean(b.date, 80, 'the time'), clean(b.place, 100, 'the place'), ends / 1000, url, img, b.cat, amount, purpose, fund]);
+    await pool.query('INSERT INTO posts (club, author_id, title, date_text, place, ends_at, post_url, img, cat) VALUES ($1,$2,$3,$4,$5,to_timestamp($6),$7,$8,$9)',
+      [u.club, u.id, clean(b.title, 80, 'the name'), clean(b.date, 80, 'the time'), clean(b.place, 100, 'the place'), ends / 1000, url, img, b.cat]);
     notify([...await membersOf('usc'), ...await membersOf(u.club)]);
     return { ok: true };
   },
@@ -160,19 +158,41 @@ const api = {
     notifyEveryone();
     return { ok: true };
   },
+  async 'POST /api/funding'(b, u) {
+    need(u && u.role === 'club' && u.approved, 403, 'Only confirmed club presidents can request funding.');
+    need(Array.isArray(b.items) && b.items.length && b.items.length <= 20, 400, 'Please add at least one thing to your budget.');
+    const items = b.items.map((x) => {
+      const cost = Number(x && x.cost);
+      need(Number.isFinite(cost) && cost > 0 && cost <= 100000, 400, 'Please check the costs in your budget.');
+      return { what: clean(x.what, 80, 'your budget items'), cost: Math.round(cost * 100) / 100 };
+    });
+    const amount = Math.round(items.reduce((t, x) => t + x.cost, 0) * 100) / 100; // always added up here, never trusted from the page
+    need(amount <= 100000, 400, 'That total is too large.');
+    const attendance = Number(b.attendance);
+    need(Number.isInteger(attendance) && attendance > 0 && attendance <= 100000, 400, 'Please say how many people you expect.');
+    need(/^\d{4}-\d{2}-\d{2}$/.test(b.neededBy || '') && !Number.isNaN(Date.parse(b.neededBy)), 400, 'Please choose when you need it by.');
+    await pool.query('INSERT INTO funding_requests (club, author_id, event, items, amount, attendance, purpose, needed_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+      [u.club, u.id, clean(b.event, 100, 'the event'), JSON.stringify(items), amount, attendance, clean(b.purpose, 500, 'what it’s for'), b.neededBy]);
+    notify([...await membersOf('usc'), ...await membersOf(u.club)]);
+    return { ok: true };
+  },
+  async 'POST /api/funding/:id/decide'(b, u, req, res, id) {
+    need(u && u.role === 'admin' && u.approved, 403, 'USC admins only.');
+    need(['approved', 'declined'].includes(b.status), 400, 'Please choose a decision.');
+    const note = typeof b.note === 'string' ? b.note.trim().slice(0, 300) : '';
+    need(b.status === 'approved' || note, 400, 'Please give a short reason, so the club knows what to change.');
+    const { rows } = await pool.query("UPDATE funding_requests SET status = $2, note = $3 WHERE id = $1 RETURNING club", [id, b.status, note]);
+    need(rows.length, 404, 'That request is gone.');
+    notify([...await membersOf('usc'), ...await membersOf(rows[0].club)]);
+    return { ok: true };
+  },
   async 'POST /api/posts/:id/review'(b, u, req, res, id) {
     need(u && u.role === 'admin' && u.approved, 403, 'USC admins only.');
     need(['approved', 'declined'].includes(b.status), 400, 'Please choose a decision.');
-    const { rowCount } = await pool.query('UPDATE posts SET status = $2 WHERE id = $1', [id, b.status]);
+    const note = typeof b.note === 'string' ? b.note.trim().slice(0, 300) : '';
+    need(b.status === 'approved' || note, 400, 'Please give a short reason, so the club knows what to change.');
+    const { rowCount } = await pool.query('UPDATE posts SET status = $2, note = $3 WHERE id = $1', [id, b.status, note]);
     need(rowCount, 404, 'That post is gone.');
-    notifyEveryone();
-    return { ok: true };
-  },
-  async 'POST /api/posts/:id/funding'(b, u, req, res, id) {
-    need(u && u.role === 'admin' && u.approved, 403, 'USC admins only.');
-    need(['approved', 'declined'].includes(b.status), 400, 'Please choose a decision.');
-    const { rowCount } = await pool.query('UPDATE posts SET funding_status = $2 WHERE id = $1 AND funding_status IS NOT NULL', [id, b.status]);
-    need(rowCount, 404, 'That request is gone.');
     notifyEveryone();
     return { ok: true };
   },

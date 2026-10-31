@@ -58,6 +58,7 @@ p{margin:0}
 .tab-glider{position:absolute;left:0;top:0;border-radius:999px;background:#FFF;box-shadow:0 0 0 1px rgb(20 20 26 / .06),0 2px 8px rgb(20 20 26 / .16);pointer-events:none}
 .tab-glider.ready{transition:transform .42s var(--ease),width .42s var(--ease),height .42s var(--ease)}
 .lab-short{display:none}
+.tab-icon{width:1.125rem;height:1.125rem;flex:none;margin-right:0.375rem}
 /* Once the library has adopted the tabs, it draws the glass and the position. Its layers blend with the page, so the anchor
    must not be a stacking context (that would isolate them and leave the blur nothing to blur); each layer gets the z-index instead. */
 .lg-on .tab-anchor{position:static;width:auto;height:auto}
@@ -74,6 +75,7 @@ p{margin:0}
   html{scroll-padding-top:1rem;scroll-padding-bottom:calc(var(--tab-h) + 1.5rem)}
   .tabs{width:min(100vw - 1rem - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px),40rem);height:var(--tab-h)}
   .tabs a{flex:1 1 0;min-width:0;flex-direction:column;gap:2px;padding:0.25rem 0;min-height:0;font-size:0.6875rem;font-weight:600;border-radius:999px}
+  .tab-icon{margin:0}
   .lab-long{display:none}
   .lab-short{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
   main.wrap{padding-bottom:2.5rem}
@@ -191,10 +193,6 @@ dialog.tour::backdrop{background:transparent}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .lg-creds{display:grid;gap:0.5rem}
 .row.spread{justify-content:space-between}
-.tools{display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end}
-.tool{display:grid;gap:0.25rem;font-size:0.875rem;font-weight:600;min-width:9rem;flex:1 1 9rem}
-.tool.grow{flex:3 1 16rem}
-.tools .text-input{background:rgb(255 255 255 / .78);height:3rem;padding-block:0;font-size:1rem}
 .rows{list-style:none;margin:0;padding:0;display:grid}
 .row-item{display:flex;flex-wrap:wrap;gap:0.75rem 1rem;align-items:center;justify-content:space-between;padding:0.875rem 0;border-top:1px solid var(--line)}
 .row-item:first-child{border-top:0;padding-top:0.25rem}
@@ -222,7 +220,6 @@ dialog.tour::backdrop{background:transparent}
 .msg-app{display:grid;grid-template-columns:minmax(0,20rem) minmax(0,1fr);height:min(70dvh,42rem);min-height:26rem;border-radius:var(--r-card);overflow:hidden;background:rgb(255 255 255 / .72);box-shadow:var(--shadow)}
 .inbox{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
 .new-chat{display:grid;gap:0.25rem;padding:0.875rem;font-size:0.8125rem;font-weight:600;border-bottom:1px solid var(--line)}
-.new-chat .text-input{height:2.75rem;padding-block:0;font-size:0.9375rem}
 .inbox-list{overflow-y:auto;flex:1;min-height:0}
 .inbox-none{padding:1rem}
 .inbox-item{appearance:none;border:0;display:grid;gap:0.25rem;width:100%;text-align:left;padding:0.875rem;background:none;color:inherit;cursor:pointer;border-bottom:1px solid var(--line);min-height:3.75rem;transition:background .24s var(--ease)}
@@ -268,6 +265,81 @@ dialog.tour::backdrop{background:transparent}
 .mode-pick button{appearance:none;border:0;background:none;color:var(--ink);font-weight:650;min-height:2.5rem;border-radius:999px;cursor:pointer;transition:background .24s var(--ease)}
 .mode-pick button[aria-pressed="true"]{background:#FFF;box-shadow:0 1px 4px rgb(20 20 26 / .16)}
 #lg-up[hidden],#lg-club-wrap[hidden],#lg-invite-wrap[hidden]{display:none}
+.tools{position:relative;z-index:6;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;padding:0.875rem;border-radius:1.5rem;background:var(--card);box-shadow:var(--shadow)}
+.tool{display:grid;gap:0.25rem;font-size:0.8125rem;font-weight:650;min-width:9rem;flex:1 1 9rem}
+.tool.grow{flex:3 1 16rem}
+.tools .text-input,.dd-btn{height:3rem;padding-block:0;font-size:1rem;background:rgb(255 255 255 / .86)}
+/* the dropdown */
+.dd{position:relative;min-width:0}
+.dd-btn{appearance:none;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;width:100%;padding-inline:0.875rem;border:1.5px solid var(--line);border-radius:0.75rem;color:var(--ink);font-weight:600;text-align:left;cursor:pointer;transition:border-color .24s var(--ease),box-shadow .24s var(--ease)}
+.dd-btn:hover,.dd-btn[aria-expanded="true"]{border-color:var(--accent);box-shadow:0 0 0 3px rgb(79 38 131 / .12)}
+.dd-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-chev{flex:none;width:0.5rem;height:0.5rem;margin:-0.1875rem 0.1875rem 0 0;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .24s var(--ease)}
+.dd-btn[aria-expanded="true"] .dd-chev{transform:translateY(0.25rem) rotate(225deg)}
+.dd-menu{position:absolute;z-index:30;top:calc(100% + 0.375rem);left:0;min-width:100%;max-height:16rem;overflow-y:auto;margin:0;padding:0.375rem;list-style:none;border-radius:1rem;background:rgb(255 255 255 / .97);box-shadow:0 0 0 1px rgb(20 20 26 / .06),0 18px 44px rgb(20 20 26 / .22);animation:ddin .2s var(--ease) both;transform-origin:top}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.dd-menu [role="option"]{padding:0.625rem 0.75rem;min-height:2.75rem;display:flex;align-items:center;border-radius:0.625rem;font-weight:550;cursor:pointer;white-space:nowrap;transition:background .16s ease,color .16s ease}
+.dd-menu [role="option"]:hover,.dd-menu [role="option"]:focus{background:var(--accent-soft);color:var(--accent);outline:0}
+.dd-menu [aria-selected="true"]{font-weight:750}
+.new-chat .dd-btn{height:2.75rem;font-size:0.9375rem}
+/* happening today */
+.today-sec{display:grid;gap:1rem}
+.sec-title{font-size:clamp(1.75rem,3.4vw,2.75rem);margin:0}
+.up-sec{display:grid;gap:1rem}
+.today-list{display:grid;gap:1rem}
+.today-card{display:grid;grid-template-columns:minmax(0,21rem) minmax(0,1fr);flex-direction:initial;box-shadow:0 0 0 2px var(--accent),0 18px 44px rgb(79 38 131 / .2);background:rgb(255 255 255 / .82)}
+.today-card .poster-shot{height:100%;aspect-ratio:4/5}
+.today-body{display:grid;gap:0.625rem;align-content:center;padding:clamp(1.25rem,3vw,2.5rem);min-width:0}
+.today-badge{justify-self:start;display:inline-flex;align-items:center;gap:0.5rem;padding:0.375rem 0.75rem;border-radius:999px;background:var(--accent);color:#FFF;font-size:0.8125rem;font-weight:700}
+.live-dot{width:0.5rem;height:0.5rem;border-radius:50%;background:#FFF;animation:livepulse 1.6s ease-out infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgb(255 255 255 / .8)}100%{box-shadow:0 0 0 0.5rem rgb(255 255 255 / 0)}}
+.today-title{font:800 clamp(1.75rem,3.6vw,3rem)/1.05 var(--font-display);letter-spacing:-.025em;margin:0;overflow-wrap:anywhere}
+@media (max-width:760px){.today-card{grid-template-columns:minmax(0,1fr)}.today-card .poster-shot{height:auto}}
+/* funding */
+.fund.sheet{width:min(34rem,calc(100vw - 2rem))}
+.stepper{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0.375rem}
+.stepper li{display:flex;align-items:center;gap:0.375rem;padding-top:0.5rem;border-top:3px solid var(--line);font-size:0.8125rem;font-weight:600;color:var(--muted);transition:border-color .3s var(--ease),color .3s var(--ease);min-width:0}
+.step-n{flex:none;display:inline-grid;place-items:center;width:1.375rem;height:1.375rem;border-radius:50%;background:var(--tint);font-size:0.75rem}
+.stepper li.now{border-color:var(--accent);color:var(--ink);font-weight:700}
+.stepper li.now .step-n{background:var(--accent);color:#FFF}
+.stepper li.done{border-color:var(--accent)}
+@media (max-width:420px){.stepper li{flex-direction:column;align-items:flex-start;font-size:0.75rem}}
+.fund-body{display:grid;gap:0.75rem;min-height:12rem;align-content:start}
+.fund-body .lg-creds[hidden]{display:none}
+.fund-q{font:700 1.25rem/1.25 var(--font-display)}
+textarea.text-input{resize:vertical;font:inherit}
+.budget-rows{display:grid;gap:0.5rem}
+.budget-row{display:grid;grid-template-columns:minmax(0,1fr) 7rem auto;gap:0.5rem;align-items:center}
+.money-input{position:relative}
+.money-input span{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:600}
+.money-input input{padding-left:1.5rem}
+.fund-total{font-size:1rem}
+.fund-total b{font:800 1.5rem/1 var(--font-display);margin-left:0.375rem}
+.fund-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.75rem}
+.review-list{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0.375rem 1rem;margin:0}
+.review-list dt{font-weight:650;color:var(--muted);font-size:0.875rem}
+.review-list dd{margin:0;overflow-wrap:anywhere}
+.budget-table{width:100%;border-collapse:collapse;font-size:0.9375rem}
+.budget-table td{padding:0.375rem 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+.budget-table .num{text-align:right;white-space:nowrap;padding-left:1rem}
+.budget-table tfoot td{font-weight:800;border-top:2px solid var(--fill)}
+.decision-note{font-size:0.875rem;margin-top:0.25rem;padding:0.375rem 0.625rem;border-radius:0.625rem;background:var(--tint);overflow-wrap:anywhere}
+/* USC decisions */
+.review-sec{display:grid;gap:0.875rem}
+.review-empty{color:var(--ink-2)}
+.review-card{display:flex;gap:1rem;align-items:flex-start;padding:1.25rem;border-radius:var(--r-card);background:rgb(255 255 255 / .8);box-shadow:var(--shadow)}
+.review-card .grow{display:grid;gap:0.625rem}
+.review-kicker{font-size:0.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.review-title{font:750 1.375rem/1.15 var(--font-display);letter-spacing:-.015em;margin:0.125rem 0 0;overflow-wrap:anywhere}
+.review-amount{font:800 2rem/1 var(--font-display);letter-spacing:-.02em}
+.note-field{display:grid;gap:0.25rem;font-size:0.8125rem;font-weight:600}
+.decide{display:flex;flex-wrap:wrap;gap:0.5rem}
+.decide .btn{flex:1 1 9rem}
+.btn.yes{background:#1F6B47;color:#FFF;box-shadow:0 6px 16px rgb(23 100 63 / .24)}
+.btn.no{background:rgb(255 255 255 / .6);color:var(--bad);box-shadow:inset 0 0 0 1.5px var(--bad)}
+@media (hover:hover){.btn.yes:not([disabled]):hover{color:#FFF;background:#17563A;box-shadow:0 8px 20px rgb(23 100 63 / .32)}.btn.no:not([disabled]):hover{color:#FFF;background:var(--bad);box-shadow:none}}
+.decided .review-card{margin-top:0.75rem;background:rgb(255 255 255 / .5)}
+summary{cursor:pointer}
 .demo-note{background:var(--tint);border-radius:0.75rem;padding:0.75rem;font-size:0.875rem;display:grid;gap:0.375rem;justify-items:start}
 .gate{max-width:36rem}
 dialog.sheet,dialog.tour{opacity:0;transition:opacity .3s ease,transform .36s var(--ease),overlay .3s allow-discrete,display .3s allow-discrete}
@@ -323,8 +395,8 @@ dialog.sheet[open]::backdrop{opacity:1}
 <div class="tab-anchor" id="tab-anchor">
     <nav class="tabs" aria-label="Sections">
       <span class="tab-glider" id="tab-glider" aria-hidden="true"></span>
-      <a href="#week" aria-label="Home"><span class="lab-long">Home</span><span class="lab-short">Home</span></a>
-      <a href="#messages" aria-label="Messages"><span class="lab-long">Messages</span><span class="lab-short">Messages</span><span class="unread tab-badge" id="msg-badge" data-testid="msg-badge" hidden></span></a>
+      <a href="#week" aria-label="Home"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4.5l8 6.7V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span class="lab-long">Home</span><span class="lab-short">Home</span></a>
+      <a href="#messages" aria-label="Messages"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4.5 3.5V17H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg><span class="lab-long">Messages</span><span class="lab-short">Messages</span><span class="unread tab-badge" id="msg-badge" data-testid="msg-badge" hidden></span></a>
       <a href="#clubs" aria-label="For clubs"><span class="lab-long">For clubs</span><span class="lab-short">Clubs</span></a>
       <a href="#usc" aria-label="USC dashboard"><span class="lab-long">USC dashboard</span><span class="lab-short">USC</span></a>
     </nav>
@@ -362,7 +434,7 @@ dialog.sheet[open]::backdrop{opacity:1}
         <label class="radio"><input type="radio" name="lg-role" value="club" id="lg-role-club"><span>Club president</span></label>
         <label class="radio"><input type="radio" name="lg-role" value="admin" id="lg-role-admin"><span>USC staff</span></label>
       </div></fieldset>
-      <div id="lg-club-wrap" class="lg-creds"><label class="field" for="lg-club">Your club</label><select id="lg-club" class="text-input"></select></div>
+      <div id="lg-club-wrap" class="lg-creds"><span class="field">Your club</span><div id="lg-club-slot"></div></div>
       <div id="lg-invite-wrap" class="lg-creds"><label class="field" for="lg-invite">USC invite code</label><input id="lg-invite" class="text-input" autocomplete="off"></div>
     </div>
     <div class="lg-creds">
@@ -376,6 +448,16 @@ dialog.sheet[open]::backdrop{opacity:1}
     <div class="row end"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn" type="submit" data-testid="login-submit">Sign in</button></div>
   </form>
   <div id="lg-who" class="sheet-body" hidden></div>
+</dialog>
+
+<dialog id="dlg-fund" class="sheet fund" aria-labelledby="fund-title" data-testid="fund">
+  <form id="fund-form" class="sheet-body" novalidate>
+    <div class="row spread"><h2 id="fund-title" class="h3">Request funding</h2><button class="btn ghost small" type="button" data-close>Close</button></div>
+    <ol class="stepper" id="fund-steps" aria-label="Steps"></ol>
+    <div id="fund-body" class="fund-body"></div>
+    <p class="err" id="fund-err" role="alert"></p>
+    <div class="row spread" id="fund-nav"><button class="btn ghost" type="button" data-act="fund-back" data-testid="fund-back">Back</button><button class="btn" type="submit" data-testid="fund-next">Next</button></div>
+  </form>
 </dialog>
 
 <dialog id="dlg-chat" class="sheet chat" aria-labelledby="chat-title" data-testid="chat">
@@ -448,13 +530,13 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (!r.ok) throw new Error(j.error || 'Something went wrong. Please try again.');
     return j;
   }
-  let D = { user: null, posts: [], mine: [], requests: [], accounts: [], threads: [] };
+  let D = { user: null, posts: [], mine: [], requests: [], funding: [], accounts: [], threads: [] };
   const UI = { q: '', club: 'All', cat: 'All', thread: null, draftInbox: null };
   const unreadTotal = () => D.threads.reduce((t, x) => t + x.unread, 0);
   // Reloads everything this person may see. New messages arrive here too, pushed by the stream below.
   async function refresh(announce) {
     if (OFFLINE) return;
-    const before = new Map(D.threads.map((t) => [t.id, t.unread])), hadUser = D.user && D.user.id;
+    const before = new Map(D.threads.map((t) => [t.id, t.unread])), hadUser = D.user && D.user.id, wasFund = new Map(D.funding.map((f) => [f.id, f.status]));
     D = await api('/api/data');
     EVENTS = [...STATIC_EVENTS, ...D.posts];
     if (D.user && hadUser !== D.user.id) openStream();
@@ -462,8 +544,9 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (announce) {
       const fresh = D.threads.find((t) => t.unread > (before.get(t.id) || 0) && !(current() === 'messages' && UI.thread === t.id));
       if (fresh) toast('New message from ' + fresh.title);
+      if (isClub()) { const f = D.funding.find((x) => wasFund.get(x.id) === 'pending' && x.status !== 'pending'); if (f) toast('The USC ' + (f.status === 'approved' ? 'approved' : 'declined') + ' your funding request for ' + f.event + '.'); }
     }
-    if (current() === 'week') { renderLists(); renderAccount(); } else render();
+    if (current() === 'week' && $('#feed')) { renderLists(); renderAccount(); } else render();
     markOpenThreadRead();
   }
   let stream = null;
@@ -486,7 +569,48 @@ dialog.sheet[open]::backdrop{opacity:1}
       '<div class="row"><button class="btn" type="button" data-act="login" data-v="in">Sign in</button><button class="btn ghost" type="button" data-act="login" data-v="up">Create account</button></div></section>';
   }
 
-  /* ---------- home: upcoming and past events ---------- */
+  /* ---------- our own dropdown, so it looks the same everywhere instead of using the browser's ---------- */
+  const ddChange = {};
+  function ddHTML(id, label, opts, value) {
+    const cur = opts.find((o) => o[0] === value) || opts[0];
+    return '<div class="dd" id="' + id + '" data-value="' + esc(cur[0]) + '"><button type="button" class="dd-btn" data-act="dd" aria-haspopup="listbox" aria-expanded="false" aria-label="' + esc(label) + '" data-testid="' + id + '"><span class="dd-label">' + esc(cur[1]) + '</span><span class="dd-chev" aria-hidden="true"></span></button>' +
+      '<ul class="dd-menu" role="listbox" aria-label="' + esc(label) + '" hidden>' + opts.map((o) => '<li role="option" tabindex="-1" data-act="dd-opt" data-v="' + esc(o[0]) + '" aria-selected="' + (o[0] === cur[0]) + '" data-testid="' + id + '-opt-' + esc(o[0]) + '">' + esc(o[1]) + '</li>').join('') + '</ul></div>';
+  }
+  function ddClose(dd, refocus) {
+    dd.querySelector('.dd-menu').hidden = true;
+    dd.querySelector('.dd-btn').setAttribute('aria-expanded', 'false');
+    if (refocus) dd.querySelector('.dd-btn').focus();
+  }
+  const ddCloseAll = (except) => document.querySelectorAll('.dd').forEach((d) => { if (d !== except) ddClose(d); });
+  function ddOpen(dd) {
+    ddCloseAll(dd);
+    const menu = dd.querySelector('.dd-menu');
+    menu.hidden = false;
+    dd.querySelector('.dd-btn').setAttribute('aria-expanded', 'true');
+    (menu.querySelector('[aria-selected="true"]') || menu.firstElementChild).focus();
+  }
+  function ddPick(li) {
+    const dd = li.closest('.dd');
+    dd.dataset.value = li.dataset.v;
+    dd.querySelector('.dd-label').textContent = li.textContent;
+    dd.querySelectorAll('[role="option"]').forEach((o) => o.setAttribute('aria-selected', o === li));
+    ddClose(dd, true);
+    if (ddChange[dd.id]) ddChange[dd.id](li.dataset.v);
+  }
+  document.addEventListener('keydown', (e) => {
+    const dd = e.target.closest && e.target.closest('.dd');
+    if (!dd) return;
+    const menu = dd.querySelector('.dd-menu'), open = !menu.hidden;
+    if (!open) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); ddOpen(dd); } return; }
+    const items = [...menu.children], at = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); (items[at + 1] || items[0]).focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); (items[at - 1] || items[items.length - 1]).focus(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (items[at]) ddPick(items[at]); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); ddClose(dd, true); }
+    else if (e.key === 'Tab') ddClose(dd);
+  });
+
+  /* ---------- home: happening today, upcoming and past events ---------- */
   function mediaHTML(e, c) {
     const alt = 'Picture of ' + esc(c.short) + '’s post for ' + esc(e.title) + '.';
     if (shot(e)) {
@@ -507,8 +631,18 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (UI.cat !== 'All' && e.cat !== UI.cat) return false;
     return !q || [e.title, c.name, c.short, e.place, e.date, e.cat, e.hosts || ''].join(' ').toLowerCase().includes(q);
   }
+  // Weekly series stay in Upcoming: they run on and off, and this list only shows what's certain to be on today.
+  function isToday(e) { const end = new Date(); end.setHours(23, 59, 59, 999); return live(e) && !e.weekly && e.at <= end.getTime(); }
+  function todayHTML(e) {
+    const c = CLUBS[e.club];
+    return '<article class="poster today-card" data-testid="event-' + e.id + '">' + mediaHTML(e, c) +
+      '<div class="today-body"><p class="today-badge"><span class="live-dot" aria-hidden="true"></span>On today</p><p class="club-line">' + esc(c.name) + '</p><h3 class="today-title">' + esc(e.title) + '</h3><p class="when">' + esc(e.date) + '</p><p class="place">' + esc(e.place) + '</p><div class="actions">' + postLink(e) + '</div></div></article>';
+  }
   function renderLists() {
-    const up = EVENTS.filter(live).filter(matches).sort((a, b) => a.ends - b.ends);
+    const today = EVENTS.filter(isToday).filter(matches);
+    $('#today-sec').hidden = !today.length;
+    $('#today').innerHTML = today.map(todayHTML).join('');
+    const up = EVENTS.filter(live).filter((e) => !isToday(e)).filter(matches).sort((a, b) => a.ends - b.ends);
     const past = EVENTS.filter((e) => !live(e)).filter(matches).sort((a, b) => b.at - a.at);
     $('#feed').innerHTML = up.map(posterHTML).join('') || '<p class="empty">No upcoming events match that.</p>';
     $('#past-grid').innerHTML = past.map((e) => {
@@ -518,26 +652,31 @@ dialog.sheet[open]::backdrop{opacity:1}
     }).join('') || '<p class="empty">No past events match that.</p>';
   }
   function renderWeek() {
-    const opt = (value, label, on) => '<option value="' + esc(value) + '"' + (on ? ' selected' : '') + '>' + esc(label) + '</option>';
     $('#view-week').innerHTML =
-      '<header class="view-head"><h1 class="h1">Upcoming events</h1></header>' +
       '<div class="tools" id="event-tools" data-testid="tools">' +
         '<label class="tool grow"><span>Search</span><input id="ev-search" class="text-input" type="search" placeholder="Search events" value="' + esc(UI.q) + '" data-testid="search"></label>' +
-        '<label class="tool"><span>Sort by club</span><select id="ev-club" class="text-input" data-testid="sort-club">' + opt('All', 'All clubs', UI.club === 'All') + Object.values(CLUBS).map((c) => opt(c.id, c.short, UI.club === c.id)).join('') + '</select></label>' +
-        '<label class="tool"><span>Category</span><select id="ev-cat" class="text-input" data-testid="sort-cat">' + opt('All', 'All categories', UI.cat === 'All') + CATEGORIES.map((c) => opt(c, c, UI.cat === c)).join('') + '</select></label>' +
+        '<div class="tool"><span>Sort by club</span>' + ddHTML('sort-club', 'Sort by club', [['All', 'All clubs'], ...Object.values(CLUBS).map((c) => [c.id, c.short])], UI.club) + '</div>' +
+        '<div class="tool"><span>Category</span>' + ddHTML('sort-cat', 'Category', [['All', 'All categories'], ...CATEGORIES.map((c) => [c, c])], UI.cat) + '</div>' +
       '</div>' +
-      '<div class="feed" id="feed" data-testid="feed"></div>' +
+      '<section class="today-sec" id="today-sec" data-testid="today" hidden><h2 class="h1 sec-title">Happening today</h2><div class="today-list" id="today"></div></section>' +
+      '<section class="up-sec"><h2 class="h1 sec-title">Upcoming events</h2><div class="feed" id="feed" data-testid="feed"></div></section>' +
       '<section class="past" data-testid="recent"><h2 class="h2">Past events</h2><div class="past-grid" id="past-grid"></div></section>';
     renderLists();
   }
+
+  const pickFilter = () => { renderLists(); fade($('#feed')); rise(document.querySelectorAll('#feed .poster')); };
+  ddChange['sort-club'] = (v) => { UI.club = v; pickFilter(); };
+  ddChange['sort-cat'] = (v) => { UI.cat = v; pickFilter(); };
 
   /* ---------- club presidents: their posts and funding requests ---------- */
   const STATUS = { pending: 'Waiting for USC approval', approved: 'Approved', declined: 'Declined' };
   const FUNDING = { pending: 'waiting for the USC', approved: 'approved', declined: 'declined' };
   const pill = (status, text) => '<span class="pill ' + status + '">' + esc(text) + '</span>';
-  function fundingLine(p) {
-    return p.funding ? '<p class="small">Funding: <b>' + money(p.funding.amount) + '</b> for ' + esc(p.funding.purpose) + ' (' + FUNDING[p.funding.status] + ')</p>' : '';
+  const noteLine = (x) => (x.note ? '<p class="decision-note">USC: ' + esc(x.note) + '</p>' : '');
+  function budgetHTML(f) {
+    return '<table class="budget-table"><tbody>' + f.items.map((x) => '<tr><td>' + esc(x.what) + '</td><td class="num">' + money(x.cost) + '</td></tr>').join('') + '</tbody><tfoot><tr><td>Total</td><td class="num">' + money(f.amount) + '</td></tr></tfoot></table>';
   }
+  const FUND_STATUS = { pending: 'Waiting for USC', approved: 'Approved', declined: 'Declined' };
   function renderClubs() {
     const u = me();
     if (!u || u.role !== 'club') { $('#view-clubs').innerHTML = gateHTML('club', 'For clubs'); return; }
@@ -550,33 +689,42 @@ dialog.sheet[open]::backdrop{opacity:1}
     $('#view-clubs').innerHTML =
       '<header class="view-head"><h1 class="h1">' + esc(c.name) + '</h1><p class="small">Signed in as ' + esc(u.email) + '</p></header>' +
       '<section class="panel"><div class="row spread"><h2 class="h3">Your posts</h2><button class="btn small" type="button" data-act="chat" data-testid="chat-open">Add a post</button></div>' +
-        (D.mine.length ? '<ul class="rows">' + D.mine.map((p) => '<li class="row-item" data-testid="mine-' + p.id + '"><div><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + '</p>' + fundingLine(p) + '</div><div class="row">' + pill(p.status, STATUS[p.status]) + '<button class="btn ghost small" type="button" data-act="remove-post" data-id="' + p.id + '" data-testid="remove-' + p.id + '">Remove</button></div></li>').join('') + '</ul>'
+        (D.mine.length ? '<ul class="rows">' + D.mine.map((p) => '<li class="row-item" data-testid="mine-' + p.id + '"><div><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + '</p>' + noteLine(p) + '</div><div class="row">' + pill(p.status, STATUS[p.status]) + '<button class="btn ghost small" type="button" data-act="remove-post" data-id="' + p.id + '" data-testid="remove-' + p.id + '">Remove</button></div></li>').join('') + '</ul>'
           : '<p class="muted">Nothing yet. Add a post, and the USC will review it before it appears on Home.</p>') + '</section>' +
+      '<section class="panel"><div class="row spread"><h2 class="h3">Funding from the USC</h2><button class="btn small" type="button" data-act="fund-start" data-testid="fund-start">Request funding</button></div>' +
+        (D.funding.length ? '<ul class="rows">' + D.funding.map((f) => '<li class="row-item" data-testid="myfund-' + f.id + '"><div class="grow"><p class="ev-title">' + esc(f.event) + ' · ' + money(f.amount) + '</p><p class="small muted">Needed by ' + esc(f.neededBy) + '</p>' + noteLine(f) + '</div>' + pill(f.status, FUND_STATUS[f.status]) + '</li>').join('') + '</ul>'
+          : '<p class="muted">Need money for an event? It takes four short steps, and the USC replies here.</p>') + '</section>' +
       (listed.length ? '<section class="panel"><h2 class="h3">Already on Home</h2><ul class="rows">' + listed.map((e) => '<li class="row-item"><div><p class="ev-title">' + esc(e.title) + '</p><p class="small muted">' + esc(e.date) + ' · ' + esc(e.place) + '</p></div>' + postLink(e) + '</li>').join('') + '</ul></section>' : '');
   }
 
   /* ---------- USC: approvals, funding and new club presidents ---------- */
-  function requestHTML(p) {
-    const c = CLUBS[p.club], fund = p.funding;
-    return '<li class="row-item request" data-testid="request-' + p.id + '">' + (p.img ? '<img class="req-shot" src="' + p.img + '" alt="">' : '') +
-      '<div class="grow"><p class="small muted">' + esc(c.short) + '</p><p class="ev-title">' + esc(p.title) + '</p><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + ' · ' + esc(p.cat) + '</p>' + fundingLine(p) + postLink(p) + '</div>' +
-      '<div class="row">' +
-        (p.status === 'pending' ? '<button class="btn small" type="button" data-act="review" data-v="approved" data-id="' + p.id + '" data-testid="approve-' + p.id + '">Approve post</button><button class="btn ghost small" type="button" data-act="review" data-v="declined" data-id="' + p.id + '" data-testid="decline-' + p.id + '">Decline post</button>' : pill(p.status, STATUS[p.status])) +
-        (fund && fund.status === 'pending' ? '<button class="btn small" type="button" data-act="fund" data-v="approved" data-id="' + p.id + '" data-testid="fund-yes-' + p.id + '">Approve ' + money(fund.amount) + '</button><button class="btn ghost small" type="button" data-act="fund" data-v="declined" data-id="' + p.id + '" data-testid="fund-no-' + p.id + '">Decline funding</button>' : '') +
-      '</div></li>';
+  const decideButtons = (kind, id, yes) => '<label class="note-field"><span>Note to the club (needed if you decline)</span><input class="text-input" id="note-' + kind + '-' + id + '" maxlength="300" autocomplete="off" data-testid="note-' + kind + '-' + id + '"></label><div class="decide"><button class="btn yes" type="button" data-act="decide" data-kind="' + kind + '" data-v="approved" data-id="' + id + '" data-testid="approve-' + kind + '-' + id + '">' + yes + '</button><button class="btn no" type="button" data-act="decide" data-kind="' + kind + '" data-v="declined" data-id="' + id + '" data-testid="decline-' + kind + '-' + id + '">Decline</button></div>';
+  function postCard(p) {
+    return '<article class="review-card" data-testid="request-' + p.id + '">' + (p.img ? '<img class="req-shot" src="' + p.img + '" alt="">' : '') + '<div class="grow"><p class="review-kicker">' + esc(CLUBS[p.club].short) + ' · new post</p><h3 class="review-title">' + esc(p.title) + '</h3><p class="small muted">' + esc(p.date) + ' · ' + esc(p.place) + ' · ' + esc(p.cat) + '</p>' + postLink(p) +
+      (p.status === 'pending' ? decideButtons('post', p.id, 'Approve post') : '<div class="row">' + pill(p.status, STATUS[p.status]) + '</div>' + noteLine(p)) + '</div></article>';
+  }
+  function fundCard(f) {
+    const each = f.amount / f.attendance;
+    return '<article class="review-card fund-card" data-testid="funding-' + f.id + '"><div class="grow"><div class="row spread"><div><p class="review-kicker">' + esc(CLUBS[f.club].short) + ' · funding</p><h3 class="review-title">' + esc(f.event) + '</h3></div><p class="review-amount">' + money(f.amount) + '</p></div>' +
+      '<p>' + esc(f.purpose) + '</p>' + budgetHTML(f) + '<p class="small muted">' + f.attendance + ' people expected, about ' + money(Math.round(each * 100) / 100) + ' each · needed by ' + esc(f.neededBy) + '</p>' +
+      (f.status === 'pending' ? decideButtons('funding', f.id, 'Approve ' + money(f.amount)) : '<div class="row">' + pill(f.status, FUND_STATUS[f.status]) + '</div>' + noteLine(f)) + '</div></article>';
   }
   function renderUSC() {
     if (!isAdmin()) { $('#view-usc').innerHTML = gateHTML('admin', 'USC dashboard'); return; }
-    const open = D.requests.filter((p) => p.status === 'pending' || (p.funding && p.funding.status === 'pending'));
-    const done = D.requests.filter((p) => !open.includes(p));
-    const sum = (st) => D.requests.reduce((t, p) => t + (p.funding && p.funding.status === st ? p.funding.amount : 0), 0);
+    const openPosts = D.requests.filter((p) => p.status === 'pending'), openFund = D.funding.filter((f) => f.status === 'pending');
+    const donePosts = D.requests.filter((p) => p.status !== 'pending'), doneFund = D.funding.filter((f) => f.status !== 'pending');
+    const sum = (st) => D.funding.reduce((t, f) => t + (f.status === st ? f.amount : 0), 0);
     const tile = (label, value, id) => '<article class="kpi" data-testid="' + id + '"><p class="label">' + label + '</p><p class="value">' + value + '</p></article>';
+    const notes = {};
+    document.querySelectorAll('#view-usc .note-field input').forEach((i) => { notes[i.id] = i.value; });
     $('#view-usc').innerHTML =
       '<header class="view-head"><h1 class="h1">USC dashboard</h1></header>' +
-      '<div class="kpis">' + tile('Waiting for a decision', open.length + D.accounts.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
-      (D.accounts.length ? '<section class="panel"><h2 class="h3">New club presidents</h2><ul class="rows">' + D.accounts.map((a) => '<li class="row-item" data-testid="account-' + a.id + '"><div><p class="ev-title">' + esc(a.name) + '</p><p class="small muted">' + esc(a.email) + ' · says they run ' + esc(CLUBS[a.club] ? CLUBS[a.club].name : a.club) + '</p></div><div class="row"><button class="btn small" type="button" data-act="account-yes" data-id="' + a.id + '" data-testid="account-yes-' + a.id + '">Confirm</button><button class="btn ghost small" type="button" data-act="account-no" data-id="' + a.id + '">Decline</button></div></li>').join('') + '</ul></section>' : '') +
-      '<section class="panel"><h2 class="h3">Requests</h2>' + (open.length ? '<ul class="rows">' + open.map(requestHTML).join('') + '</ul>' : '<p class="muted">Nothing is waiting. New requests from club presidents appear here.</p>') + '</section>' +
-      (done.length ? '<section class="panel"><h2 class="h3">Decided</h2><ul class="rows">' + done.map(requestHTML).join('') + '</ul></section>' : '');
+      '<div class="kpis">' + tile('Waiting for a decision', openPosts.length + openFund.length + D.accounts.length, 'kpi-open') + tile('Funding requested', money(sum('pending')), 'kpi-asked') + tile('Funding approved', money(sum('approved')), 'kpi-given') + '</div>' +
+      (D.accounts.length ? '<section class="panel"><h2 class="h3">New club presidents</h2><ul class="rows">' + D.accounts.map((a) => '<li class="row-item" data-testid="account-' + a.id + '"><div><p class="ev-title">' + esc(a.name) + '</p><p class="small muted">' + esc(a.email) + ' · says they run ' + esc(CLUBS[a.club] ? CLUBS[a.club].name : a.club) + '</p></div><div class="decide"><button class="btn yes small" type="button" data-act="account-yes" data-id="' + a.id + '" data-testid="account-yes-' + a.id + '">Confirm</button><button class="btn no small" type="button" data-act="account-no" data-id="' + a.id + '">Decline</button></div></li>').join('') + '</ul></section>' : '') +
+      '<section class="review-sec"><h2 class="h2">Funding requests</h2>' + (openFund.map(fundCard).join('') || '<p class="review-empty">No funding requests waiting.</p>') + '</section>' +
+      '<section class="review-sec"><h2 class="h2">Posts to review</h2>' + (openPosts.map(postCard).join('') || '<p class="review-empty">No posts waiting.</p>') + '</section>' +
+      (donePosts.length + doneFund.length ? '<details class="panel decided"><summary class="h3">Decided</summary>' + doneFund.map(fundCard).join('') + donePosts.map(postCard).join('') + '</details>' : '');
+    Object.entries(notes).forEach(([k, v]) => { const i = document.getElementById(k); if (i) i.value = v; });
   }
 
   /* ---------- messages: each person talks to an inbox (the USC or a club), and that inbox's staff can answer ---------- */
@@ -613,7 +761,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     }
     box.innerHTML = '<header class="view-head"><h1 class="h1">Messages</h1></header>' +
       '<div class="msg-app' + (showing ? ' reading' : '') + '">' +
-        '<aside class="inbox"><label class="new-chat"><span>Start a new chat</span><select id="new-chat" class="text-input" data-testid="new-chat"><option value="">Choose who to message</option>' + options.map((x) => '<option value="' + x + '">' + esc(inboxFull(x)) + '</option>').join('') + '</select></label>' +
+        '<aside class="inbox"><div class="new-chat"><span>Start a new chat</span>' + ddHTML('new-chat', 'Start a new chat', [['', 'Choose who to message'], ...options.map((x) => [x, inboxFull(x)])], '') + '</div>' +
           '<div class="inbox-list" data-testid="inbox-list">' + (list || '<p class="muted inbox-none">No chats yet.</p>') + '</div></aside>' +
         '<section class="thread" aria-label="Conversation">' + pane + '</section>' +
       '</div>';
@@ -740,13 +888,13 @@ dialog.sheet[open]::backdrop{opacity:1}
     $('#lg-form').hidden = true; who.hidden = false;
     openDialog($('#dlg-login'));
   }
-  $('#lg-club').innerHTML = Object.values(CLUBS).map((c) => '<option value="' + c.id + '">' + esc(c.name) + '</option>').join('');
+  $('#lg-club-slot').innerHTML = ddHTML('lg-club', 'Your club', Object.values(CLUBS).map((c) => [c.id, c.name]), 'pbsn');
   $('#lg-form').addEventListener('change', (e) => { if (e.target.name === 'lg-role') setLoginRole(e.target.value); });
   $('#lg-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const up = loginMode === 'up', submit = $('[data-testid="login-submit"]');
     const body = { email: $('#lg-email').value, password: $('#lg-pass').value };
-    if (up) Object.assign(body, { name: $('#lg-name').value, role: $('input[name="lg-role"]:checked').value, club: $('#lg-club').value, invite: $('#lg-invite').value });
+    if (up) Object.assign(body, { name: $('#lg-name').value, role: $('input[name="lg-role"]:checked').value, club: $('#lg-club').dataset.value, invite: $('#lg-invite').value });
     submit.disabled = true;
     try {
       await api(up ? '/api/signup' : '/api/login', body);
@@ -761,6 +909,88 @@ dialog.sheet[open]::backdrop{opacity:1}
       if (!up) $('#lg-pass').value = '';
       $('#lg-err').textContent = err.message;
     } finally { submit.disabled = false; }
+  });
+
+  /* ---------- request funding: four short steps ---------- */
+  const FUND = { step: 0, d: null };
+  const FUND_STEPS = ['Event', 'Budget', 'Why', 'Review'];
+  const fundTotal = () => FUND.d.items.reduce((t, x) => t + (Number(x.cost) || 0), 0);
+  function fundEvents() {
+    const c = me().club, seen = new Set();
+    const names = [...STATIC_EVENTS.filter((e) => e.club === c && live(e)).map((e) => e.title), ...D.mine.filter((p) => p.status !== 'declined').map((p) => p.title)].filter((n) => !seen.has(n) && seen.add(n));
+    return names;
+  }
+  function renderFund() {
+    const { step, d } = FUND;
+    $('#fund-steps').innerHTML = FUND_STEPS.map((n, i) => '<li class="' + (i < step ? 'done' : i === step ? 'now' : '') + '"' + (i === step ? ' aria-current="step"' : '') + '><span class="step-n">' + (i + 1) + '</span>' + n + '</li>').join('');
+    $('#fund-err').textContent = '';
+    $('[data-testid="fund-back"]').style.visibility = step ? 'visible' : 'hidden';
+    $('[data-testid="fund-next"]').textContent = step === 3 ? 'Send to the USC' : 'Next';
+    const body = $('#fund-body');
+    if (step === 0) {
+      const names = fundEvents();
+      body.innerHTML = '<p class="fund-q">Which event is this for?</p>' + ddHTML('fund-event', 'Event', [...names.map((n) => [n, n]), ['__other', 'Something else']], d.eventPick || names[0] || '__other') +
+        '<label class="lg-creds" id="fund-other-wrap"><span class="field">Name of the event</span><input id="fund-other" class="text-input" maxlength="100" value="' + esc(d.other) + '" data-bind="other" data-testid="fund-other"></label>';
+      d.eventPick = $('#fund-event').dataset.value;
+      $('#fund-other-wrap').hidden = d.eventPick !== '__other';
+    } else if (step === 1) {
+      body.innerHTML = '<p class="fund-q">What do you need money for?</p><div class="budget-rows">' + d.items.map((x, i) => '<div class="budget-row"><input class="text-input" placeholder="Item, like Food" maxlength="80" aria-label="Item ' + (i + 1) + '" value="' + esc(x.what) + '" data-item="' + i + '" data-key="what" data-testid="item-what-' + i + '"><label class="money-input"><span aria-hidden="true">$</span><input class="text-input" inputmode="decimal" placeholder="0" aria-label="Cost of item ' + (i + 1) + '" value="' + esc(x.cost) + '" data-item="' + i + '" data-key="cost" data-testid="item-cost-' + i + '"></label>' + (d.items.length > 1 ? '<button class="linkbtn" type="button" data-act="fund-del" data-v="' + i + '">Remove</button>' : '') + '</div>').join('') + '</div>' +
+        '<div class="row spread"><button class="btn ghost small" type="button" data-act="fund-add" data-testid="fund-add">Add another</button><p class="fund-total">Total <b id="fund-total" data-testid="fund-total">' + money(fundTotal()) + '</b></p></div>';
+    } else if (step === 2) {
+      body.innerHTML = '<label class="lg-creds"><span class="field">Why does this event need the money?</span><textarea id="fund-purpose" class="text-input" rows="3" maxlength="500" data-bind="purpose" data-testid="fund-purpose">' + esc(d.purpose) + '</textarea></label>' +
+        '<div class="fund-two"><label class="lg-creds"><span class="field">People you expect</span><input class="text-input" inputmode="numeric" value="' + esc(d.attendance) + '" data-bind="attendance" data-testid="fund-attendance"></label><label class="lg-creds"><span class="field">Needed by</span><input class="text-input" type="date" value="' + esc(d.neededBy) + '" data-bind="neededBy" data-testid="fund-needed"></label></div>';
+    } else {
+      const f = { items: d.items.map((x) => ({ what: x.what, cost: Number(x.cost) })), amount: fundTotal() };
+      body.innerHTML = '<p class="fund-q">Does this look right?</p><dl class="review-list"><dt>Event</dt><dd>' + esc(fundEventName()) + '</dd><dt>Why</dt><dd>' + esc(d.purpose) + '</dd><dt>People</dt><dd>' + esc(d.attendance) + '</dd><dt>Needed by</dt><dd>' + esc(d.neededBy) + '</dd></dl>' + budgetHTML(f);
+    }
+    fade(body, 220);
+    const first = body.querySelector('input,textarea,.dd-btn');
+    if (first) first.focus();
+  }
+  const fundEventName = () => (FUND.d.eventPick === '__other' ? FUND.d.other.trim() : FUND.d.eventPick);
+  function fundCheck() {
+    const { step, d } = FUND;
+    if (step === 0 && !fundEventName()) return 'Please name the event.';
+    if (step === 1) {
+      const rows = d.items.filter((x) => String(x.what).trim() || String(x.cost).trim());
+      if (!rows.length) return 'Please add at least one item.';
+      if (rows.some((x) => !String(x.what).trim())) return 'Please name each item.';
+      if (rows.some((x) => !(Number(x.cost) > 0))) return 'Please enter a cost for each item, like 120.';
+      d.items = rows;
+    }
+    if (step === 2) {
+      if (!d.purpose.trim()) return 'Please say why the event needs the money.';
+      if (!/^\d+$/.test(String(d.attendance).trim()) || Number(d.attendance) < 1) return 'Please say how many people you expect, like 50.';
+      if (!d.neededBy) return 'Please choose when you need it by.';
+    }
+    return '';
+  }
+  function openFund() {
+    if (!isClub()) return;
+    FUND.step = 0;
+    FUND.d = { eventPick: '', other: '', items: [{ what: '', cost: '' }], purpose: '', attendance: '', neededBy: '' };
+    renderFund();
+    openDialog($('#dlg-fund'));
+  }
+  ddChange['fund-event'] = (v) => { FUND.d.eventPick = v; $('#fund-other-wrap').hidden = v !== '__other'; if (v === '__other') $('#fund-other').focus(); };
+  $('#fund-form').addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.dataset.bind) FUND.d[t.dataset.bind] = t.value;
+    if (t.dataset.item !== undefined) { FUND.d.items[t.dataset.item][t.dataset.key] = t.dataset.key === 'cost' ? t.value.replace(/[$,\s]/g, '') : t.value; $('#fund-total').textContent = money(fundTotal()); }
+  });
+  $('#fund-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = fundCheck();
+    if (err) { $('#fund-err').textContent = err; return; }
+    if (FUND.step < 3) { FUND.step++; renderFund(); return; }
+    const d = FUND.d, btn = $('[data-testid="fund-next"]');
+    btn.disabled = true;
+    try {
+      await api('/api/funding', { event: fundEventName(), items: d.items.map((x) => ({ what: x.what, cost: Number(x.cost) })), attendance: Number(d.attendance), purpose: d.purpose, neededBy: d.neededBy });
+      await refresh();
+      closeDialog($('#dlg-fund'));
+      toast('Sent to the USC. You’ll see their answer here.');
+    } catch (x) { $('#fund-err').textContent = x.message; } finally { btn.disabled = false; }
   });
 
   /* ---------- chat bubbles and buttons, shared by the post assistant and help ---------- */
@@ -803,10 +1033,6 @@ dialog.sheet[open]::backdrop{opacity:1}
       take(v, d) { const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m) return 'Please pick a date.'; const t = new Date(+m[1], +m[2] - 1, +m[3], 23, 59).getTime(); if (t < Date.now()) return 'That date has already passed. Please pick a later one.'; d.ends = t; } },
     { ask: 'Which category fits best?', input: 'choice', options: CATEGORIES, pick(c, d) { d.cat = c; } },
     { ask: 'Want to add a picture?', input: 'file' },
-    { ask: 'Do you need funding from the USC for this event?', input: 'choice', options: ['No funding', 'Request funding'], pick(c, d) { d.wantsFunding = c === 'Request funding'; } },
-    { ask: 'How much do you need? For example: 250', input: 'text', when: (d) => d.wantsFunding,
-      take(v, d) { const n = Number(v.replace(/[$,\s]/g, '')); if (!v || !Number.isFinite(n) || n <= 0 || n > 100000) return 'Please enter a dollar amount, like 250.'; d.amount = Math.round(n * 100) / 100; } },
-    { ask: 'What will the money pay for?', input: 'text', when: (d) => d.wantsFunding, take(v, d) { if (!v || v.length > 200) return 'Please say what it’s for, up to 200 characters.'; d.purpose = v; } },
   ];
   function nextStep() { CHAT.step++; askStep(); }
   function askStep() {
@@ -855,7 +1081,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   function showPreview() {
     const d = CHAT.d;
     $('#chat-form').hidden = true;
-    say('#chat-log', 'Here’s your request:\n' + d.title + '\n' + d.date + '\n' + d.place + '\n' + d.cat + '\n' + (d.post ? 'Instagram post linked' : 'No Instagram link') + '\n' + (d.wantsFunding ? 'Funding: ' + money(d.amount) + ' for ' + d.purpose : 'No funding'), null, d.img);
+    say('#chat-log', 'Here’s your request:\n' + d.title + '\n' + d.date + '\n' + d.place + '\n' + d.cat + '\n' + (d.post ? 'Instagram post linked' : 'No Instagram link'), null, d.img);
     setButtons('#chat-actions', [chatBtn('Request approval', requestApproval, false, 'chat-request'), chatBtn('Start over', startChat, true)]);
   }
   async function requestApproval() {
@@ -863,7 +1089,7 @@ dialog.sheet[open]::backdrop{opacity:1}
     if (!isClub()) return;
     setButtons('#chat-actions', []);
     try {
-      await api('/api/posts', { title: d.title, date: d.date, place: d.place, ends: d.ends, post: d.post || '', img: d.img || '', cat: d.cat, funding: d.wantsFunding ? { amount: d.amount, purpose: d.purpose } : null });
+      await api('/api/posts', { title: d.title, date: d.date, place: d.place, ends: d.ends, post: d.post || '', img: d.img || '', cat: d.cat });
       await refresh();
     } catch (e) {
       say('#chat-log', e.message);
@@ -875,7 +1101,7 @@ dialog.sheet[open]::backdrop{opacity:1}
   }
   function startChat() {
     CHAT.reset();
-    say('#chat-log', 'Hi, ' + me().short + ' president. A few short questions and I’ll send your post to the USC for approval. You can ask for funding along the way. Type “start over” at any time.');
+    say('#chat-log', 'Hi, ' + me().short + ' president. A few short questions and I’ll send your post to the USC for approval. Type “start over” at any time.');
     askStep();
   }
   function openChat() {
@@ -1065,11 +1291,8 @@ dialog.sheet[open]::backdrop{opacity:1}
   document.addEventListener('input', (e) => {
     if (e.target.id === 'ev-search') { UI.q = e.target.value; renderLists(); }
   });
-  document.addEventListener('change', (e) => {
-    if (e.target.id === 'ev-club') { UI.club = e.target.value; renderLists(); fade($('#feed')); rise(document.querySelectorAll('#feed .poster')); }
-    if (e.target.id === 'ev-cat') { UI.cat = e.target.value; renderLists(); fade($('#feed')); rise(document.querySelectorAll('#feed .poster')); }
-  });
   document.addEventListener('click', (e) => {
+    if (!(e.target.closest && e.target.closest('.dd'))) ddCloseAll();
     const closer = e.target.closest('[data-close]');
     if (closer) { const d = closer.closest('dialog'); if (d) closeDialog(d); return; }
     const b = e.target.closest('[data-act]');
@@ -1083,8 +1306,23 @@ dialog.sheet[open]::backdrop{opacity:1}
       case 'thread': UI.thread = v; UI.draftInbox = null; if ($('#msg-input')) $('#msg-input').value = ''; renderMessages(); fade($('#msg-log')); markOpenThreadRead(); if ($('#msg-input')) $('#msg-input').focus({ preventScroll: true }); break;
       case 'thread-back': UI.thread = null; UI.draftInbox = null; if ($('#msg-input')) $('#msg-input').value = ''; renderMessages(); break;
       case 'remove-post': act(api('/api/posts/' + id, undefined, 'DELETE').then(() => refresh()).then(() => toast('Post removed.'))); break;
-      case 'review': act(api('/api/posts/' + id + '/review', { status: v }).then(() => refresh()).then(() => toast(v === 'approved' ? 'Approved. It’s on Home now.' : 'Post declined.'))); break;
-      case 'fund': act(api('/api/posts/' + id + '/funding', { status: v }).then(() => refresh()).then(() => toast(v === 'approved' ? 'Funding approved.' : 'Funding declined.'))); break;
+      case 'dd': { const dd = b.closest('.dd'); if (dd.querySelector('.dd-menu').hidden) ddOpen(dd); else ddClose(dd); break; }
+      case 'dd-opt': ddPick(b); break;
+      case 'fund-start': openFund(); break;
+      case 'fund-add': FUND.d.items.push({ what: '', cost: '' }); renderFund(); break;
+      case 'fund-del': FUND.d.items.splice(Number(v), 1); renderFund(); break;
+      case 'fund-back': FUND.step--; renderFund(); break;
+      case 'decide': {
+        const kind = b.dataset.kind, note = $('#note-' + kind + '-' + id).value.trim();
+        if (v === 'declined' && !note) { toast('Please add a short note saying why.'); $('#note-' + kind + '-' + id).focus(); break; }
+        const card = b.closest('.review-card');
+        act(api(kind === 'post' ? '/api/posts/' + id + '/review' : '/api/funding/' + id + '/decide', { status: v, note }).then(async () => {
+          if (card && card.animate && !still()) await card.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(' + (v === 'approved' ? 24 : -24) + 'px)' }], { duration: 260, easing: 'ease', fill: 'forwards' }).finished;
+          await refresh();
+          toast(v === 'approved' ? (kind === 'post' ? 'Approved. It’s on Home now.' : 'Funding approved.') : 'Declined. The club can see your note.');
+        }));
+        break;
+      }
       case 'account-yes': act(api('/api/accounts/' + id + '/decide', { approve: true }).then(() => refresh()).then(() => toast('Club president confirmed.'))); break;
       case 'account-no': act(api('/api/accounts/' + id + '/decide', { approve: false }).then(() => refresh()).then(() => toast('Declined. They keep a student account.'))); break;
       case 'account': if (me()) openAccount(); else openLogin('in'); break;
@@ -1098,12 +1336,12 @@ dialog.sheet[open]::backdrop{opacity:1}
     }
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#ask-panel').hidden && !document.querySelector('dialog[open]')) toggleAsk(false); });
-  document.addEventListener('change', (e) => {
-    if (e.target.id !== 'new-chat' || !e.target.value) return;
-    const inbox = e.target.value, have = D.threads.find((t) => t.inbox === inbox && t.title === inboxLabel(inbox));
+  ddChange['new-chat'] = (inbox) => {
+    if (!inbox) return;
+    const have = D.threads.find((t) => t.inbox === inbox && t.title === inboxLabel(inbox));
     UI.thread = have ? have.id : null; UI.draftInbox = have ? null : inbox;
     renderMessages(); markOpenThreadRead(); if ($('#msg-input')) $('#msg-input').focus();
-  });
+  };
 
     route();
   if (!tourSeen()) startTour();
